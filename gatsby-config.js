@@ -6,6 +6,6 @@
 
 module.exports = {
   /* Your site config here */
-  plugins: [],
+  plugins: ["gatsby-plugin-postcss"],
   pathPrefix: "/lg4ever",
 }
