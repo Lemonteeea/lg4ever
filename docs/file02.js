@@ -1,7 +1,7 @@
 
-  const article = {
-    title: '08 | 深入剖析浏览器中页面的渲染过程',
-    context: `
+    const article = {
+      title: '08 | 深入剖析浏览器中页面的渲染过程',
+      context: `
                     <p data-nodeid="1185" class="">
                       作为前端开发，我们的日常工作中除了编码以外，几乎大多数时间都在跟浏览器打交道。所以我们更加要吃透浏览器，掌握它到底是怎样将我们编写的代码渲染到页面中的。
                     </p>
@@ -434,5 +434,6 @@
                     </ol>
                     <p data-nodeid="1311" class="">把你的想法写在留言区吧！</p>
                   `
-  } 
-  export default article
+    } 
+    export default article
+  
