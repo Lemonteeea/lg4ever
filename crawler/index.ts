@@ -43,7 +43,7 @@ function createColumn(dirName: string) {
     const docId = parseInt(filename.replace(".html", ""))
     const name = id + (Array(2).join("0") + docId).slice(-2) + ".json"
     writeDoc(name, destStr)
-    list.push({ title, name })
+    list.push({ title, filename: name })
   })
   resList.push({
     id,
