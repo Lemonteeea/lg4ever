@@ -31,6 +31,7 @@ function createColumn(dirName: string) {
   const columnTitle = "前端进击笔记"
   const list = [] as any[]
   const fileList = fs.readdirSync(path.resolve(__dirname, `./rawHtml/${id}`))
+  fileList.sort((a, b) => parseInt(a) - parseInt(b))
   fileList.forEach(filename => {
     let htmlStr = readHtml(id, filename).trim()
     const reg = /<h1.*class=\"main-title\">.*\n\s*(.*)\n.*<\/h1>/
