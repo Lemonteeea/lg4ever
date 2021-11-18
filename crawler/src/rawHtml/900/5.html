@@ -1,0 +1,2412 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">前端性能优化方法与实战 - 拉勾教育</h1>
+
+  <meta
+    content="前端开发,前端面试,性能优化,性能指标,首屏时间,白屏,卡顿,性能平台搭建,性能监控,预警,诊断,Hybrid,加载,骨架屏,SSR 优化,WebView层,预渲染,预加载,RN,Flutter,小程序,Enhance Hybrid,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React"
+    name="keywords"
+  />
+
+  <meta
+    content="对前端工程师而言，性能优化是一项必备能力，而且，越往上走对性能优化能力要求越高。性能优化能力决定了你能否进入大厂或成为一名高级工程师。在实际工作当中，前端性能优化往往比较繁杂，防布局抖动、HTML 优化、图片加载优化等等，许多细节都需要顾及到。想要更好的掌握前端性能优化，你需要拥有正确的方法论和实战演练。"
+    name="description"
+  />
+
+  <title>前端性能优化方法与实战 - 前58集团技术副总监 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="前端性能优化方法与实战 - 前58集团技术副总监 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image/M00/94/1D/Ciqc1GAXbriAGqn3AAEgx3qPrKo991.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  前端性能优化方法与实战
+                </div>
+                <div data-v-5f686215="" class="name">
+                  溪风
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  前58集团技术副总监
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 开启刻意练习之路，进阶前端性能技术专家
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：性能优化方法论
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 体系总览：性能优化体系及关键指标设定
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 性能瓶颈点：从 URL 输入到页面加载整过程分析
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 案例分析：移动端 M 站性能优化落地注意事项
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：性能优化指标采集及上报
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 指标采集：首屏时间指标采集具体办法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 指标采集：白屏、卡顿、网络环境指标采集方法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 工具实践：性能 SDK 及上报策略设计
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：性能诊断及优化手段
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 平台实践：如何从 0 到 1 搭建前端性能平台
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 诊断清单：如何实现监控预警并进行问题诊断
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 优化手段：首屏秒开的 4 重保障
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 优化手段：白屏 300ms 和界面流畅优化技巧
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 工具实践：如何进行性能专项测试
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：Hybrid 下的进阶优化手段
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 理论分析：Hybrid 下的性能优化整体分析
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 高级进阶：保证首次加载为秒开的离线包设计
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 高级进阶：瞒天过海的骨架屏及 SSR 优化手段
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 高级进阶：WebView 层及代码架构层面优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 黑科技：详解预请求、预加载及预渲染机制
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：一线大厂性能优化体系演进
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 横向对比：百度、阿里云、美团性能方案对比
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 性能演进：RN、Flutter、小程序和 Enhance Hybrid
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 成长之路：前端技术专业能力与业务产出平衡
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 开启性能优化实践之路
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 158px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  04 | 指标采集：首屏时间指标采集具体办法
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/03/03
+                  <span data-v-1605a430="" class="auth">溪风</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/15:13"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="913"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/15:13</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            39.71M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/15:13
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="805" class="">
+                      记得那是 2014 年我刚入职
+                      58，负责整个集团前端团队，有一天公司老板突然发话，希望从整体上优化一下
+                      M 站性能。
+                    </p>
+                    <p data-nodeid="806">
+                      根据过往经验，我先是和资深前端工程师 F
+                      同学说了下我的想法，然后让他来给出具体方案。
+                    </p>
+                    <p data-nodeid="807">
+                      半个小时后，F
+                      同学就找到我说：“老大，我感觉你想多了，我们只要把首屏慢的问题给解决就行了，还需要做啥首屏指标采集，本质上还是要解决问题嘛。”
+                    </p>
+                    <p data-nodeid="808">
+                      我说：“你如果能解决当然更好了。”很快 F
+                      同学又给了我一个结论：我们列表页的首屏时间没问题。
+                    </p>
+                    <p data-nodeid="809">为什么会得出这个结论呢？</p>
+                    <p data-nodeid="810">
+                      原来，F 同学是在内网通过 Chrome DevTools
+                      观察首屏时间的，这样内外网络环境就不同，首屏时间也会受到影响；还有，他使用的是调试工具，而用户是直接访问的，访问方式不同；最后，他观察首屏时间的手机只有几种，而真实用户人不同，手机型号也有很大不同。
+                    </p>
+                    <p data-nodeid="811">
+                      如此复杂的环境，我们到底该如何了解用户的首屏时间？大量用户的首屏时间分布又是怎样的？性能差的用户首屏时间是多少？想要了解这些并对首屏时间进行优化，我们首先要做的就是首屏指标采集。
+                    </p>
+                    <p data-nodeid="812">那么，具体都有哪些采集方式呢？</p>
+                    <p data-nodeid="813">
+                      在实际当中，首屏指标采集有手动采集和自动化采集两种，接下来我就来为你分别介绍下。
+                    </p>
+                    <h3 data-nodeid="814">手动采集办法及优缺点</h3>
+                    <p data-nodeid="815">
+                      <strong data-nodeid="910"
+                        >所谓手动采集，一般是通过埋点的方式进行，</strong
+                      >
+                      比如在页面开始位置打上 FMP.Start()，在首屏结束位置打上
+                      FMP.End()，利用 FMP.End()-FMP.Start() 获取到首屏时间。
+                    </p>
+                    <p data-nodeid="816">
+                      以电商平台为例，如果是电商类商品详情页，首屏包括头图、购买、商品信息、下单按钮等，就在这些内容加载完毕的位置打上首屏结束的点。
+                    </p>
+                    <p data-nodeid="817">
+                      如果是电商列表页，瀑布流型的页面，需要根据各个机型下的首屏位置，估算一个平均的首屏位置，然后打上点。
+                    </p>
+                    <p data-nodeid="818">
+                      如果是直播型的页面，页面核心是一个直播框，就需要在直播框的结束位置，打上点。
+                    </p>
+                    <p data-nodeid="819">手动采集都有哪些优点和缺点呢？</p>
+                    <p data-nodeid="820">
+                      首先是它兼容性强，业务同学知道在这个业务场景下首屏结束点在哪里，可以随情况变动。其次是去中心化，各个业务负责自己的打点代码，有问题时业务同学去排查即可，假如一条业务出现问题，并不会影响其他业务。
+                    </p>
+                    <p data-nodeid="821">
+                      缺点方面，手动采集会和业务代码严重耦合，如果首屏采集逻辑调整，业务代码也需要修改；还有，它的覆盖率不足，因为要手动采集，业务一旦忙起来，性能优化方案就会延迟排后。
+                    </p>
+                    <p data-nodeid="822">
+                      最后，手动采集的统计结果并不精确，因为依赖于人，每个人对首屏的理解有偏差，经常打错或者忘记打点。
+                    </p>
+                    <h3 data-nodeid="823">自动化采集优势及办法</h3>
+                    <p data-nodeid="824">
+                      接下来我们看自动化采集。获取首屏时间，目前业界还是以自动化采集为主。<strong
+                        data-nodeid="924"
+                        >所谓自动化采集，即引入一段通用的代码来做首屏时间自动化采集，引入过程中，除了必要的配置不需要做其他事情</strong
+                      >。
+                    </p>
+                    <p data-nodeid="825">
+                      自动化采集的好处是独立性更强，接入过程更自动化。具体的自动化采集代码，可以由一个公共团队来开发，试点后，推广到各个业务团队。而且统计结果更标准化，同一段统计代码，标准更统一，业务侧同学也更认可这个统计结果。
+                    </p>
+                    <p data-nodeid="826">
+                      当然，它也有缺点，最明显的是，有些个性化需求无法满足，毕竟在工作中，总会有一些特殊业务场景。所以，采用自动化采集方案必须做一些取舍。
+                    </p>
+                    <p data-nodeid="827">
+                      既然是自动化采集，具体怎么采集呢？都有哪些办法？
+                    </p>
+                    <p data-nodeid="828">
+                      首屏指标自动化采集，需要考虑是服务端模板业务，还是单页面（SPA）应用开发业务，业务场景不同，对应的采集方法也不同。下面我来分别介绍下。
+                    </p>
+                    <h4 data-nodeid="829">服务端模板业务下的采集办法</h4>
+                    <p data-nodeid="830">
+                      提到服务端模板业务，很多人可能会问，现在不都是 Vue 和
+                      React 这些单页面应用的天下了吗？其实在一些 B
+                      端业务的公司用的还是服务端模板，如 Velocity、Smarty
+                      等。另外大名鼎鼎的 SSR 用的也是服务端模板。
+                    </p>
+                    <p data-nodeid="831">
+                      这些业务后端比较重，前端偏配合，出于效率方面的考虑，前后端并没有解耦。因此，公司内部研发同学既做前端又做后端，这时候如果使用现在流行的
+                      Vue/React，无疑会增加学习成本。
+                    </p>
+                    <p data-nodeid="832">
+                      那服务端模板项目的加载流程是怎样的呢？
+                    </p>
+                    <p data-nodeid="833">
+                      大致流程是这样的：HTTP 请求 → HTML 文档加载解析完成 →
+                      加载样式和脚本文件 → 完成页面渲染。
+                    </p>
+                    <p data-nodeid="834">
+                      其中，HTML
+                      文档加载解析完成的时间点，就是首屏时间点，而要采集这个首屏时间，可以用浏览器提供的
+                      DOMContentLoaded 接口来实现。
+                    </p>
+                    <p data-nodeid="835">
+                      我们来直观看一下什么是 DOMContentLoaded。打开 Chrome
+                      浏览器调试工具，进入 Network
+                      选项，重新加载网页，我们就会得到这么一张图。
+                    </p>
+                    <p data-nodeid="836">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/0F/EB/Cgp9HWA-BM6AF77NAAHEtECWVO0860.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="938"
+                      />
+                    </p>
+                    <div data-nodeid="837">
+                      <p style="text-align: center">DOMContentLoaded 示意图</p>
+                    </div>
+                    <p data-nodeid="838">
+                      右侧中间竖向的一条蓝线，代表了 DOMContentLoaded
+                      这个事件触发的时间，而下面的蓝色文字（DOMContentLoaded
+                      1.02s），代表 HTML 元素加载解析完成用了 1.02
+                      秒。根据服务端模板项目加载流程，我们就知道这个时间就是首屏时间。
+                    </p>
+                    <p data-nodeid="839">
+                      那么，DOMContentLoaded 时间具体的采集思路是怎样的呢？
+                    </p>
+                    <p data-nodeid="840">
+                      当页面中的 HTML
+                      元素被加载和解析完成（不需要等待样式表、图片和一些脚本的加载过程），DOMContentLoaded
+                      事件触发。此时我们记录下当前时间
+                      domContentLoadedEventEnd，再减去页面初始进入的时间
+                      fetchStart，就是 DOMContentLoaded
+                      的时间，也就是我们要采集的首屏时间。<br />
+                      即首屏时间=DOMContentLoaded
+                      时间=domContentLoadedEventEnd-fetchStart。
+                    </p>
+                    <p data-nodeid="841">
+                      那么，这种采集方法可以照搬到单页面应用下吗？答案是不可以。
+                    </p>
+                    <h4 data-nodeid="842">单页面（SPA）应用业务下的采集办法</h4>
+                    <p data-nodeid="843">
+                      SPA 页面首屏时间采集会有什么不同？如果也使用 Performance
+                      API 会有什么问题？
+                    </p>
+                    <p data-nodeid="844">
+                      我举个例子，在 2018 年 6 月的 GMTC
+                      大会上，阿里云曾分享了他们的一个首屏指标采集结果：
+                    </p>
+                    <blockquote data-nodeid="845">
+                      <p data-nodeid="846">
+                        使用 Performance API 接口采集的首屏时间是 1106ms<br />
+                        实际的首屏时间是 1976ms
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="847">为什么偏差如此大呢？</p>
+                    <p data-nodeid="848">
+                      原来在 Vue 页面中，整体加载流程是这样的。
+                    </p>
+                    <p data-nodeid="849">
+                      用户请求一个页面时，页面会先加载
+                      index.html，加载完成后，就会触发 DOMContentLoaded 和
+                      load。而这个时候，页面展示的只是个空白页。此时根本不算真正意义的首屏。接下来，页面会加载相关脚本资源并通过
+                      axios
+                      异步请求数据，使用数据渲染页面主题部分，这个时候首屏才渲染完成。
+                    </p>
+                    <p data-nodeid="850">
+                      正是这个原因造成了用 Performance 接口取得的时间是
+                      1106ms，实际时间则是 1976ms，差距如此之大。可以说，SPA
+                      的流行让 Performance
+                      接口失去了原来的意义。那么，这种情况下怎么采集首屏指标呢？可以使用
+                      MutationObserver 采集首屏时间。
+                    </p>
+                    <p data-nodeid="851">
+                      SPA 页面因为无法基于 DOMContentLoaded
+                      做首屏指标采集，最初我们想过使用技术栈的生命周期来解决这个问题。
+                    </p>
+                    <p data-nodeid="852">
+                      比如，我们以 Vue 为例，记录首屏各个组件 mounted
+                      的时间，最终在 onload 时，统计出最后一个组件 mounted
+                      的时间，做为首屏时间。但很快，我就发现这个方案存在以下问题。
+                    </p>
+                    <ol data-nodeid="853">
+                      <li data-nodeid="854">
+                        <p data-nodeid="855">
+                          如果一个首屏页面的内容没有被组件化，那么首屏时间无法被统计到，除非各个业务都定一套组件标准，首屏内容必须封装成组件。
+                        </p>
+                      </li>
+                      <li data-nodeid="856">
+                        <p data-nodeid="857">
+                          前面也提过 onload 的时间并非最终时间，可能 onload
+                          时，首屏还没加载完。
+                        </p>
+                      </li>
+                      <li data-nodeid="858">
+                        <p data-nodeid="859">
+                          没有考虑首屏是张图片的情况，在这种情况，首屏虽然加载完成了，可是图片是异步的，图片并没有加载，试想你会在看不到商品图片的情况下，直接下单吗？
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="860">
+                      当时我们就想，如果能在首屏渲染过程中，把各个资源的加载时间记录到日志中，后续再通过分析，确定某一个资源加载完的时间，就是首屏时间。而
+                      MutationObserver 恰恰可以做到这些。
+                    </p>
+                    <p data-nodeid="861">
+                      MutationObserver 是什么意思呢？请看 MDN 上关于它的定义：
+                    </p>
+                    <blockquote data-nodeid="862">
+                      <p data-nodeid="863">
+                        MutationObserver 接口提供了监视对 DOM
+                        树所做更改的能力。它被设计为旧的 Mutation Events
+                        功能的替代品，该功能是 DOM3 Events 规范的一部分。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="864">
+                      简单来说， 使用 MutationObserver
+                      能监控页面信息的变化，当页面 body
+                      变化最剧烈的时候，我们拿到的时间数据，就是首屏时间。
+                    </p>
+                    <p data-nodeid="865">但具体怎么做呢？</p>
+                    <p data-nodeid="866">
+                      首先，在用户进入页面时，我们可以使用 MutationObserver 监控
+                      DOM 元素 （Document Object Model，文档对象模型）。当 DOM
+                      元素发生变化时，程序会标记变化的元素，记录时间点和分数，存储到数组中。数据的格式类似于
+                      [200ms,18.5] 。
+                    </p>
+                    <p data-nodeid="867">
+                      为了提升计算的效率，我们认为首屏指标采集到某些条件时，首屏渲染已经结束，我们需要考虑首屏采集终止的条件，即计算时间超过
+                      30 秒还没有结束；计算了 4 轮且 1 秒内分数不再变化；计算了
+                      9 次且分数不再变化。
+                    </p>
+                    <p data-nodeid="868">接下来，设定元素权重计算分数。</p>
+                    <p data-nodeid="869">
+                      递归遍历 DOM
+                      元素及其子元素，根据子元素所在层数设定元素权重，比如第一层元素权重是
+                      1，当它被渲染时得 1 分，每增加一层权重增加
+                      0.5，比如第五层元素权重是 3.5，渲染时给出对应分数。
+                    </p>
+                    <p data-nodeid="870">为什么需要权重呢？</p>
+                    <p data-nodeid="871">
+                      因为页面中每个 DOM
+                      元素对于首屏的意义是不同的，越往内层越接近真实的首屏内容，如图片和文字，越往外层越接近
+                      body 等框架层。
+                    </p>
+                    <p data-nodeid="872">
+                      最后，根据前面的得分，计算元素的分数变化率，获取变化率最大点对应的分数。然后找到该分数对应的时间，即为首屏时间。
+                    </p>
+                    <p data-nodeid="873">
+                      分数部分核心计算逻辑是递归遍历元素，将一些无用的标签排除，如果元素超过可视范围返回
+                      0 分，每一层增加 0.5 的权重，具体请看下面代码示例。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">CScor</span>(<span class="hljs-params">el, tiers, parentScore</span>) </span>{
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">let</span> score = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">const</span> tagName = el.tagName;
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">if</span> (<span class="hljs-string">"SCRIPT"</span> !== tagName &amp;&amp; <span class="hljs-string">"STYLE"</span> !== tagName &amp;&amp; <span class="hljs-string">"META"</span> !== tagName &amp;&amp; <span class="hljs-string">"HEAD"</span> !== tagName) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">const</span> childrenLen = el.children ? el.children.length : <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (childrenLen &gt; <span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> childs = el.children, len = childrenLen - <span class="hljs-number">1</span>; len &gt;= <span class="hljs-number">0</span>; len--) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; score += calculateScore(childs[len], tiers + <span class="hljs-number">1</span>, score &gt; <span class="hljs-number">0</span>);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (score &lt;= <span class="hljs-number">0</span> &amp;&amp; !parentScore) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (!(el.getBoundingClientRect &amp;&amp; el.getBoundingClientRect().top &lt; WH)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; score += <span class="hljs-number">1</span> + <span class="hljs-number">.5</span> * tiers;
+</div></li><li><div class="code-word">&nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">return</span> score;
+</div></li><li><div class="code-word">&nbsp; }
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="875">
+                      变化率部分核心计算逻辑是获取 DOM
+                      变化最大时对应的时间，代码如下所示。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">calFinallScore() {
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">try</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.sendMark) <span class="hljs-keyword">return</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">const</span> time = <span class="hljs-built_in">Date</span>.now() - performance.timing.fetchStart;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> isCheckFmp = time &gt; <span class="hljs-number">30000</span> || SCORE_ITEMS &amp;&amp; SCORE_ITEMS.length &gt; <span class="hljs-number">4</span> &amp;&amp; time - (SCORE_ITEMS &amp;&amp; SCORE_ITEMS.length &amp;&amp; SCORE_ITEMS[SCORE_ITEMS.length - <span class="hljs-number">1</span>].t || <span class="hljs-number">0</span>) &gt; <span class="hljs-number">2</span> * CHECK_INTERVAL || (SCORE_ITEMS.length &gt; <span class="hljs-number">10</span> &amp;&amp; <span class="hljs-built_in">window</span>.performance.timing.loadEventEnd !== <span class="hljs-number">0</span> &amp;&amp; SCORE_ITEMS[SCORE_ITEMS.length - <span class="hljs-number">1</span>].score === SCORE_ITEMS[SCORE_ITEMS.length - <span class="hljs-number">9</span>].score);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.observer &amp;&amp; isCheckFmp) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">this</span>.observer.disconnect();
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-built_in">window</span>.SCORE_ITEMS_CHART = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-built_in">JSON</span>.stringify(SCORE_ITEMS));
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">let</span> fmps = getFmp(SCORE_ITEMS);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">let</span> record = <span class="hljs-literal">null</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> o = <span class="hljs-number">1</span>; o &lt; fmps.length; o++) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (fmps[o].t &gt;= fmps[o - <span class="hljs-number">1</span>].t) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">let</span> l = fmps[o].score - fmps[o - <span class="hljs-number">1</span>].score;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (!record || record.rate &lt;= l) &amp;&amp; (record = {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-attr">t</span>: fmps[o].t,
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-attr">rate</span>: l
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; });
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-comment">//</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">this</span>.fmp = record &amp;&amp; record.t || <span class="hljs-number">30001</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">try</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">this</span>.checkImgs(<span class="hljs-built_in">document</span>.body)
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">let</span> max = <span class="hljs-built_in">Math</span>.max(...this.imgs.map(<span class="hljs-function"><span class="hljs-params">element</span> =&gt;</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span>(<span class="hljs-regexp">/^(\/\/)/</span>.test(element)) element = <span class="hljs-string">'https:'</span> + element;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">try</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> performance.getEntriesByName(element)[<span class="hljs-number">0</span>].responseEnd || <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } <span class="hljs-keyword">catch</span> (error) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }))
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; record &amp;&amp; record.t &gt; <span class="hljs-number">0</span> &amp;&amp; record.t &lt; <span class="hljs-number">36e5</span> ? <span class="hljs-keyword">this</span>.setPerformance({
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-attr">fmpImg</span>: <span class="hljs-built_in">parseInt</span>(<span class="hljs-built_in">Math</span>.max(record.t , max))
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }) : <span class="hljs-keyword">this</span>.setPerformance({});
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; } <span class="hljs-keyword">catch</span> (error) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">this</span>.setPerformance({});
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-comment">// console.error(error)</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">this</span>.calFinallScore();
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }, CHECK_INTERVAL);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; } <span class="hljs-keyword">catch</span> (error) {
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">&nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; }
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="877">这个就是首屏计算的部分流程。</p>
+                    <p data-nodeid="878">
+                      看完前面的流程，不知道你有没有这样的疑问：如果页面里包含图片，使用上面的首屏指标采集方案，结果准确吗？
+                    </p>
+                    <p data-nodeid="879">
+                      结论是：不准确。上述计算逻辑主要是针对 DOM
+                      元素来做的，图片加载过程是异步，图片容器（图片的 DOM
+                      元素）和内容的加载是分开的，当容器加载出来时，内容还没出来，一定要确保内容加载出来，才算首屏。
+                    </p>
+                    <p data-nodeid="880">
+                      这就需要增加一些策略了，以下是包含图片页面的首屏计算
+                      demo。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="xml"><ol><li><div class="code-word"><span class="hljs-meta">&lt;!doctype <span class="hljs-meta-keyword">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"imgTest"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://www.baidu.com/img/bd_logo1.png?where=super"</span>&gt;</span>
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"imgTest"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://www.baidu.com/img/bd_logo1.png?where=super"</span>&gt;</span>
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-tag">&lt;<span class="hljs-name">style</span> <span class="hljs-attr">type</span>=<span class="hljs-string">text/css</span>&gt;</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; background-image:url('https://www.baidu.com/img/dong_8f1d47bcb77d74a1e029d8cbb3b33854.gif);
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript">
+</span></div></li><li><div class="code-word">(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-keyword">const</span> imgs = []
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-keyword">const</span> getImageDomSrc = {
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-attr">_getImgSrcFromBgImg</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">bgImg</span>) </span>{
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> imgSrc;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> matches = bgImg.match(<span class="hljs-regexp">/url\(.*?\)/g</span>);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (matches &amp;&amp; matches.length) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> urlStr = matches[matches.length - <span class="hljs-number">1</span>];
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> innerUrl = urlStr.replace(<span class="hljs-regexp">/^url\([\'\"]?/</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/[\'\"]?\)$/</span>, <span class="hljs-string">''</span>);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (((<span class="hljs-regexp">/^http/</span>.test(innerUrl) || <span class="hljs-regexp">/^\/\//</span>.test(innerUrl)))) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; imgSrc = innerUrl;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> imgSrc;
+</div></li><li><div class="code-word">&nbsp; &nbsp; },
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-attr">getImgSrcFromDom</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom, imgFilter</span>) </span>{
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (!(dom.getBoundingClientRect &amp;&amp; dom.getBoundingClientRect().top &lt; <span class="hljs-built_in">window</span>.innerHeight))
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; imgFilter = [<span class="hljs-regexp">/(\.)(png|jpg|jpeg|gif|webp|ico|bmp|tiff|svg)/i</span>]
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> src;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (dom.nodeName.toUpperCase() == <span class="hljs-string">'IMG'</span>) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; src = dom.getAttribute(<span class="hljs-string">'src'</span>);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> computedStyle = <span class="hljs-built_in">window</span>.getComputedStyle(dom);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> bgImg = computedStyle.getPropertyValue(<span class="hljs-string">'background-image'</span>) || computedStyle.getPropertyValue(<span class="hljs-string">'background'</span>);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> tempSrc = <span class="hljs-keyword">this</span>._getImgSrcFromBgImg(bgImg, imgFilter);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (tempSrc &amp;&amp; <span class="hljs-keyword">this</span>._isImg(tempSrc, imgFilter)) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; src = tempSrc;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> src;
+</div></li><li><div class="code-word">&nbsp; &nbsp; },
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-attr">_isImg</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">src, imgFilter</span>) </span>{
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, len = imgFilter.length; i &lt; len; i++) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (imgFilter[i].test(src)) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; },
+</div></li><li><div class="code-word">&nbsp; &nbsp; traverse(e) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> _this = <span class="hljs-keyword">this</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; , tName = e.tagName;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (<span class="hljs-string">"SCRIPT"</span> !== tName &amp;&amp; <span class="hljs-string">"STYLE"</span> !== tName &amp;&amp; <span class="hljs-string">"META"</span> !== tName &amp;&amp; <span class="hljs-string">"HEAD"</span> !== tName) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> el = <span class="hljs-keyword">this</span>.getImgSrcFromDom(e)
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (el &amp;&amp; !imgs.includes(el))
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; imgs.push(el)
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> len = e.children ? e.children.length : <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">if</span> (len &gt; <span class="hljs-number">0</span>)
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> child = e.children, _len = len - <span class="hljs-number">1</span>; _len &gt;= <span class="hljs-number">0</span>; _len--)
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _this.traverse(child[_len]);
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; }
+</div></li><li><div class="code-word">&nbsp; getImageDomSrc.traverse(<span class="hljs-built_in">document</span>.body);
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-built_in">window</span>.onload=<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-keyword">var</span> max = <span class="hljs-built_in">Math</span>.max(...imgs.map(<span class="hljs-function"><span class="hljs-params">element</span> =&gt;</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp;<span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^(\/\/)/</span>.test(element))
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; element = <span class="hljs-string">'https:'</span> + element;
+</div></li><li><div class="code-word">&nbsp; &nbsp; <span class="hljs-keyword">try</span> {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> performance.getEntriesByName(element)[<span class="hljs-number">0</span>].responseEnd || <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; } <span class="hljs-keyword">catch</span> (error) {
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">&nbsp; &nbsp; }
+</div></li><li><div class="code-word">&nbsp; }
+</div></li><li><div class="code-word">&nbsp; ))
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-built_in">console</span>.log(max);
+</div></li><li><div class="code-word">&nbsp; }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">)()
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="882">它的计算逻辑是这样的。</p>
+                    <p data-nodeid="883">
+                      首先，获取页面所有的图片路径。在这里，图片类型分两种，一种是带
+                      IMG 标签的，一种是带 DIV 标签的。前者可以直接通过 src
+                      值得到图片路径，后者可以使用 window.getComputedStyle(dom)
+                      方式获取它的样式集合。
+                    </p>
+                    <p data-nodeid="884">
+                      接下来，通过正则获取图片的路径即可。
+                    </p>
+                    <p data-nodeid="885">
+                      然后通过
+                      performance.getEntriesByName(element)[0].responseEnd
+                      的方式获取到对应图片路径的下载时间，最后与使用
+                      MutationObserver 获得的 DOM
+                      首屏时间相比较，哪个更长，哪个就是最终的首屏时间。
+                    </p>
+                    <p data-nodeid="886">以上就是首屏采集的完整流程。</p>
+                    <h3 data-nodeid="1397">小结</h3>
+                    <p data-nodeid="1398" class="te-preview-highlight">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/13/4C/CioPOWBB_OyAW8ipAAFZ1B6bNmQ490.png"
+                        alt="溪风的思维导图04.png"
+                        data-nodeid="1402"
+                      />
+                    </p>
+
+                    <p data-nodeid="889">
+                      这一讲我主要介绍了首屏指标采集相关的内容。不知道你看完后有没有这样的疑惑：这种性能采集方案靠谱吗？目前一线大厂有谁在使用这种采集方案？采集过程中会不会有什么坑？
+                    </p>
+                    <p data-nodeid="890">
+                      先说靠不靠谱，目前来说，这是市面中最好的首屏指标采集方案，它兼容了单页面应用和服务端模板的页面。我们反复做了几个月的数据实验，并借助它完成了一个全公司的性能优化项目，用实验和实践结果证明这种方案的靠谱程度。
+                    </p>
+                    <p data-nodeid="891">
+                      第二个问题，一线大厂里，阿里云、淘宝、阿里飞猪、得到
+                      App、微店等公司都广泛在使用这个方案。
+                    </p>
+                    <p data-nodeid="892">
+                      最后一个问题，首屏指标采集中会不会有坑。实践中确实有不少的坑。比如，一个单页面应用，我们需要采集它的首屏时间，当我们采集首页的首屏指标时，用户恰好输入了一些东西导致页面跳转到了搜索结果页。此时首屏采集脚本继续在执行，那最终统计的就是搜索结果页的首屏数据而不是首页的
+                    </p>
+                    <p data-nodeid="893">
+                      类似这种问题，你想过怎么解决吗？欢迎在评论区和我留言进行交流。
+                    </p>
+                    <p data-nodeid="894">
+                      上面就是首屏指标采集和优化手段相关的内容，接下来看看其他的指标如何采集。
+                    </p>
+                    <p data-nodeid="895" class="">
+                      源码地址：<a
+                        href="https://github.com/lagoueduCol/WebPerformanceOptimization-xifeng"
+                        data-nodeid="1004"
+                        >https://github.com/lagoueduCol/WebPerformanceOptimization-xifeng</a
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >前端性能优化方法与实战</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **谦
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        4
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      为啥domcontentload加载完就是首屏时间？难道那时候图片都出来了？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    赞认真思考，对于首屏即是图片的情形确实是个问题，这时候如果严格的话，会求出首屏最长图片的展示时间。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *奇
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        4
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      感觉这边SPA的采集和谷歌提出的Largest Contentful Paint(LCP)
+                      有一些相似之处
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **轩
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        3
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      计算首屏时间用到的getBoundingClientRect和getComputedStyle会引起强制回流，这样得到的时间准确吗？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个确实会，赞严谨，这里确实没想到好的办法。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **东
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        3
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      github 源码不是完整代码？老师能提供完整的 demo 吗
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个和一些基础库有关，如埋点库等，后续剥离后才能对外。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **华
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        3
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      老师讲得精彩，学到了首屏指标采集相关知识
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **志
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      我们需要考虑首屏采集终止的条件，即计算时间超过 30
+                      秒还没有结束；计算了 4 轮且 1 秒内分数不再变化；计算了 9
+                      次且分数不再变化。-------请问这种判断方法是否准确呢？另外，计算四轮是怎么计算呢？计算9次，这个数字为啥是9呢？看了下贴出来的代码，完全不能跑啊。很多参数缺失。
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个是业务过程中的实验总结，也参考了行业内的的技术实现。四轮和9次都是指首屏采集的时间指标连续4次和9次的值。执行的时侯，需要自己补充一些PerFormance兼容性相关代码，然后再运行即可。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **6460
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      这个方案，是有什么参考吗，不然怎么写出这么多的，感觉挺复杂，而且代码里面还有安卓的代码，不是单纯的webapp
+                      而是webview里面加载的webapp?
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个方案参考了淘宝首屏统计方案；首屏时间的采集都是前端的代码，在卡顿指标采集时用到了Native的代码实现；是webview里面加载的webapp。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **志
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      强烈要求剥离完整代码出来，最近在做骨架屏加载，有个问题是什么时候清除骨架屏。首屏渲染，不包含计算图片渲染时间的那一段，刚好适合骨架屏。dom结构加载稳定就可以销毁骨架屏了，这种场景不需要等图片渲染出来。
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个思路不错，点赞，期待实验后给大家分享一下
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **行舟
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      老师，我们通过统计能发现首屏时间超过30s的人很多，但是这种情况应该是不可能的，如果出现这种情况是否可质疑监控的平台的准确性？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    要看一下你们业务情况，只要在webview超时范围内的首屏数据，按道理都是合适的，我们是结合了一下业务情况，超过30s在我们业务是不正常的，你提到很多应该很容易复现，看一下用户出现问题时的日志（
+                    userAgent等），用这个条件去试着复现。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 638,
+      courseCId: "",
+      courseName: "前端性能优化方法与实战",
+      teachers: [
+        {
+          id: 622,
+          teacherName: "溪风",
+          position: "前58集团技术副总监",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image/M00/94/1D/Ciqc1GAXboeAIHz2AAAfXiXvNrI157.png",
+          description: "<p>1</p>",
+        },
+      ],
+      totalCourseTime: 19,
+      totalDuration: 280,
+      sales: 10361,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image/M00/94/1D/Ciqc1GAXboeAIHz2AAAfXiXvNrI157.png",
+      sellGoodsId: 736,
+      sellGoodsPriceId: 61389,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "对前端工程师而言，性能优化是一项必备能力，而且，越往上走对性能优化能力要求越高。性能优化能力决定了你能否进入大厂或成为一名高级工程师。在实际工作当中，前端性能优化往往比较繁杂，防布局抖动、HTML 优化、图片加载优化等等，许多细节都需要顾及到。想要更好的掌握前端性能优化，你需要拥有正确的方法论和实战演练。",
+      seoKeywords:
+        "前端开发,前端面试,性能优化,性能指标,首屏时间,白屏,卡顿,性能平台搭建,性能监控,预警,诊断,Hybrid,加载,骨架屏,SSR 优化,WebView层,预渲染,预加载,RN,Flutter,小程序,Enhance Hybrid,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React",
+      seoTitle: "前端性能优化方法与实战 - 前58集团技术副总监 - 拉勾教育",
+      shareTitle: "玩转前端性能优化，看这篇就够了！",
+      shareDescription: "想升职加薪的前端看过来~",
+      brief: "掌握优化方法论，突破 Web 页面性能瓶颈",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image/M00/94/1D/Ciqc1GAXbriAGqn3AAEgx3qPrKo991.png",
+      courseType: 1,
+      previewFirstField: "共19讲",
+      previewSecondField: "已更新至第2讲",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 590,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 590,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "7faa0a72e77b48d39e3108beb9bbe172"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

@@ -614,6 +614,7 @@
                       class="
                         class-level-one
                         over-ellipsis
+                        isclick
                         class-level-one-detail
                       "
                     >
@@ -683,7 +684,6 @@
                       class="
                         class-level-one
                         over-ellipsis
-                        isclick
                         class-level-one-detail
                       "
                     >
@@ -1052,10 +1052,10 @@
             <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
               <div data-v-1605a430="">
                 <h1 data-v-1605a430="" class="main-title">
-                  10 | 掌握前端框架模板引擎的实现原理
+                  07 | HTTP 协议和前端开发有什么关系？
                 </h1>
                 <div data-v-1605a430="" class="main-tips">
-                  2021/05/05
+                  2021/04/26
                   <span data-v-1605a430="" class="auth">王贝珊（被删）</span>
                 </div>
                 <div data-v-1605a430="" class="media-player-wrap">
@@ -1094,12 +1094,12 @@
                                 "
                               ></div>
                               <div
-                                aria-valuetext="00:00/14:43"
+                                aria-valuetext="00:00/15:27"
                                 class="vue-slider-dot vue-slider-dot-hover"
                                 role="slider"
                                 aria-valuenow="0"
                                 aria-valuemin="0"
-                                aria-valuemax="883"
+                                aria-valuemax="927"
                                 aria-orientation="horizontal"
                                 tabindex="0"
                                 style="
@@ -1144,7 +1144,7 @@
                                     "
                                   >
                                     <span class="vue-slider-dot-tooltip-text"
-                                      >00:00/14:43</span
+                                      >00:00/15:27</span
                                     >
                                   </div>
                                 </div>
@@ -1154,10 +1154,10 @@
                         </div>
                         <div data-v-6ecd2302="" class="detail-wrap">
                           <div data-v-6ecd2302="" class="detail-one">
-                            38.39M
+                            40.32M
                           </div>
                           <div data-v-6ecd2302="" class="detail-two">
-                            00:00/14:43
+                            00:00/15:27
                           </div>
                         </div>
                       </div>
@@ -1175,734 +1175,465 @@
                 </div>
                 <div data-v-1605a430="" class="main-container">
                   <div data-v-1605a430="" class="rich-text-wrap">
-                    <p data-nodeid="68536">
-                      如今说起前端开发，基本上都离不开前端框架。随着前端技术不断迭代，前端框架相关的文档和社区日益完善，前端入门也越来越简单了。我们可以快速上手一些工具和框架，但常常会忽略其中的设计和原理。
+                    <p data-nodeid="1085" class="">
+                      HTTP 请求的场景相对复杂，对应的 HTTP
+                      协议也是各式各样的，因此很多时候大家都认为内容太多太杂，认为学习
+                      HTTP 协议性价比太低了。
                     </p>
-                    <p data-nodeid="68537">
-                      对框架和工具的了解不够深入，会导致我们在遇到一些偏门的问题时容易找不到方向，也不利于个人的知识领域扩展，不能很好地进行技术选型。
+                    <p data-nodeid="1086">
+                      其实我们日常开发中，经常会使用到
+                      cookie、浏览器的缓存机制、各种形式的网络连接（比如
+                      Websocket），这些网络请求相关的场景都跟 HTTP
+                      协议有密切的关系。
                     </p>
-                    <p data-nodeid="68538">
-                      今天，我会带你了解前端框架为什么会这么热门，以及介绍前端框架的核心能力——模板引擎的实现原理。在讲解的过程中，一些代码会以
-                      Vue.js 作为示例。
+                    <p data-nodeid="1087">
+                      对于前端开发来说，HTTP 协议基本上不会离开嘴边。HTTP
+                      协议的内容很多很杂，这里我先给大家梳理一下它的设计和演变。
                     </p>
-                    <p data-nodeid="68539">
-                      我们先来看一下，为什么要使用前端框架。
+                    <h3 data-nodeid="1088">认识 HTTP 协议</h3>
+                    <p data-nodeid="1089">
+                      上一讲，我们知道了网络请求的过程，当服务端建立起与客户端的
+                      TCP
+                      连接之后，服务端会持续监听客户端发起的请求。接下来，客户端将发起
+                      HTTP
+                      请求，请求内容通常包括请求方法、请求的资源等，服务端收到请求后会进行回复，回复内容通常包括
+                      HTTP 状态、响应消息等。
                     </p>
-                    <h3 data-nodeid="68540">为什么要使用前端框架</h3>
-                    <p data-nodeid="68541">
-                      一个工具被大多数人使用、成为热门，离不开相关技术发展的历史进程。了解这些工具和框架出现的原因，我们可以及时掌握技术的发展方向，保持对技术的敏感度、更新自身的认知，这些都会成为我们自身的竞争力。
+                    <p data-nodeid="1090">
+                      可以看到，网络请求的过程包括两个步骤：客户端发送请求，服务器返回响应。这就是<strong
+                        data-nodeid="1186"
+                        >HTTP
+                        协议的主要特点：遵循经典的“客户端-服务端”模型</strong
+                      >。
                     </p>
-                    <p data-nodeid="68542">
-                      前端框架也一样。在前端框架出现之前，jQuery
-                      也是前端开发必备的工具库，大多数项目中都会使用。短短几年间，前端开发却变得无法离开前端框架，这中间到底发生了什么呢？
+                    <p data-nodeid="1091">
+                      除此之外，HTTP 协议还被设计得简单易读。在 HTTP/2
+                      之前，HTTP
+                      协议是语义可读的，我们可以直观地获取其中的内容。比如：
                     </p>
-                    <h4 data-nodeid="68543">前端的飞速发展</h4>
-                    <p data-nodeid="68544">
-                      曾几何时，一提到前端，大家都会想到 jQuery。那是 jQuery
-                      一把梭的年代，不管前端后台都会用 jQuery
-                      完成页面开发。那时候前端开发的工作倾向于切图和重构，重页面样式而轻逻辑，工作内容常常是拼接
-                      JSP 模板、拼 PHP 模板以及调节浏览器兼容。
-                    </p>
-                    <p data-nodeid="68545">
-                      为什么 jQuery 那么热门呢？除了超方便的 Sizzle
-                      引擎元素选择器、简单易用的异步请求库
-                      ajax，还有链式调用的编程方式使得代码如行云流水般流畅。jQuery
-                      提供的便捷几乎满足了当时前端的大部分工作（所以说 jQuery
-                      一把梭不是毫无道理的）。
-                    </p>
-                    <p data-nodeid="68546">
-                      接下来短短的几年时间，前端经历了特别多的改变。随着 Node.js
-                      的出现、NPM
-                      包管理的完善，再加上热闹的开源社区，前端领域获得了千千万万开发者的支援。从页面开发到工具库开发、框架开发、脚本开发、到服务端开发，单线程的
-                      JavaScript
-                      正在不断进行自我革新，从而将领域不断拓宽，形成了如今你所能看到的、获得赋能的前端。
-                    </p>
-                    <p data-nodeid="68547">
-                      那么，是什么原因导致了 jQuery
-                      被逐渐冷落，前端框架站上了舞台中央呢？其中的原因有很多，包括业务场景的进化、技术的更新迭代，比如前端应用逐渐复杂、单页应用的出现、前端模块化等。
-                    </p>
-                    <h4 data-nodeid="68548">前端框架的出现</h4>
-                    <p data-nodeid="68549">
-                      前面第 8
-                      讲中，我们知道了浏览器是如何渲染页面的。从用户的角度来看，浏览器生成了最终的渲染树，并通过光栅化来将页面显示在屏幕上，页面渲染的工作就完成了。
-                    </p>
-                    <p data-nodeid="68550">
-                      实际上，浏览器页面更多的不只是静态页面的渲染，还包括点击、拖拽等事件操作以及接口请求、数据渲染到页面等动态的交互逻辑，因此我们还常常需要更新页面的内容。
-                    </p>
-                    <p data-nodeid="68551">
-                      要理解前端框架为什么如此重要，需要先看看在框架出现前，前端开发是如何实现和用户进行交互的。
-                    </p>
-                    <p data-nodeid="68552">
-                      这个过程跟上一讲事件驱动的内容很相似，以一个常见的表单提交作为例子，会包括编写静态页面、给对应的元素绑定对应的事件、事件触发时更新页面内容等步骤，这是最简单的页面交互。
-                    </p>
-                    <p data-nodeid="68553">
-                      对于更新页面内容这个步骤，如果我们页面中有很多的内容需要更新，光拼接字符串我们可能就有一大堆代码。
-                    </p>
-                    <blockquote data-nodeid="68554">
-                      <p data-nodeid="68555">
-                        以下的例子，为了不占用大量的篇幅，使用了
-                        jQuery，否则代码量会更多。
-                      </p>
-                    </blockquote>
-                    <p data-nodeid="68556">
-                      举个例子，抢答活动中常常会出现题目和多个答案进行选择，我们现在需要开发一个管理端，对这些抢答卡片进行管理。假设一个问题会包括两个答案，我们可以通过新增卡片的方式来添加一套问答，编辑卡片的过程包括这些步骤。
-                    </p>
-                    <p data-nodeid="69931" class="">
-                      <strong data-nodeid="69937">1</strong>.
-                      新增一个卡片时，通过插入 DOM 节点的方式添加卡片样式。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">var</span> index = <span class="hljs-number">0</span>;
-</div></li><li><div class="code-word"><span class="hljs-comment">// 用来新增一个卡片，卡片内需要填写一些内容</span>
-</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">addCard</span><span class="hljs-params">()</span> </span>{
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 获取一个id为the-dom的元素</span>
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> body = $(<span class="hljs-string">"#the-dom"</span>);
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 从该元素内获取class为the-class的元素</span>
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> addDom = body.find(<span class="hljs-string">".the-class"</span>);
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 在the-class元素前方插入一个div</span>
-</div></li><li><div class="code-word">  addDom.before(<span class="hljs-string">'&lt;div class="col-lg-4" data-index="'</span> + index + <span class="hljs-string">'"&gt;&lt;/div&gt;'</span>);
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 同时保存下来该DOM节点，方便更新内容</span>
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> theDom = body.find(<span class="hljs-string">'[data-index="'</span> + index + <span class="hljs-string">'"]'</span>);
-</div></li><li><div class="code-word">  theDom.innerHTML(
-</div></li><li><div class="code-word">    `&lt;input type=<span class="hljs-string">"text"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"form-control question"</span> placeholder=<span class="hljs-string">"你的问题"</span>&gt;
-</div></li><li><div class="code-word">         &lt;input type=<span class="hljs-string">"text"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"form-control option-a"</span> placeholder=<span class="hljs-string">"回答1"</span>&gt;
-</div></li><li><div class="code-word">         &lt;input type=<span class="hljs-string">"text"</span> <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"form-control option-b"</span> placeholder=<span class="hljs-string">"回答2"</span>&gt;
-</div></li><li><div class="code-word">        `
-</div></li><li><div class="code-word">  );
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 做完上面这堆之后index自增</span>
-</div></li><li><div class="code-word">  index++;
-</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> theDom;
-</div></li><li><div class="code-word">}
-</div></li></ol></code></pre>
-                    </div>
-
-                    <p data-nodeid="70496" class="">
-                      <strong data-nodeid="70502">2</strong>.
-                      卡片内编辑题目和答案时，会有字数限制（使用 jQuery
-                      对输入框的输入事件进行监听，并限制输入内容）。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// theDom使用上面代码保存下来的引用</span>
-</div></li><li><div class="code-word"><span class="hljs-comment">// 问题绑定值</span>
-</div></li><li><div class="code-word">theDom
-</div></li><li><div class="code-word">  .on(<span class="hljs-string">"keyup"</span>, <span class="hljs-string">".question"</span>, function (ev) {
-</div></li><li><div class="code-word">    ev.target.value = ev.target.value.substr(<span class="hljs-number">0</span>, <span class="hljs-number">20</span>);
-</div></li><li><div class="code-word">  })
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 答案a绑定值</span>
-</div></li><li><div class="code-word">  .on(<span class="hljs-string">"keyup"</span>, <span class="hljs-string">".option-a"</span>, function (ev) {
-</div></li><li><div class="code-word">    ev.target.value = ev.target.value.substr(<span class="hljs-number">0</span>, <span class="hljs-number">10</span>);
-</div></li><li><div class="code-word">  })
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 答案b绑定值</span>
-</div></li><li><div class="code-word">  .on(<span class="hljs-string">"keyup"</span>, <span class="hljs-string">".option-b"</span>, function (ev) {
-</div></li><li><div class="code-word">    ev.target.value = ev.target.value.substr(<span class="hljs-number">0</span>, <span class="hljs-number">10</span>);
-</div></li><li><div class="code-word">  });
-</div></li></ol></code></pre>
-                    </div>
-
-                    <p data-nodeid="71065" class="te-preview-highlight">
-                      <strong data-nodeid="71071">3</strong>.
-                      获取输入框内的内容（使用 jQuery
-                      选择元素并获取内容），用于提交到后台。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 获取卡片的输入值</span>
-</div></li><li><div class="code-word"><span class="hljs-comment">// theDom 使用上面代码保存下来的引用</span>
-</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">getCardValue</span><span class="hljs-params">(index)</span> </span>{
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> body = $(<span class="hljs-string">"#the-dom"</span>);
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> theDom = body.find(<span class="hljs-string">'[data-index="'</span> + index + <span class="hljs-string">'"]'</span>);
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> questionName = theDom.find(<span class="hljs-string">".question"</span>).val();
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> optionA = theDom.find(<span class="hljs-string">".option-a"</span>).val();
-</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> optionB = theDom.find(<span class="hljs-string">".option-b"</span>).val();
-</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> { questionName, optionA, optionB };
-</div></li><li><div class="code-word">}
-</div></li></ol></code></pre>
-                    </div>
-
-                    <p data-nodeid="68569">
-                      可以看到，仅是实现一个问答卡片的编辑就需要编写不少的代码，大多数代码内容都是为了拼接
-                      HTML 内容、获取 DOM 节点、操作 DOM 节点。<br />
-                      这些代码逻辑，如果我们使用 Vue 来实现，只需要这么写：
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;template&gt;
-</div></li><li><div class="code-word">  &lt;div v-for="card in cards"&gt;
-</div></li><li><div class="code-word">    &lt;input
-</div></li><li><div class="code-word">      type="text"
-</div></li><li><div class="code-word">      class="form-control question"
-</div></li><li><div class="code-word">      v-model="card.questionName"
-</div></li><li><div class="code-word">      placeholder="你的问题"
-</div></li><li><div class="code-word">    /&gt;
-</div></li><li><div class="code-word">    &lt;input
-</div></li><li><div class="code-word">      type="text"
-</div></li><li><div class="code-word">      class="form-control option-a"
-</div></li><li><div class="code-word">      v-model="card.optionA"
-</div></li><li><div class="code-word">      placeholder="回答1"
-</div></li><li><div class="code-word">    /&gt;
-</div></li><li><div class="code-word">    &lt;input
-</div></li><li><div class="code-word">      type="text"
-</div></li><li><div class="code-word">      class="form-control option-b"
-</div></li><li><div class="code-word">      v-model="card.optionB"
-</div></li><li><div class="code-word">      placeholder="回答2"
-</div></li><li><div class="code-word">    /&gt;
-</div></li><li><div class="code-word">  &lt;/div&gt;
-</div></li><li><div class="code-word">&lt;/template&gt;
-</div></li><li><div class="code-word">&lt;script&gt;
-</div></li><li><div class="code-word">  export default {
-</div></li><li><div class="code-word">    name: "Cards",
-</div></li><li><div class="code-word">    data() {
-</div></li><li><div class="code-word">      return {
-</div></li><li><div class="code-word">        cards: [],
-</div></li><li><div class="code-word">      };
-</div></li><li><div class="code-word">    },
-</div></li><li><div class="code-word">    methods: {
-</div></li><li><div class="code-word">      // 添加一个卡片
-</div></li><li><div class="code-word">      addCard() {
-</div></li><li><div class="code-word">        this.cards.push({
-</div></li><li><div class="code-word">          questionName: "",
-</div></li><li><div class="code-word">          optionA: "",
-</div></li><li><div class="code-word">          optionB: "",
-</div></li><li><div class="code-word">        });
-</div></li><li><div class="code-word">      },
-</div></li><li><div class="code-word">      // 获取卡片的输入值
-</div></li><li><div class="code-word">      getCardValue(index) {
-</div></li><li><div class="code-word">        return this.cards[index];
-</div></li><li><div class="code-word">      },
-</div></li><li><div class="code-word">    },
-</div></li><li><div class="code-word">  };
-</div></li><li><div class="code-word">&lt;/script&gt;
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="68571">
-                      可见，前端框架提供了便利的数据绑定、界面更新、事件监听等
-                      API，我们不需要再手动更新前端页面的内容、维护一大堆的 HTML
-                      和变量拼接的动态内容了。<br />
-                      使用前端框架对开发效率有很大的提升，同时也在一定程度上避免了代码可读性、可维护性等问题。这也是为什么前端框架这么热门，大家都会使用它来进行开发的原因。
-                    </p>
-                    <p data-nodeid="68572">
-                      那么，前端框架是怎么做到这些的呢？要实现这些能力，离不开其中的模板引擎。
-                    </p>
-                    <h3 data-nodeid="68573">前端框架的核心——模板引擎</h3>
-                    <p data-nodeid="68574">
-                      当用户对页面进行操作、页面内容更新，我们需要实现的功能流程包括：
-                    </p>
-                    <ol data-nodeid="68575">
-                      <li data-nodeid="68576">
-                        <p data-nodeid="68577">监听操作；</p>
-                      </li>
-                      <li data-nodeid="68578">
-                        <p data-nodeid="68579">获取数据变量；</p>
-                      </li>
-                      <li data-nodeid="68580">
-                        <p data-nodeid="68581">
-                          使用数据变量拼接成 HTML 模板；
+                    <ul data-nodeid="1092">
+                      <li data-nodeid="1093">
+                        <p data-nodeid="1094">
+                          HTTP 请求方法：代表着客户端的动作行为（<code
+                            data-backticks="1"
+                            data-nodeid="1189"
+                            >GET</code
+                          >-获取资源/<code data-backticks="1" data-nodeid="1191"
+                            >POST</code
+                          >-提交资源/<code data-backticks="1" data-nodeid="1193"
+                            >PUT</code
+                          >-修改资源/<code data-backticks="1" data-nodeid="1195"
+                            >DELETE</code
+                          >-删除资源）。
                         </p>
                       </li>
-                      <li data-nodeid="68582">
-                        <p data-nodeid="68583">
-                          将 HTML 内容塞到页面对应的地方；
+                      <li data-nodeid="1095">
+                        <p data-nodeid="1096">
+                          HTTP 状态码：代表着当前请求的状态（<code
+                            data-backticks="1"
+                            data-nodeid="1198"
+                            >1XX</code
+                          >-提示信息/<code data-backticks="1" data-nodeid="1200"
+                            >2XX</code
+                          >-成功/<code data-backticks="1" data-nodeid="1202"
+                            >3XX</code
+                          >-重定向/<code data-backticks="1" data-nodeid="1204"
+                            >4XX</code
+                          >-客户端错误/<code
+                            data-backticks="1"
+                            data-nodeid="1206"
+                            >5XX</code
+                          >-服务端错误）。
                         </p>
                       </li>
-                      <li data-nodeid="68584">
-                        <p data-nodeid="68585">
-                          将 HTML 片段内需要监听的点击等事件进行绑定。
-                        </p>
-                      </li>
-                    </ol>
-                    <p data-nodeid="68586">
-                      可以看到，实现逻辑会比较复杂和烦琐。
-                    </p>
-                    <p data-nodeid="68587">如果使用前端框架，我们可以：</p>
-                    <ul data-nodeid="68588">
-                      <li data-nodeid="68589">
-                        <p data-nodeid="68590">
-                          使用将数据变量绑定到 HTML
-                          模板的方式，来控制展示的内容；
-                        </p>
-                      </li>
-                      <li data-nodeid="68591">
-                        <p data-nodeid="68592">
-                          配合一些条件判断、条件循环等逻辑，控制交互的具体逻辑；
-                        </p>
-                      </li>
-                      <li data-nodeid="68593">
-                        <p data-nodeid="68594">
-                          通过改变数据变量，框架会自动更新页面内容。
+                      <li data-nodeid="1097">
+                        <p data-nodeid="1098">
+                          HTTP 消息头：客户端和服务端通过<code
+                            data-backticks="1"
+                            data-nodeid="1209"
+                            >request</code
+                          >和<code data-backticks="1" data-nodeid="1211"
+                            >response</code
+                          >传递附加信息。
                         </p>
                       </li>
                     </ul>
-                    <p data-nodeid="68595">
-                      这样，我们可以快速高效地完成功能开发，代码的可读性和维护性都远胜于纯手工实现。
+                    <p data-nodeid="1099">
+                      通过 HTTP
+                      协议，我们可以看到该请求是否成功、错误原因是哪些、请求是否使用了缓存、请求和响应数据是否符合预期等。想必这些内容你多少都已经有所了解，因此这里我不再赘述。
                     </p>
-                    <p data-nodeid="68596">
-                      如果使用数据驱动的方式，还可以通过让逻辑与 UI
-                      解耦的方式，提升代码的可维护性。其中的数据绑定、事件绑定等功能，前端框架是依赖模板引擎的方式来实现的。
+                    <p data-nodeid="1100">
+                      前面我们说到，HTTP 协议在 HTTP/2 之前是语义可读的，那么
+                      HTTP/2 之后发生了什么呢？我们可以看一下 HTTP
+                      协议的演变过程。
                     </p>
-                    <p data-nodeid="68597">
-                      以 Vue 为例子，对于开发者编写的 Vue 代码，Vue
-                      会将其进行以下处理从而渲染到页面中：
+                    <h4 data-nodeid="1101">HTTP 协议的演变</h4>
+                    <p data-nodeid="1102">
+                      HTTP 协议从被创造以来，一直在不断演变着：从
+                      HTTP/1.0、HTTP/1.1，到 HTTP/2、HTTP/3，HTTP
+                      协议在保持协议简单性的同时，拓展了灵活性，提供越来越快、更加可靠的传输服务。
                     </p>
-                    <ol data-nodeid="68598">
-                      <li data-nodeid="68599">
-                        <p data-nodeid="68600">解析语法生成 AST 对象；</p>
-                      </li>
-                      <li data-nodeid="68601">
-                        <p data-nodeid="68602">
-                          根据生成的 AST 对象，完成<code
-                            data-backticks="1"
-                            data-nodeid="68729"
-                            >data</code
-                          >数据初始化；
+                    <p data-nodeid="1103">
+                      <strong data-nodeid="1225"
+                        >HTTP/1.0 到 HTTP/1.1，主要实现了对 TCP
+                        连接的复用。</strong
+                      >
+                      最初在 HTTP/1.0 中，每一对 HTTP
+                      请求和响应都需要打开一个单独的 TCP
+                      连接。这样的方式对资源消耗很大，因此 HTTP/1.1
+                      中引入了持久连接的概念，通过设置<code
+                        data-backticks="1"
+                        data-nodeid="1221"
+                        >Connection</code
+                      >头部为<code data-backticks="1" data-nodeid="1223"
+                        >keep-alive</code
+                      >的方式，可以让 TCP 连接不会关闭。该功能避免了 TCP
+                      连接的重新建立，客户端可在已建立的 TCP
+                      连接上，长时间地对同一个服务端的发起请求。
+                    </p>
+                    <p data-nodeid="1104">
+                      <strong data-nodeid="1230"
+                        >HTTP/1.1 到 HTTP/2，主要实现了多个请求的复用。</strong
+                      >
+                      HTTP/2 通过将 HTTP
+                      消息拆分为独立的帧，进行交错发送，实现在同一个连接上并行多个请求，来减少网络请求的延迟。为了实现多路复用，HTTP/2
+                      协议对 HTTP
+                      头部进行了二进制编码，因此不再语义可读。除此之外，HTTP2
+                      还实现了 Header 压缩、服务端主动推动、流优先级等能力。
+                    </p>
+                    <p data-nodeid="1105">
+                      <strong data-nodeid="1235"
+                        >HTTP/2 到 HTTP/3，主要实现了基于 UDP
+                        协议、更快的传输。</strong
+                      >
+                      HTTP/3 使用了基于 UDP 的 QUIC
+                      协议，实现了又快又可靠的传输。由于 UDP
+                      协议中没有错误检查内容，因此可以更快地实现通信。同时，QUIC
+                      协议负责合并纠错、重建丢失的数据，解决了 UDP
+                      协议传输丢包的问题。
+                    </p>
+                    <p data-nodeid="1106">
+                      总的来说，<strong data-nodeid="1241"
+                        >HTTP
+                        协议的演变过程主要围绕着传输效率和速度上的优化</strong
+                      >，我们可以通过升级 HTTP
+                      协议来优化前端应用。除此之外，我们在日常的工作中，同样可以借鉴
+                      HTTP
+                      协议的优化手段。比如，可以使用资源压缩、资源复用等技术手段，来优化前端性能。技术常常是通用的，我们在学习一些看起来不相关的内容时，会发现其实很多技术转变都是值得思考和参考的。
+                    </p>
+                    <p data-nodeid="1107">
+                      下面我们来看一下常见的一些 HTTP 协议场景。
+                    </p>
+                    <h3 data-nodeid="1108">HTTP Cookie</h3>
+                    <p data-nodeid="1109">
+                      HTTP 协议是无状态的，这意味着在同一个 TCP
+                      连接中，先后发起的请求之间没有任何关系。这给服务端带来了挑战：用户在同一个网站中进行连续的操作，服务端无法知道这些操作来自哪里。
+                    </p>
+                    <p data-nodeid="1110">
+                      使用 HTTP Cookie 可以解决这个问题。当服务端将 HTTP
+                      响应返回给客户端时，通过在响应头里面添加一个<code
+                        data-backticks="1"
+                        data-nodeid="1246"
+                        >Set-Cookie</code
+                      >信息，浏览器收到带<code
+                        data-backticks="1"
+                        data-nodeid="1248"
+                        >Set-Cookie</code
+                      >信息的响应后会将 Cookie
+                      保存，在后面发送给该服务端的每个请求中，都会自动带上
+                      Cookie 信息。服务端根据 Cookie
+                      信息，就能取得客户端的数据信息。
+                    </p>
+                    <p data-nodeid="1111">
+                      由于 Cookie
+                      信息是被浏览器识别并自动保存和发送的，因此在默认情况下，浏览器关闭之后它就会被自动删除。但我们也可以通过指定过期时间（<code
+                        data-backticks="1"
+                        data-nodeid="1251"
+                        >Expires</code
+                      >）或者有效期（<code data-backticks="1" data-nodeid="1253"
+                        >Max-Age</code
+                      >），来让 Cookie 获得更久的有效期。
+                    </p>
+                    <p data-nodeid="1112">
+                      需要注意的是，某个网站在设置了 Cookie
+                      之后，所有符合条件（有效期、域名、路径、适用站点等）的请求都会被自动带上
+                      Cookie。这带来了一个 Web
+                      安全隐患：服务端只知道请求来自某个用户的浏览器，却不知道请求本身是否用户自愿发出的。
+                    </p>
+                    <p data-nodeid="1113">
+                      利用这一漏洞，攻击者可通过一些技术手段（图片地址、超链接等）欺骗用户的浏览器访问曾经认证过的网站，并利用用户的登录态进行一些操作，可能导致用户信息泄露、资产被转移、在不知情的情况下发送信息等，带来了恶劣的后果。这便是我们常说的
+                      Web 安全问题之一：跨站请求伪造（CSRF）。
+                    </p>
+                    <p data-nodeid="1114">
+                      为了应对这种情况，我们可以校验 HTTP 请求头中的<code
+                        data-backticks="1"
+                        data-nodeid="1258"
+                        >Referer</code
+                      >字段，这个字段用以标明请求来源于哪个地址。但由于该字段可能会被篡改，因此只能作为辅助校验手段。
+                    </p>
+                    <p data-nodeid="1115">
+                      防范跨站请求伪造攻击的有效方法，就是避免依赖浏览器自动带上的
+                      Cookie
+                      信息。我们可以使用其他方式校验用户登录态，比如将用户登录态保存在浏览器缓存中，在发送请求的时候添加用于标识用户的参数值，现在大多数应用也是使用
+                      Token 来进行用户标识。
+                    </p>
+                    <p data-nodeid="1116">
+                      除了 HTTP Cookie 之外，浏览器中 HTTP 缓存机制也同样依赖
+                      HTTP 协议。
+                    </p>
+                    <h3 data-nodeid="1117">HTTP 缓存</h3>
+                    <p data-nodeid="1118">
+                      缓存常常被用作性能优化的技术方案之一，通过缓存我们可以有效地减少资源获取的耗时，减少用户的等待时长，从而提升用户的体验。
+                    </p>
+                    <p data-nodeid="1119">
+                      其中，我们可以通过 HTTP 协议，设置浏览器对 HTTP
+                      响应资源进行缓存。使用浏览器缓存后，当我们再发起 HTTP
+                      请求时，如果浏览器缓存发现请求的资源已经被存储，它会拦截请求并返回该资源的副本，不需要再去请求服务端获取资源，因此减少了
+                      HTTP 请求的耗时，同时也能有效地缓解服务端压力。
+                    </p>
+                    <p data-nodeid="1120">
+                      一般来说，HTTP 缓存只能存储 GET
+                      请求的响应内容，对于这些响应内容可能会存在两种情况：
+                    </p>
+                    <ol data-nodeid="1121">
+                      <li data-nodeid="1122">
+                        <p data-nodeid="1123">
+                          不缓存内容，每次请求的时候都会从服务端获取最新的内容；
                         </p>
                       </li>
-                      <li data-nodeid="68603">
-                        <p data-nodeid="68604">
-                          根据 AST 对象和<code
-                            data-backticks="1"
-                            data-nodeid="68732"
-                            >data</code
-                          >数据绑定情况，生成虚拟 DOM 对象；
-                        </p>
-                      </li>
-                      <li data-nodeid="68605">
-                        <p data-nodeid="68606">
-                          将虚拟 DOM 对象生成真正的 DOM
-                          元素插入到页面中，此时页面会被渲染。
+                      <li data-nodeid="1124">
+                        <p data-nodeid="1125">
+                          设置了缓存内容，则在有效期内会从缓存获取，如果用户刷新或内容过期则去服务端获取最新的内容。
                         </p>
                       </li>
                     </ol>
-                    <p data-nodeid="68607">
-                      模板引擎将模板语法进行解析，分别生成 HTML DOM，使用像 HTML
-                      拼接的方式（在对应的位置绑定变量、指令解析获取拼接逻辑等等），同时配合事件的管理、虚拟
-                      DOM 的设计，可以最大化地提升页面的性能。
+                    <p data-nodeid="1126">
+                      那么，要如何给 GET
+                      请求设置缓存呢？在浏览器中，便是依靠请求和响应中的头信息来控制缓存的。根据缓存的行为，我们可以将它们分为强制缓存和协商缓存两种。
                     </p>
-                    <p data-nodeid="68608">
-                      这些便是模板引擎主要的工作，我们来分别看一下。
-                    </p>
-                    <h4 data-nodeid="68609">解析语法生成 AST 对象</h4>
-                    <p data-nodeid="68610">
-                      抽象语法树（Abstract Syntax Tree）也称为 AST
-                      语法树，指的是源代码语法所对应的树状结构。其实我们的 DOM
-                      结构树，也是 AST 的一种，浏览器会对 HTML DOM
-                      进行语法解析、并生成最终的页面。
-                    </p>
-                    <p data-nodeid="68611">
-                      生成 AST 的过程涉及编译器的原理，一般经过以下过程。
-                    </p>
-                    <ol data-nodeid="68612">
-                      <li data-nodeid="68613">
-                        <p data-nodeid="68614">
-                          语法分析。模板引擎需要在这个过程中识别出特定的语法，比如<code
-                            data-backticks="1"
-                            data-nodeid="68741"
-                            >v-if</code
-                          >/<code data-backticks="1" data-nodeid="68743"
-                            >v-for</code
-                          >这样的指令，或是<code
-                            data-backticks="1"
-                            data-nodeid="68745"
-                            >&lt;MyCustomComponent&gt;</code
-                          >这样的自定义 DOM 标签，还有<code
-                            data-backticks="1"
-                            data-nodeid="68747"
-                            >@click</code
-                          >/<code data-backticks="1" data-nodeid="68749"
-                            >:props</code
-                          >这样的简化绑定语法等。
+                    <ol data-nodeid="1356">
+                      <li data-nodeid="1357">
+                        <p data-nodeid="1358">
+                          <strong data-nodeid="1377">强制缓存，</strong>
+                          在规定有效期内，直接使用缓存。可以通过以下的方式使用强制缓存：
                         </p>
+                        <ol data-nodeid="1359">
+                          <li data-nodeid="1360">
+                            <p data-nodeid="1361">
+                              服务端通过设置<code
+                                data-backticks="1"
+                                data-nodeid="1379"
+                                >Expires</code
+                              >和<code data-backticks="1" data-nodeid="1381"
+                                >Cache-Control</code
+                              >，和客户端约定缓存内容的有效时间；
+                            </p>
+                          </li>
+                          <li data-nodeid="1362">
+                            <p data-nodeid="1363">
+                              若符合缓存条件，浏览器响应<code
+                                data-backticks="1"
+                                data-nodeid="1384"
+                                >HTTP 200(from cache)</code
+                              >。
+                            </p>
+                          </li>
+                        </ol>
                       </li>
-                      <li data-nodeid="68615">
-                        <p data-nodeid="68616">
-                          语义分析。这个过程会审查源程序有无语义错误，为代码生成阶段收集类型信息，一般类型检查也会在这个过程中进行。例如我们绑定了某个不存在的变量或者事件，又或者是使用了某个未定义的自定义组件等，都会在这个阶段进行报错提示。
+                      <li data-nodeid="1364">
+                        <p data-nodeid="1365">
+                          <strong data-nodeid="1390">协商缓存，</strong>
+                          与服务端协商是否使用缓存。可以通过以下的方式使用协商缓存：
                         </p>
-                      </li>
-                      <li data-nodeid="68617">
-                        <p data-nodeid="68618">生成 AST 对象。</p>
+                        <ol data-nodeid="1366">
+                          <li data-nodeid="1367">
+                            <p data-nodeid="1368">
+                              服务端通过设置<code
+                                data-backticks="1"
+                                data-nodeid="1392"
+                                >If-Modified-Since</code
+                              >和<code data-backticks="1" data-nodeid="1394"
+                                >If-None-Match</code
+                              >，和客户端约定标识协商缓存的值；
+                            </p>
+                          </li>
+                          <li data-nodeid="1369">
+                            <p data-nodeid="1370" class="te-preview-highlight">
+                              当有效期过后，浏览器将缓存信息中的 Etag 和
+                              Last-Modified 信息，分别使用 If-None-Match 和
+                              If-Modified-Since 请求头设置，提交给服务端。
+                            </p>
+                          </li>
+                          <li data-nodeid="1371">
+                            <p data-nodeid="1372">
+                              若符合缓存条件，服务端则响应<code
+                                data-backticks="1"
+                                data-nodeid="1398"
+                                >HTTP 304</code
+                              >，浏览器将从缓存读数据。
+                            </p>
+                          </li>
+                        </ol>
                       </li>
                     </ol>
-                    <p data-nodeid="68619">
-                      以 Vue 为例，生成 AST 的过程包括 HTML
-                      模板解析、元素检查和预处理：
+
+                    <p data-nodeid="1144">
+                      若以上缓存条件均不符合，服务端响应<code
+                        data-backticks="1"
+                        data-nodeid="1305"
+                        >HTTP 200</code
+                      >，返回更新后的数据，同时通过响应头更新 HTTP
+                      缓存设置。整个过程可以用下面的流程图来表示：
                     </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">/**
-</span></div></li><li><div class="code-word"> *  将HTML编译成AST对象
-</div></li><li><div class="code-word"> *  该代码片段基于Vue2.x版本
-</div></li><li><div class="code-word"> */
-</div></li><li><div class="code-word"><span class="hljs-function">export function <span class="hljs-title">parse</span><span class="hljs-params">(
-</span></span></div></li><li><div class="code-word">  template: string,
-</div></li><li><div class="code-word">  options: CompilerOptions
-</div></li><li><div class="code-word">): ASTElement | <span class="hljs-keyword">void</span> {
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 返回AST对象</span>
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 篇幅原因，一些前置定义省略</span>
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 此处开始解析HTML模板</span>
-</div></li><li><div class="code-word">  parseHTML(template, {
-</div></li><li><div class="code-word">    expectHTML: options.expectHTML,
-</div></li><li><div class="code-word">    isUnaryTag: options.isUnaryTag,
-</div></li><li><div class="code-word">    shouldDecodeNewlines: options.shouldDecodeNewlines,
-</div></li><li><div class="code-word">    start(tag, attrs, unary) {
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 一些前置检查和设置、兼容处理此处省略</span>
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 此处定义了初始化的元素AST对象</span>
-</div></li><li><div class="code-word">      <span class="hljs-keyword">const</span> element: ASTElement = {
-</div></li><li><div class="code-word">        type: <span class="hljs-number">1</span>,
-</div></li><li><div class="code-word">        tag,
-</div></li><li><div class="code-word">        attrsList: attrs,
-</div></li><li><div class="code-word">        attrsMap: makeAttrsMap(attrs),
-</div></li><li><div class="code-word">        parent: currentParent,
-</div></li><li><div class="code-word">        children: [],
-</div></li><li><div class="code-word">      };
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 检查元素标签是否合法（不是保留命名）</span>
-</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (isForbiddenTag(element) &amp;&amp; !isServerRendering()) {
-</div></li><li><div class="code-word">        element.forbidden = <span class="hljs-keyword">true</span>;
-</div></li><li><div class="code-word">        process.env.NODE_ENV !== <span class="hljs-string">"production"</span> &amp;&amp;
-</div></li><li><div class="code-word">          warn(
-</div></li><li><div class="code-word">            <span class="hljs-string">"Templates should only be responsible for mapping the state to the "</span> +
-</div></li><li><div class="code-word">              <span class="hljs-string">"UI. Avoid placing tags with side-effects in your templates, such as "</span> +
-</div></li><li><div class="code-word">              `&lt;${tag}&gt;` +
-</div></li><li><div class="code-word">              <span class="hljs-string">", as they will not be parsed."</span>
-</div></li><li><div class="code-word">          );
-</div></li><li><div class="code-word">      }
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 执行一些前置的元素预处理</span>
-</div></li><li><div class="code-word">      <span class="hljs-keyword">for</span> (let i = <span class="hljs-number">0</span>; i &lt; preTransforms.length; i++) {
-</div></li><li><div class="code-word">        preTransforms[i](element, options);
-</div></li><li><div class="code-word">      }
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 是否原生元素</span>
-</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (inVPre) {
-</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理元素的一些属性</span>
-</div></li><li><div class="code-word">        processRawAttrs(element);
-</div></li><li><div class="code-word">      } <span class="hljs-keyword">else</span> {
-</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理指令，此处包括v-for/v-if/v-once/key等等</span>
-</div></li><li><div class="code-word">        processFor(element);
-</div></li><li><div class="code-word">        processIf(element);
-</div></li><li><div class="code-word">        processOnce(element);
-</div></li><li><div class="code-word">        processKey(element); <span class="hljs-comment">// 删除结构属性</span>
-</div></li><li><div class="code-word">        <span class="hljs-comment">// 确定这是否是一个简单的元素</span>
-</div></li><li><div class="code-word">        element.plain = !element.key &amp;&amp; !attrs.length;
-</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理ref/slot/component等属性</span>
-</div></li><li><div class="code-word">        processRef(element);
-</div></li><li><div class="code-word">        processSlot(element);
-</div></li><li><div class="code-word">        processComponent(element);
-</div></li><li><div class="code-word">        <span class="hljs-keyword">for</span> (let i = <span class="hljs-number">0</span>; i &lt; transforms.length; i++) {
-</div></li><li><div class="code-word">          transforms[i](element, options);
-</div></li><li><div class="code-word">        }
-</div></li><li><div class="code-word">        processAttrs(element);
-</div></li><li><div class="code-word">      }
-</div></li><li><div class="code-word">      <span class="hljs-comment">// 后面还有一些父子节点等处理，此处省略</span>
-</div></li><li><div class="code-word">    },
-</div></li><li><div class="code-word">    <span class="hljs-comment">// 其他省略</span>
-</div></li><li><div class="code-word">  });
-</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> root;
-</div></li><li><div class="code-word">}
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="68621">
-                      到这里，Vue 将开发者的模板代码解析成 AST
-                      对象，我们来看看这样的 AST 对象是怎样生成 DOM 元素的。
+                    <p data-nodeid="1145">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/3B/0F/CioPOWCCZ3WAFH_BAAF-GPWG-Gs412.png"
+                        alt="图片1.png"
+                        data-nodeid="1309"
+                      />
                     </p>
-                    <h4 data-nodeid="68622">AST 对象生成 DOM 元素</h4>
-                    <p data-nodeid="68623">
-                      前面提到，在编译解析和渲染过程中，模板引擎会识别和解析模板语法语义、生成
-                      AST 对象，最后根据 AST 对象会生成最终的 DOM 元素。
+                    <p data-nodeid="1146">
+                      浏览器会在第一次请求完服务端后得到响应，通过适当地设置响应头信息，我们可以使用更多的缓存资源，从而提升网站的响应速度和性能，给到用户更好的体验。
                     </p>
-                    <p data-nodeid="68624">
-                      举个例子，我们写了以下这么一段 HTML 模板：
+                    <p data-nodeid="1147">
+                      除了常见的 Cookie 和 GET
+                      请求的缓存，客户端和服务端在实现双向通信的时候，同样会依赖
+                      HTTP 协议来完成。
                     </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;div&gt;
-</div></li><li><div class="code-word">  &lt;a&gt;123&lt;/a&gt;
-</div></li><li><div class="code-word">  &lt;p&gt;456&lt;span&gt;789&lt;/span&gt;&lt;/p&gt;
-</div></li><li><div class="code-word">&lt;/div&gt;
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="68626">
-                      模板引擎可以在语法分析、语义分析等步骤后，得到这样的一个
-                      AST 对象：
+                    <h3 data-nodeid="1148">客户端服务端双向通信</h3>
+                    <p data-nodeid="1149">
+                      客户端和服务端的通信方式有很多种，大多数场景下都是由客户端主动发送数据给服务端，但在特定的场景下（如多人协作、在线游戏）客户端还需要和服务端保持实时通信，此时需要使用双向通信。
                     </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">thisDiv = {
-</div></li><li><div class="code-word">  dom: {
-</div></li><li><div class="code-word">    type: <span class="hljs-string">"dom"</span>,
-</div></li><li><div class="code-word">    ele: <span class="hljs-string">"div"</span>,
-</div></li><li><div class="code-word">    nodeIndex: <span class="hljs-number">0</span>,
-</div></li><li><div class="code-word">    children: [
-</div></li><li><div class="code-word">      {
-</div></li><li><div class="code-word">        type: <span class="hljs-string">"dom"</span>,
-</div></li><li><div class="code-word">        ele: <span class="hljs-string">"a"</span>,
-</div></li><li><div class="code-word">        nodeIndex: <span class="hljs-number">1</span>,
-</div></li><li><div class="code-word">        children: [{ type: <span class="hljs-string">"text"</span>, value: <span class="hljs-string">"123"</span> }],
-</div></li><li><div class="code-word">      },
-</div></li><li><div class="code-word">      {
-</div></li><li><div class="code-word">        type: <span class="hljs-string">"dom"</span>,
-</div></li><li><div class="code-word">        ele: <span class="hljs-string">"p"</span>,
-</div></li><li><div class="code-word">        nodeIndex: <span class="hljs-number">2</span>,
-</div></li><li><div class="code-word">        children: [
-</div></li><li><div class="code-word">          { type: <span class="hljs-string">"text"</span>, value: <span class="hljs-string">"456"</span> },
-</div></li><li><div class="code-word">          {
-</div></li><li><div class="code-word">            type: <span class="hljs-string">"dom"</span>,
-</div></li><li><div class="code-word">            ele: <span class="hljs-string">"span"</span>,
-</div></li><li><div class="code-word">            nodeIndex: <span class="hljs-number">3</span>,
-</div></li><li><div class="code-word">            children: [{ type: <span class="hljs-string">"text"</span>, value: <span class="hljs-string">"789"</span> }],
-</div></li><li><div class="code-word">          },
-</div></li><li><div class="code-word">        ],
-</div></li><li><div class="code-word">      },
-</div></li><li><div class="code-word">    ],
-</div></li><li><div class="code-word">  },
-</div></li><li><div class="code-word">};
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="68628">
-                      这个 AST 对象维护我们需要的一些信息，包括 HTML 元素里：
+                    <p data-nodeid="1150">
+                      常见的双向通信方式包括 HTTP 短轮询（polling）、HTTP
+                      长轮询（long-polling）、XHR Streaming、Server-Sent
+                      Events、Websocket 等。
                     </p>
-                    <ul data-nodeid="68629">
-                      <li data-nodeid="68630">
-                        <p data-nodeid="68631">
-                          需要绑定哪些变量（变量更新的时候需要更新该节点内容）；
+                    <p data-nodeid="1151">
+                      其中，最简单粗暴的莫过于 HTTP
+                      短轮询，客户端每隔特定的时间（比如
+                      1s）便向服务端发起请求，获取最新的资源信息。该方式会造成较多的资源浪费，尤其当服务端内容更新频率低于轮询间隔时，就会造成服务端资源、客户端资源的浪费。除此之外，过于频繁的请求也会给服务端造成额外的压力，当服务端负载较高的时候，甚至可能导致雪崩等情况发生。
+                    </p>
+                    <p data-nodeid="1152">
+                      HTTP
+                      长轮询解决了短轮询的一些问题，长轮询实现特点主要为当客户端向服务端发起请求后，服务端保持住连接，当数据更新响应之后才断开连接。然后客户端会重新建立连接，并继续等待新数据。此技术的主要问题在于，在重新连接过程中，页面上的数据可能会过时且不准确。
+                    </p>
+                    <p data-nodeid="1153">
+                      相比 HTTP 长轮询，XHR Streaming
+                      可以维护客户端和服务端之间的连接。但使用 XHR Streaming
+                      过程中，<code data-backticks="1" data-nodeid="1318"
+                        >XMLHttpRequest</code
+                      >对象的数量将不断增长，因此在使用过程中需要定期关闭连接，来清除缓冲区。
+                    </p>
+                    <p data-nodeid="1154">
+                      SSE（Server-Sent Events）方案思想便是 XHR
+                      Streaming，主要基于浏览器中<code
+                        data-backticks="1"
+                        data-nodeid="1321"
+                        >EventSource</code
+                      >API 的封装和协议。它会对 HTTP
+                      服务开启一个持久化的连接，以<code
+                        data-backticks="1"
+                        data-nodeid="1323"
+                        >text/event-stream</code
+                      >格式发送事件， 会一直保持开启直到被要求关闭。
+                    </p>
+                    <p data-nodeid="1155">
+                      最后我们来介绍
+                      WebSocket，它实现了浏览器与服务端全双工通信。前面我们提到，HTTP
+                      短轮询、长轮询都会带来额外的资源浪费，因此 Websocket
+                      在实现实时通信的同时，能更好地节省服务端资源和带宽。
+                    </p>
+                    <p data-nodeid="1156">
+                      Websoctet 是如何实现全双工通信的呢？Websocket 建立在 TCP
+                      协议之上，握手阶段采用 HTTP 协议，但这个 HTTP
+                      协议的请求头中，有以下的标识性内容。
+                    </p>
+                    <ul data-nodeid="1157">
+                      <li data-nodeid="1158">
+                        <p data-nodeid="1159">
+                          <code data-backticks="1" data-nodeid="1327"
+                            >Connection: Upgrade</code
+                          >、<code data-backticks="1" data-nodeid="1329"
+                            >Upgrade: websocket</code
+                          >：表示这个连接将要被转换为 WebSocket 连接。
                         </p>
                       </li>
-                      <li data-nodeid="68632">
-                        <p data-nodeid="68633">
-                          是否有其他的逻辑需要处理（比如含有逻辑指令，如<code
-                            data-backticks="1"
-                            data-nodeid="68762"
-                            >v-if</code
-                          >、<code data-backticks="1" data-nodeid="68764"
-                            >v-for</code
-                          >等）；
+                      <li data-nodeid="1160">
+                        <p data-nodeid="1161">
+                          <code data-backticks="1" data-nodeid="1331"
+                            >Sec-WebSocket-Key</code
+                          >：向服务端提供所需的信息，以确认客户端有权请求升级到
+                          WebSocket。
                         </p>
                       </li>
-                      <li data-nodeid="68634">
-                        <p data-nodeid="68635">
-                          哪些节点绑定了事件监听事件（是否匹配一些常用的事件能力支持，如<code
-                            data-backticks="1"
-                            data-nodeid="68767"
-                            >@click</code
-                          >）。
+                      <li data-nodeid="1162">
+                        <p data-nodeid="1163">
+                          <code data-backticks="1" data-nodeid="1333"
+                            >Sec-WebSocket-Protocol</code
+                          >：指定一个或多个的 WebSocket 协议。
+                        </p>
+                      </li>
+                      <li data-nodeid="1164">
+                        <p data-nodeid="1165">
+                          <code data-backticks="1" data-nodeid="1335"
+                            >Sec-WebSocket-Version</code
+                          >：指定 WebSocket 的协议版本。
                         </p>
                       </li>
                     </ul>
-                    <p data-nodeid="68636">
-                      模板引擎会根据 AST
-                      对象生成最终的页面片段和逻辑，在这个过程中会通过添加特殊标识（例如元素
-                      ID、属性标记等）的方式来标记 DOM 节点，配合 DOM
-                      元素选择方式、事件监听方式等，在需要更新的时候可快速定位到该
-                      DOM 节点，并进行节点内容更新，从而实现页面内容的更新。
+                    <p data-nodeid="1166">
+                      如果服务端同意启动 WebSocket 连接，会在握手过程中的 HTTP
+                      协议中返回包含<code data-backticks="1" data-nodeid="1338"
+                        >Sec-WebSocket-Accept</code
+                      >的响应消息，接下来客户端和服务端便建立 WebSocket
+                      连接，并通过 WebSocket 协议传输数据。
                     </p>
-                    <p data-nodeid="68637">
-                      目前来说，前端模板渲染的实现一般分为以下两种方式。
+                    <p data-nodeid="1167">
+                      由于不再需要通过 HTTP
+                      协议通信，省去请求头等内容设置，Websocket
+                      数据格式会更加轻量，通信更加高效，性能开销也相应地降低。除此之外，不同于
+                      HTTP 协议，Websocket
+                      协议没有同源限制，因此客户端可以与任意服务端通信。
                     </p>
-                    <ol data-nodeid="68638">
-                      <li data-nodeid="68639">
-                        <p data-nodeid="68640">
-                          字符串模版方式：使用拼接的方式生成 DOM
-                          字符串，直接通过<code
-                            data-backticks="1"
-                            data-nodeid="68772"
-                            >innderHTML()</code
-                          >插入页面。
-                        </p>
-                      </li>
-                      <li data-nodeid="68641">
-                        <p data-nodeid="68642">
-                          节点模版方式：使用<code
-                            data-backticks="1"
-                            data-nodeid="68775"
-                            >createElement()</code
-                          >/<code data-backticks="1" data-nodeid="68777"
-                            >appendChild()</code
-                          >/<code data-backticks="1" data-nodeid="68779"
-                            >textContent</code
-                          >等方法动态地插入 DOM 节点。
-                        </p>
-                      </li>
-                    </ol>
-                    <p data-nodeid="68643">
-                      在使用字符串模版的时候，我们将<code
+                    <p data-nodeid="1168">
+                      以上这些，都是客户端和服务端双向通信的一些解决方案，我帮你简单整理成思维导图：
+                    </p>
+                    <p data-nodeid="1169">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/3B/0F/CioPOWCCZ4GAc2TXAARhvXuRnyU470.png"
+                        alt="图片2.png"
+                        data-nodeid="1344"
+                      />
+                    </p>
+                    <p data-nodeid="1170">
+                      在依赖双向通信的场景中，这些方案并没有绝对的最优解，更多时候都是不同场景和架构设计下的选择。
+                    </p>
+                    <p data-nodeid="1171">
+                      如果你去仔细研究在线协作的办公工具，比如谷歌文档、石墨文档、金山文档、腾讯文档，你会发现它们的双向通信都分别使用了不同的解决方案。
+                    </p>
+                    <h3 data-nodeid="1172">小结</h3>
+                    <p data-nodeid="1173">
+                      今天，我主要介绍了 HTTP
+                      协议相关的内容，同时介绍了较常见的一些 HTTP
+                      协议的应用场景，包括 HTTP Cookie、HTTP
+                      缓存、客户端和服务端双向通信。
+                    </p>
+                    <p data-nodeid="1174">
+                      关于 HTTP
+                      缓存过程想必你也应该掌握了，那你知道当我们在浏览器中分别使用<code
                         data-backticks="1"
-                        data-nodeid="68782"
-                        >nodeIndex</code
-                      >绑定在元素属性上，主要用于在数据更新时追寻节点进行内容更新。
+                        data-nodeid="1350"
+                        >F5</code
+                      >和<code data-backticks="1" data-nodeid="1352"
+                        >ctrl + F5</code
+                      >快捷键刷新页面的时候，HTTP
+                      的缓存过程又是怎样呢？把你的想法写在留言区~
                     </p>
-                    <p data-nodeid="68644">
-                      在使用节点模版的时候，我们可在创建节点时将该节点保存下来，直接用于数据更新：
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">// 假设这是一个生成 DOM 的过程，包括 innerHTML 和事件监听
-</div></li><li><div class="code-word">function generateDOM(astObject) {
-</div></li><li><div class="code-word">  const { dom, binding = [] } = astObject;
-</div></li><li><div class="code-word">  // 生成DOM，这里假装当前节点是baseDom
-</div></li><li><div class="code-word">  baseDom.innerHTML = getDOMString(dom);
-</div></li><li><div class="code-word">  // 对于数据绑定的，来进行监听更新吧
-</div></li><li><div class="code-word">  baseDom.addEventListener("data:change", (name, value) =&gt; {
-</div></li><li><div class="code-word">    // 寻找匹配的数据绑定
-</div></li><li><div class="code-word">    const obj = binding.find((x) =&gt; x.valueName == name);
-</div></li><li><div class="code-word">    // 若找到值绑定的对应节点，则更新其值。
-</div></li><li><div class="code-word">    if (obj) {
-</div></li><li><div class="code-word">      baseDom.find(`[data-node-index="${obj.nodeIndex}"]`).innerHTML = value;
-</div></li><li><div class="code-word">    }
-</div></li><li><div class="code-word">  });
-</div></li><li><div class="code-word">}
-</div></li><li><div class="code-word">// 获取DOM字符串，这里简单拼成字符串
-</div></li><li><div class="code-word">function getDOMString(domObj) {
-</div></li><li><div class="code-word">  // 无效对象返回''
-</div></li><li><div class="code-word">  if (!domObj) return "";
-</div></li><li><div class="code-word">  const { type, children = [], nodeIndex, ele, value } = domObj;
-</div></li><li><div class="code-word">  if (type == "dom") {
-</div></li><li><div class="code-word">    // 若有子对象，递归返回生成的字符串拼接
-</div></li><li><div class="code-word">    const childString = "";
-</div></li><li><div class="code-word">    children.forEach((x) =&gt; {
-</div></li><li><div class="code-word">      childString += getDOMString(x);
-</div></li><li><div class="code-word">    });
-</div></li><li><div class="code-word">    // dom对象，拼接生成对象字符串
-</div></li><li><div class="code-word">    return `&lt;${ele} data-node-index="${nodeIndex}"&gt;${childString}&lt;/${ele}&gt;`;
-</div></li><li><div class="code-word">  } else if (type == "text") {
-</div></li><li><div class="code-word">    // 若为textNode，返回text的值
-</div></li><li><div class="code-word">    return value;
-</div></li><li><div class="code-word">  }
-</div></li><li><div class="code-word">}
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="68646">
-                      通过上面的方式，前端框架实现了将 AST 对象生成 DOM
-                      元素，并将这些 DOM 元素渲染或更新到页面上。
-                    </p>
-                    <p data-nodeid="68647">
-                      或许你会觉得疑惑：原本就是一个<code
-                        data-backticks="1"
-                        data-nodeid="68787"
-                        >&lt;div&gt;</code
-                      >HTML 模板，经过 AST 生成一个对象，最终还是生成一个<code
-                        data-backticks="1"
-                        data-nodeid="68789"
-                        >&lt;div&gt;</code
-                      >DOM 节点，看起来好像挺多余的。
-                    </p>
-                    <p data-nodeid="68648">
-                      实际上，在这个过程中，模板引擎可以实现更多功能。
-                    </p>
-                    <h4 data-nodeid="68649">模板引擎可以做更多</h4>
-                    <p data-nodeid="68650">
-                      将 HTML 模板解析成 AST 对象，再根据 AST 对象生成 DOM
-                      节点，在这个过程中前端框架可以实现以下功能：
-                    </p>
-                    <ol data-nodeid="68651">
-                      <li data-nodeid="68652">
-                        <p data-nodeid="68653">
-                          排除无效 DOM 元素（非自定义组件、也非默认组件的 DOM
-                          元素），在构建阶段可及时发现并进行报错；
-                        </p>
-                      </li>
-                      <li data-nodeid="68654">
-                        <p data-nodeid="68655">
-                          可识别出自定义组件，并渲染对应的组件；
-                        </p>
-                      </li>
-                      <li data-nodeid="68656">
-                        <p data-nodeid="68657">
-                          可方便地实现数据绑定、事件绑定等功能；
-                        </p>
-                      </li>
-                      <li data-nodeid="68658">
-                        <p data-nodeid="68659">
-                          为虚拟 DOM Diff 过程打下铺垫；
-                        </p>
-                      </li>
-                      <li data-nodeid="68660">
-                        <p data-nodeid="68661">HTML 转义（预防 XSS 漏洞）。</p>
-                      </li>
-                    </ol>
-                    <p data-nodeid="68662">
-                      这里我们以第 5 点预防 XSS
-                      漏洞为例子，详细地介绍一下模板引擎是如何避免 XSS 攻击的。
-                    </p>
-                    <h4 data-nodeid="68663">预防 XSS 漏洞</h4>
-                    <p data-nodeid="68664">
-                      我们知道 XSS 的整个攻击过程大概为：
-                    </p>
-                    <ol data-nodeid="68665">
-                      <li data-nodeid="68666">
-                        <p data-nodeid="68667">
-                          攻击者提交含有恶意代码的内容（比如 JavaScript 脚本）；
-                        </p>
-                      </li>
-                      <li data-nodeid="68668">
-                        <p data-nodeid="68669">
-                          页面渲染的时候，这些内容未被过滤就被加载处理，比如获取
-                          Cookie、执行操作等；
-                        </p>
-                      </li>
-                      <li data-nodeid="68670">
-                        <p data-nodeid="68671">
-                          其他用户在浏览页面的时候，就会在加载到恶意代码时受到攻击。
-                        </p>
-                      </li>
-                    </ol>
-                    <p data-nodeid="68672">
-                      要避免网站用户受到 XSS
-                      攻击，主要方法是将用户提交的内容进行过滤处理。大多数前端框架会自带
-                      HTML 转义功能，从而避免的 XSS 攻击。
-                    </p>
-                    <p data-nodeid="68673">
-                      以 Vue 为例，使用默认的数据绑定方式（双大括号、<code
-                        data-backticks="1"
-                        data-nodeid="68807"
-                        >v-bind</code
-                      >等）会进行 HTML 转义，将数据解释为普通文本，而非 HTML
-                      代码。
-                    </p>
-                    <p data-nodeid="68674">
-                      除此预防 XSS
-                      漏洞之外，前端框架还做了一些性能、安全性等方面的优化，也提供了一些用于项目开发配套的工具，包括路由的管理、状态和数据的管理等工具。
-                    </p>
-                    <h3 data-nodeid="68675">小结</h3>
-                    <p data-nodeid="68676">
-                      今天我带大家了解了前端框架的出现，由于前端框架帮开发者解决了很多重复性的工作（拼接
-                      HTML 模板、DOM 元素查找、DOM
-                      元素事件监听等），极大地提升了开发者的效率，同时还提升了代码的可读性和可维护性，因此受到很多前端开发的追捧。
-                    </p>
-                    <p data-nodeid="68677">
-                      除此之外，我还介绍了前端框架中模板引擎的实现原理，包括解析语法生成
-                      AST 对象、根据 AST 对象生成 DOM 元素，并对生成的 DOM
-                      元素进行标记，则可以在变量改变的时候，解析找到相应的 DOM
-                      元素进行内容的更新。
-                    </p>
-                    <p data-nodeid="68678">
-                      在了解这些内容之后，我们可以在页面渲染遇到性能问题的时候，根据所使用框架的具体实现，找到可能导致页面渲染卡顿或是不流畅的原因。除此之外，在使用框架的过程中，遇到一些语法报错、XSS
-                      安全漏洞等问题的时候，也可以快速找到解决办法。
-                    </p>
-                    <p data-nodeid="68679">
-                      今日思考：React.js 中的 JSX
-                      和模板引擎是什么关系？在留言区写出你的想法！
+                    <p data-nodeid="1175" class="">
+                      我们在日常开发中就会经常遇到网络请求失败、调试异常等情况，如果不了解
+                      HTTP 协议会极大地影响调试效率。因此对 HTTP
+                      协议的掌握，对于前端的联调和开发过程中是必不可少的。
                     </p>
                   </div>
                 </div>
@@ -2006,97 +1737,7 @@
                         data-v-4bc80e00=""
                         class="message-list-title-left-name"
                       >
-                        **宇
-                      </div>
-                    </div>
-                    <div data-v-4bc80e00="" class="message-list-title-right">
-                      <!---->
-                      <img
-                        data-v-4bc80e00=""
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
-                        alt="right-icon"
-                        class="message-list-title-right-icon"
-                      />
-                      <div
-                        data-v-4bc80e00=""
-                        class="message-list-title-right-praise"
-                      >
-                        1
-                      </div>
-                    </div>
-                  </div>
-                  <div data-v-4bc80e00="" class="message-list-container">
-                    <div
-                      data-v-4bc80e00=""
-                      class="message-list-content ellipsis"
-                    >
-                      jsx会被babel编译成React.createElement()，用来创建相应的虚拟dom对象，后面会被reactdom或者react
-                      native等不同平台的渲染库渲染成ui或者SSR。之所以发明jsx是因为，React.createElement太过繁琐，jsx可以像写html一样写ui，同时也保留了部分js的能力。题外话：其实Facebook最初并没有打算让createElement作为jsx的编译产物，因为它里面的defaultValue，propType，ref
-                      key的拦截等等逻辑比较浪费性能，对props的属性有O(n)级别的复杂度，本来只是作为让用户临时手动生产虚拟dom的一个补充手段，但因为当时只有它是最好的选择，所以才这样了，react17以后可能有变化。
-                    </div>
-                    <div data-v-4bc80e00="" class="message-list-expand">
-                      全部
-                    </div>
-                  </div>
-                  <!---->
-                  <!---->
-                  <!---->
-                </div>
-                <div data-v-4bc80e00="" class="message-list">
-                  <div data-v-4bc80e00="" class="message-list-title">
-                    <div data-v-4bc80e00="" class="message-list-title-left">
-                      <!---->
-                      <div
-                        data-v-4bc80e00=""
-                        class="message-list-title-left-name"
-                      >
-                        *浩
-                      </div>
-                    </div>
-                    <div data-v-4bc80e00="" class="message-list-title-right">
-                      <!---->
-                      <img
-                        data-v-4bc80e00=""
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
-                        alt="right-icon"
-                        class="message-list-title-right-icon"
-                      />
-                      <div
-                        data-v-4bc80e00=""
-                        class="message-list-title-right-praise"
-                      ></div>
-                    </div>
-                  </div>
-                  <div data-v-4bc80e00="" class="message-list-container">
-                    <div
-                      data-v-4bc80e00=""
-                      class="message-list-content ellipsis"
-                    >
-                      今日思考的回答：React中的jsx本质是JavaScript语法的扩展，充分具备JavaScript能力，这就能让developer像写JavaScript一样写UI，我们写的虽然是jsx，借助babel等类似的工具的转化，最终还是会编译成React.createElement()这样的函数去生成虚拟DOM，后面生成AST,再由AST生成真实DOM,这些过程应该跟老师经的一样吧，有写错的地方，望老师批评指正。
-                    </div>
-                    <div data-v-4bc80e00="" class="message-list-expand">
-                      全部
-                    </div>
-                  </div>
-                  <div data-v-4bc80e00="" class="message-list-replay">
-                    <div data-v-4bc80e00="" class="borleft"></div>
-                    <span data-v-4bc80e00="" class="message-list-replay-name"
-                      >讲师回复：</span
-                    >
-                    赞！思路很清晰~
-                  </div>
-                  <!---->
-                  <!---->
-                </div>
-                <div data-v-4bc80e00="" class="message-list">
-                  <div data-v-4bc80e00="" class="message-list-title">
-                    <div data-v-4bc80e00="" class="message-list-title-left">
-                      <!---->
-                      <div
-                        data-v-4bc80e00=""
-                        class="message-list-title-left-name"
-                      >
-                        856
+                        **北
                       </div>
                     </div>
                     <div data-v-4bc80e00="" class="message-list-title-right">
@@ -2115,9 +1756,7 @@
                   </div>
                   <div data-v-4bc80e00="" class="message-list-container">
                     <div data-v-4bc80e00="" class="message-list-content">
-                      jsx
-                      是把代码转成react可以解读的代码，并没有生成dom模板引擎是通过自己的语法生成dom
-                      相同点都是用自己的语法 写html ,底层实现操作dom
+                      如果想防止更新自动删除数据，就需要用到本地存储来将刷新前数据存起来然后再设置
                     </div>
                     <!---->
                   </div>
@@ -2126,8 +1765,97 @@
                     <span data-v-4bc80e00="" class="message-list-replay-name"
                       >讲师回复：</span
                     >
-                    大体上差不多，但也不一定是通过自己的语法生成 DOM，可以考虑下
-                    jsx 是如何对接 react 和 vue 的
+                    这是一个思路，但是可能使用场景会少一些~
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **峰
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      需要注意的是，某个网站在设置了 Cookie
+                      之后，所有符合条件（有效期、域名、路径、适用站点等）的请求都会被自动带上
+                      Cookie。———这里的设置cookie什么意思？浏览器设置的，还是服务器设置的？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    当服务器收到 HTTP 请求时，服务器可以在响应头里面添加一个
+                    Set-Cookie 选项。浏览器收到响应后通常会保存下
+                    Cookie，之后对该服务器每一次请求中都通过 Cookie 请求头部将
+                    Cookie 信息发送给服务器。 也就是说，Cookie
+                    是服务器种下的，后续符合条件的请求会被自动带上则是浏览器默认的行为。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **飞
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      ctrl + F5 应该等同于 dev tools里面设置 no cache，F5
+                      还是会按照缓存逻辑去命中缓存的。
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    基本上差不多，但是如果服务器忽略无缓存头，则即使Ctrl +
+                    F5也会返回该页面的旧版本
                   </div>
                   <!---->
                   <!---->

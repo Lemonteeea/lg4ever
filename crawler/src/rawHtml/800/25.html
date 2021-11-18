@@ -1,0 +1,2588 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  19 | 插槽：如何实现内容分发？
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/08:36"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="516"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/08:36</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">7.92M</div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/08:36
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="217312">
+                      前面一节课我们学习了
+                      Props，使用它我们可以让组件支持不同的配置来实现不同的功能。
+                    </p>
+
+                    <p data-nodeid="216468">
+                      不过，有些时候我们希望子组件模板中的部分内容可以定制化，这个时候使用
+                      Props 就显得不够灵活和易用了。因此，Vue.js 受到 Web
+                      Component
+                      草案的启发，通过插槽的方式实现内容分发，它允许我们在父组件中编写
+                      DOM 并在子组件渲染时把 DOM
+                      添加到子组件的插槽中，使用起来非常方便。
+                    </p>
+                    <p data-nodeid="216469">
+                      在分析插槽的实现前，我们先来简单回顾一下插槽的使用方法。
+                    </p>
+                    <h3 data-nodeid="216470">插槽的用法</h3>
+                    <p data-nodeid="216471">
+                      举个简单的例子，假设我们有一个 TodoButton 子组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;button <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"todo-button"</span>&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">slot</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span></span>
+</div></li><li><div class="code-word">&lt;/button&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="219599">
+                      然后我们在父组件中可以这么使用 TodoButton 组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;todo-button&gt;
+</div></li><li><div class="code-word">  &lt;!-- 添加一个字体图标 --&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"icon icon-plus"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span></span>
+</div></li><li><div class="code-word">  Add todo
+</div></li><li><div class="code-word">&lt;/todo-button&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="220087">
+                      其实就是在 todo-button 的标签内部去编写插槽中的 DOM
+                      内容，最终 TodoButton 组件渲染的 HTML 是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;button <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"todo-button"</span>&gt;
+</div></li><li><div class="code-word">  &lt;!-- 添加一个字体图标 --&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"icon icon-plus"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span></span>
+</div></li><li><div class="code-word">  Add todo
+</div></li><li><div class="code-word">&lt;/button&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="221051">
+                      这个例子就是最简单的普通插槽的用法，有时候我们希望子组件可以有多个插槽，再举个例子，假设我们有一个布局组件
+                      Layout，定义如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"layout"</span>&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"header"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">footer</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"footer"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">footer</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/div&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="221524">
+                      我们在 Layout
+                      组件中定义了多个插槽，并且其中两个插槽标签还添加了 name
+                      属性（没有设置 name 属性则默认 name 是
+                      default），然后我们在父组件中可以这么使用 Layout 组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">layout</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:header</span>&gt;</span>
+</div></li><li><div class="code-word">      <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>{{ header }}<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:default</span>&gt;</span>
+</div></li><li><div class="code-word">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{ main }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">     
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:footer</span>&gt;</span>
+</div></li><li><div class="code-word">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{ footer }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">layout</span>&gt;</span>  
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li><li><div class="code-word"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+</span></span></div></li><li><div class="code-word">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+</div></li><li><div class="code-word">    data (){
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">        <span class="hljs-attr">header</span>: <span class="hljs-string">'Here might be a page title'</span>,
+</div></li><li><div class="code-word">        <span class="hljs-attr">main</span>: <span class="hljs-string">'A paragraph for the main content.'</span>,
+</div></li><li><div class="code-word">        <span class="hljs-attr">footer</span>: <span class="hljs-string">'Here\'s some contact info'</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="221994">
+                      这里使用 template 以及 v-slot 指令去把内部的 DOM
+                      分发到子组件对应的插槽中，最终 Layout 组件渲染的 HTML
+                      如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"layout"</span>&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Here might be a page title<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>A paragraph for the main content.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">footer</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Here's some contact info<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">footer</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/div&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="222461">
+                      这个例子就是命名插槽的用法，它实现了在一个组件中定义多个插槽的需求。另外我们需要注意，父组件在插槽中引入的数据，它的作用域是父组件的。
+                    </p>
+                    <p data-nodeid="222462">
+                      不过有些时候，我们希望父组件填充插槽内容的时候，使用子组件的一些数据，为了实现这个需求，Vue.js
+                      提供了作用域插槽。
+                    </p>
+                    <p data-nodeid="222463">
+                      举个例子，我们有这样一个 TodoList 子组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">"(item, index) in items"</span>&gt;</span>
+</div></li><li><div class="code-word">      <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">:item</span>=<span class="hljs-string">"item"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li><li><div class="code-word"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+</span></span></div></li><li><div class="code-word">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+</div></li><li><div class="code-word">    data() {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">        <span class="hljs-attr">items</span>: [<span class="hljs-string">'Feed a cat'</span>, <span class="hljs-string">'Buy milk'</span>]
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="222925">
+                      注意，这里我们给 slot 标签加上了 item
+                      属性，目的就是传递子组件中的 item
+                      数据，然后我们可以在父组件中这么去使用 TodoList 组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;todo-list&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:default</span>=<span class="hljs-string">"slotProps"</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"icon icon-check"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"green"</span>&gt;</span>{{ slotProps.item }}<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">todo-list</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="223382" class="">
+                      注意，这里的 v-slot 指令的值为
+                      slotProps，它是一个对象，它的值包含了子组件往 slot
+                      标签中添加的 props，在我们这个例子中，v-slot 就包含了 item
+                      属性，然后我们就可以在内部使用这个 slotProps.item 了，最终
+                      TodoList 子组件渲染的 HTML 如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;ul&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">"(item, index) in items"</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"icon icon-check"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"green"</span>&gt;</span>{{ item }}<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="223836">
+                      上述例子就是作用域插槽的用法，它实现了在父组件填写子组件插槽内容的时候，可以使用子组件传递数据的需求。
+                    </p>
+                    <p data-nodeid="223837">
+                      这些就是插槽的一些常见使用方式，那么接下来，我们就来探究一下插槽背后的实现原理吧！
+                    </p>
+                    <h3 data-nodeid="223838">插槽的实现</h3>
+                    <p data-nodeid="223839">
+                      在分析具体的代码前，我们先来想一下插槽的特点，其实就是在父组件中去编写子组件插槽部分的模板，然后在子组件渲染的时候，把这部分模板内容填充到子组件的插槽中。
+                    </p>
+                    <p data-nodeid="223840">
+                      所以在父组件渲染阶段，子组件插槽部分的 DOM
+                      是不能渲染的，需要通过某种方式保留下来，等到子组件渲染的时候再渲染。顺着这个思路，我们来分析具体实现的代码。
+                    </p>
+                    <p data-nodeid="223841">
+                      我们还是通过例子的方式来分析插槽实现的整个流程，首先来看父组件模板：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;layout&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:header</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>{{ header }}<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:default</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{ main }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">template</span> <span class="hljs-attr">v-slot:footer</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{ footer }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/layout&gt;  
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="224287">
+                      这里你可以借助模板编译工具看一下它编译后的 render 函数：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, createVNode <span class="hljs-keyword">as</span> _createVNode, resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, withCtx <span class="hljs-keyword">as</span> _withCtx, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache, $props, $setup, $data, $options</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_layout = _resolveComponent(<span class="hljs-string">"layout"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(_component_layout, <span class="hljs-literal">null</span>, {
+</div></li><li><div class="code-word">    <span class="hljs-attr">header</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">      _createVNode(<span class="hljs-string">"h1"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.header), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">    ]),
+</div></li><li><div class="code-word">    <span class="hljs-attr">default</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">      _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.main), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">    ]),
+</div></li><li><div class="code-word">    <span class="hljs-attr">footer</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">      _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.footer), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">    ]),
+</div></li><li><div class="code-word">    <span class="hljs-attr">_</span>: <span class="hljs-number">1</span>
+</div></li><li><div class="code-word">  }))
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="224725">
+                      前面我们学习过 createBlock，它的内部通过执行 createVNode
+                      创建了 vnode，注意 createBlock
+                      函数的第三个参数，它表示创建的 vnode
+                      子节点，在我们这个例子中，它是一个对象。
+                    </p>
+                    <p data-nodeid="224726">
+                      通常，我们创建 vnode
+                      传入的子节点是一个数组，那么对于对象类型的子节点，它内部做了哪些处理呢？我们来回顾一下
+                      createVNode 的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createVNode</span>(<span class="hljs-params">type,props = null,children = null</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (props) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 处理 props 相关逻辑，标准化 class 和 style</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 对 vnode 类型信息编码</span>
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 vnode 对象</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> vnode = {
+</div></li><li><div class="code-word">    type,
+</div></li><li><div class="code-word">    props
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 其他一些属性</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 标准化子节点，把不同数据类型的 children 转成数组或者文本类型</span>
+</div></li><li><div class="code-word">  normalizeChildren(vnode, children)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="225160">
+                      其中，normalizeChildren 就是用来处理传入的参数
+                      children，我们来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">normalizeChildren</span> (<span class="hljs-params">vnode, children</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">let</span> type = <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { shapeFlag } = vnode
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (children == <span class="hljs-literal">null</span>) {
+</div></li><li><div class="code-word">    children = <span class="hljs-literal">null</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isArray(children)) {
+</div></li><li><div class="code-word">    type = <span class="hljs-number">16</span> <span class="hljs-comment">/* ARRAY_CHILDREN */</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> children === <span class="hljs-string">'object'</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 标准化 slot 子节点</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> ((shapeFlag &amp; <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span> || shapeFlag &amp; <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>) &amp;&amp; children.default) {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理 Teleport 的情况</span>
+</div></li><li><div class="code-word">      normalizeChildren(vnode, children.default())
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 确定 vnode 子节点类型为 slot 子节点</span>
+</div></li><li><div class="code-word">      type = <span class="hljs-number">32</span> <span class="hljs-comment">/* SLOTS_CHILDREN */</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">const</span> slotFlag = children._
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (!slotFlag &amp;&amp; !(InternalObjectKey <span class="hljs-keyword">in</span> children)) {
+</div></li><li><div class="code-word">        children._ctx = currentRenderingInstance
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (slotFlag === <span class="hljs-number">3</span> <span class="hljs-comment">/* FORWARDED */</span> &amp;&amp; currentRenderingInstance) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理类型为 FORWARDED 的情况</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (currentRenderingInstance.vnode.patchFlag &amp; <span class="hljs-number">1024</span> <span class="hljs-comment">/* DYNAMIC_SLOTS */</span>) {
+</div></li><li><div class="code-word">          children._ = <span class="hljs-number">2</span> <span class="hljs-comment">/* DYNAMIC */</span>
+</div></li><li><div class="code-word">          vnode.patchFlag |= <span class="hljs-number">1024</span> <span class="hljs-comment">/* DYNAMIC_SLOTS */</span>
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">          children._ = <span class="hljs-number">1</span> <span class="hljs-comment">/* STABLE */</span>
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isFunction(children)) {
+</div></li><li><div class="code-word">    children = { <span class="hljs-attr">default</span>: children, <span class="hljs-attr">_ctx</span>: currentRenderingInstance }
+</div></li><li><div class="code-word">    type = <span class="hljs-number">32</span> <span class="hljs-comment">/* SLOTS_CHILDREN */</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    children = <span class="hljs-built_in">String</span>(children)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>) {
+</div></li><li><div class="code-word">      type = <span class="hljs-number">16</span> <span class="hljs-comment">/* ARRAY_CHILDREN */</span>
+</div></li><li><div class="code-word">      children = [createTextVNode(children)]
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      type = <span class="hljs-number">8</span> <span class="hljs-comment">/* TEXT_CHILDREN */</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  vnode.children = children
+</div></li><li><div class="code-word">  vnode.shapeFlag |= type
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="225590">
+                      normalizeChildren 函数主要的作用就是标准化 children
+                      以及获取 vnode 的节点类型 shapeFlag。
+                    </p>
+                    <p data-nodeid="225591">
+                      这里，我们重点关注插槽相关的逻辑。经过处理，vnode.children
+                      仍然是传入的对象数据，而 vnode.shapeFlag 会与 slot
+                      子节点类型 SLOTS_CHILDREN 进行<strong data-nodeid="225648"
+                        >或</strong
+                      >运算，由于 vnode 本身的 shapFlag 是
+                      STATEFUL_COMPONENT，所以运算后的 shapeFlag 是
+                      SLOTS_CHILDREN | STATEFUL_COMPONENT。
+                    </p>
+                    <p data-nodeid="225592">
+                      确定了 shapeFlag，会影响后续的 patch 过程，我们知道在
+                      patch 中会根据 vnode 的 type 和 shapeFlag
+                      来决定后续的执行逻辑，我们来回顾一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> patch = <span class="hljs-function">(<span class="hljs-params">n1, n2, container, anchor = <span class="hljs-literal">null</span>, parentComponent = <span class="hljs-literal">null</span>, parentSuspense = <span class="hljs-literal">null</span>, isSVG = <span class="hljs-literal">false</span>, optimized = <span class="hljs-literal">false</span></span>) =&gt;</span> {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 如果存在新旧节点, 且新旧节点类型不同，则销毁旧节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n1 &amp;&amp; !isSameVNodeType(n1, n2)) {
+</div></li><li><div class="code-word">    anchor = getNextHostNode(n1)
+</div></li><li><div class="code-word">    unmount(n1, parentComponent, parentSuspense, <span class="hljs-literal">true</span>)
+</div></li><li><div class="code-word">    n1 = <span class="hljs-literal">null</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { type, shapeFlag } = n2
+</div></li><li><div class="code-word">  <span class="hljs-keyword">switch</span> (type) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Text:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理文本节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Comment:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理注释节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Static:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理静态节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Fragment:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理 Fragment 元素</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-attr">default</span>:
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理普通 DOM 元素</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">6</span> <span class="hljs-comment">/* COMPONENT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理组件</span>
+</div></li><li><div class="code-word">        processComponent(n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理 TELEPORT</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">128</span> <span class="hljs-comment">/* SUSPENSE */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理 SUSPENSE</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="226017">
+                      这里由于 type 是组件对象，shapeFlag 满足<code
+                        data-backticks="1"
+                        data-nodeid="226058"
+                        >shapeFlag&amp;6</code
+                      >的情况，所以会走到 processComponent
+                      的逻辑，递归去渲染子组件。
+                    </p>
+                    <p data-nodeid="226018">
+                      至此，带有子节点插槽的组件与普通的组件渲染并无区别，还是通过递归的方式去渲染子组件。
+                    </p>
+                    <p data-nodeid="226019">
+                      渲染子组件又会执行组件的渲染逻辑了，这个流程我们在前面的章节已经分析过，其中有一个
+                      setupComponent 的流程，我们来回顾一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setupComponent</span> (<span class="hljs-params">instance, isSSR = false</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { props, children, shapeFlag } = instance.vnode
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 判断是否是一个有状态的组件</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> isStateful = shapeFlag &amp; <span class="hljs-number">4</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 初始化 props</span>
+</div></li><li><div class="code-word">  initProps(instance, props, isStateful, isSSR)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 初始化插槽</span>
+</div></li><li><div class="code-word">  initSlots(instance, children)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 设置有状态的组件实例</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> setupResult = isStateful
+</div></li><li><div class="code-word">    ? setupStatefulComponent(instance, isSSR)
+</div></li><li><div class="code-word">    : <span class="hljs-literal">undefined</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> setupResult
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="226424">
+                      注意，这里的 instance.vnode 就是组件
+                      vnode，我们可以从中拿到子组件的实例、props 和 children
+                      等数据。setupComponent 执行过程中会通过 initSlots
+                      函数去初始化插槽，并传入 instance 和
+                      children，我们来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> initSlots = <span class="hljs-function">(<span class="hljs-params">instance, children</span>) =&gt;</span> {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (instance.vnode.shapeFlag &amp; <span class="hljs-number">32</span> <span class="hljs-comment">/* SLOTS_CHILDREN */</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> type = children._
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (type) {
+</div></li><li><div class="code-word">      instance.slots = children
+</div></li><li><div class="code-word">      def(children, <span class="hljs-string">'_'</span>, type)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      normalizeObjectSlots(children, (instance.slots = {}))
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    instance.slots = {}
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (children) {
+</div></li><li><div class="code-word">      normalizeVNodeSlots(instance, children)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  def(instance.slots, InternalObjectKey, <span class="hljs-number">1</span>)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="226822">
+                      initSlots 的实现逻辑很简单，这里的 children
+                      就是前面传入的插槽对象数据，然后我们把它保留到
+                      instance.slots 对象中，后续我们就可以从 instance.slots
+                      拿到插槽的数据了。
+                    </p>
+                    <p data-nodeid="226823">
+                      到这里，我们在子组件的初始化过程中就拿到由父组件传入的插槽数据了，那么接下来，我们就来分析子组件是如何把这些插槽数据渲染到页面上的吧。
+                    </p>
+                    <p data-nodeid="226824">我们先来看子组件的模板：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"layout"</span>&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"header"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">footer</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"footer"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">footer</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/div&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="227217">
+                      这里你可以借助模板编译工具看一下它编译后的 render 函数：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { renderSlot <span class="hljs-keyword">as</span> _renderSlot, createVNode <span class="hljs-keyword">as</span> _createVNode, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache, $props, $setup, $data, $options</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, { <span class="hljs-attr">class</span>: <span class="hljs-string">"layout"</span> }, [
+</div></li><li><div class="code-word">    _createVNode(<span class="hljs-string">"header"</span>, <span class="hljs-literal">null</span>, [
+</div></li><li><div class="code-word">      _renderSlot(_ctx.$slots, <span class="hljs-string">"header"</span>)
+</div></li><li><div class="code-word">    ]),
+</div></li><li><div class="code-word">    _createVNode(<span class="hljs-string">"main"</span>, <span class="hljs-literal">null</span>, [
+</div></li><li><div class="code-word">      _renderSlot(_ctx.$slots, <span class="hljs-string">"default"</span>)
+</div></li><li><div class="code-word">    ]),
+</div></li><li><div class="code-word">    _createVNode(<span class="hljs-string">"footer"</span>, <span class="hljs-literal">null</span>, [
+</div></li><li><div class="code-word">      _renderSlot(_ctx.$slots, <span class="hljs-string">"footer"</span>)
+</div></li><li><div class="code-word">    ])
+</div></li><li><div class="code-word">  ]))
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="227605">
+                      通过编译后的代码我们可以看出，子组件的插槽部分的 DOM
+                      主要通过 renderSlot 方法渲染生成的，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderSlot</span>(<span class="hljs-params">slots, name, props = {}, fallback</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">let</span> slot = slots[name];
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (openBlock(),
+</div></li><li><div class="code-word">    createBlock(Fragment, { <span class="hljs-attr">key</span>: props.key }, slot ? slot(props) : fallback ? fallback() : [], slots._ === <span class="hljs-number">1</span> <span class="hljs-comment">/* STABLE */</span>
+</div></li><li><div class="code-word">      ? <span class="hljs-number">64</span> <span class="hljs-comment">/* STABLE_FRAGMENT */</span>
+</div></li><li><div class="code-word">      : <span class="hljs-number">-2</span> <span class="hljs-comment">/* BAIL */</span>));
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="227990">
+                      renderSlot 函数的第一个参数 slots 就是
+                      instance.slots，我们在子组件初始化的时候已经获得了这个
+                      slots 对象，第二个参数是 name。
+                    </p>
+                    <p data-nodeid="227991">
+                      renderSlot 的实现也很简单，首先根据第二个参数 name
+                      获取对应的插槽函数 slot，接着通过 createBlock 创建了 vnode
+                      节点，注意，它的类型是一个 Fragment，children 是执行 slot
+                      插槽函数的返回值。
+                    </p>
+                    <p data-nodeid="227992">
+                      下面我们来看看 slot 函数长啥样，先看一下示例中的
+                      instance.slots 的值：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">{
+</div></li><li><div class="code-word"><span class="hljs-attr">header</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">_createVNode(<span class="hljs-string">"h1"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.header), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">]),
+</div></li><li><div class="code-word"><span class="hljs-attr">default</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.main), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">]),
+</div></li><li><div class="code-word"><span class="hljs-attr">footer</span>: _withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.footer), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">]),
+</div></li><li><div class="code-word"><span class="hljs-attr">_</span>: <span class="hljs-number">1</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="229118" class="">
+                      那么对于 name 为 header，它的值就是：
+                    </p>
+
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">_withCtx(<span class="hljs-function">() =&gt;</span> [
+</div></li><li><div class="code-word">  _createVNode(<span class="hljs-string">"h1"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.header), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">])
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="228747">
+                      它是执行 _withCtx 函数后的返回值，我们接着看 withCtx
+                      函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">function withCtx(fn, ctx = currentRenderingInstance) {
+</div></li><li><div class="code-word">  if (!ctx)
+</div></li><li><div class="code-word">    return fn
+</div></li><li><div class="code-word">  return function renderFnWithContext() {
+</div></li><li><div class="code-word">    const owner = currentRenderingInstance
+</div></li><li><div class="code-word">    setCurrentRenderingInstance(ctx)
+</div></li><li><div class="code-word">    const res = fn.apply(null, arguments)
+</div></li><li><div class="code-word">    setCurrentRenderingInstance(owner)
+</div></li><li><div class="code-word">    return res
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="228749">
+                      withCtx 的实现很简单，它支持传入一个函数 fn
+                      和执行的上下文变量 ctx，它的默认值是
+                      currentRenderingInstance，也就是执行 render
+                      函数时的当前组件实例。
+                    </p>
+                    <p data-nodeid="228750">
+                      withCtx
+                      会返回一个新的函数，这个函数执行的时候，会先保存当前渲染的组件实例
+                      owner，然后把 ctx 设置为当前渲染的组件实例，接着执行
+                      fn，执行完毕后，再把之前的 owner 设置为当前组件实例。
+                    </p>
+                    <p data-nodeid="228751">
+                      这么做就是为了保证在子组件中渲染具体插槽内容时，它的渲染组件实例是父组件实例，这样也就保证它的数据作用域也是父组件的了。
+                    </p>
+                    <p data-nodeid="228752">
+                      所以对于 header 这个 slot，它的 slot
+                      函数的返回值是一个数组，如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">[
+</div></li><li><div class="code-word">  _createVNode(<span class="hljs-string">"h1"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.header), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)
+</div></li><li><div class="code-word">]
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="230521">
+                      我们回到 renderSlot 函数，最终插槽对应的 vnode
+                      渲染就变成了如下函数：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">createBlock(Fragment, { <span class="hljs-attr">key</span>: props.key }, [_createVNode(<span class="hljs-string">"h1"</span>, <span class="hljs-literal">null</span>, _toDisplayString(_ctx.header), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>)], <span class="hljs-number">64</span> <span class="hljs-comment">/* STABLE_FRAGMENT */</span>)
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="231234">
+                      我们知道，createBlock 内部是会执行 createVNode 创建
+                      vnode，vnode 创建完后，仍然会通过 patch 把 vnode
+                      挂载到页面上，那么对于插槽的渲染，patch
+                      过程又有什么不同呢？
+                    </p>
+                    <p data-nodeid="231235">
+                      注意这里我们的 vnode 的 type 是 Fragement，所以在执行
+                      patch 的时候，会执行 processFragment
+                      逻辑，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> processFragment = <span class="hljs-function">(<span class="hljs-params">n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized</span>) =&gt;</span> {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> fragmentStartAnchor = (n2.el = n1 ? n1.el : hostCreateText(<span class="hljs-string">''</span>))
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> fragmentEndAnchor = (n2.anchor = n1 ? n1.anchor : hostCreateText(<span class="hljs-string">''</span>))
+</div></li><li><div class="code-word">  <span class="hljs-keyword">let</span> { patchFlag } = n2
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (patchFlag &gt; <span class="hljs-number">0</span>) {
+</div></li><li><div class="code-word">    optimized = <span class="hljs-literal">true</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n1 == <span class="hljs-literal">null</span>) {
+</div></li><li><div class="code-word">   <span class="hljs-comment">//插入节点</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// 先在前后插入两个空文本节点</span>
+</div></li><li><div class="code-word">    hostInsert(fragmentStartAnchor, container, anchor)
+</div></li><li><div class="code-word">    hostInsert(fragmentEndAnchor, container, anchor)
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 再挂载子节点</span>
+</div></li><li><div class="code-word">    mountChildren(n2.children, container, fragmentEndAnchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 更新节点</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="231939">
+                      我们只分析挂载子节点的过程，所以 n1 的值为 null，n2
+                      就是我们前面创建的 vnode 节点，它的 children 是一个数组。
+                    </p>
+                    <p data-nodeid="231940">
+                      processFragment 函数首先通过 hostInsert
+                      在容器的前后插入两个空文本节点，然后在以尾文本节点作为参考锚点，通过
+                      mountChildren 把 children 挂载到 container 容器中。
+                    </p>
+                    <p data-nodeid="231941">
+                      至此，我们就完成了子组件插槽内容的渲染。可以看到，插槽的实现实际上就是一种延时渲染，把父组件中编写的插槽内容保存到一个对象上，并且把具体渲染
+                      DOM
+                      的代码用函数的方式封装，然后在子组件渲染的时候，根据插槽名在对象中找到对应的函数，然后执行这些函数做真正的渲染。
+                    </p>
+                    <h3 data-nodeid="231942">总结</h3>
+                    <p data-nodeid="231943">
+                      好的，到这里我们这一节课的学习就结束啦。希望你能了解插槽的实现原理，知道父组件和子组件在实现插槽
+                      feature 的时候各自做了哪些事情。
+                    </p>
+                    <p data-nodeid="231944">
+                      最后，给你留一道思考题目，作用域插槽是如何实现子组件数据传递的？欢迎你在留言区与我分享。
+                    </p>
+                    <blockquote data-nodeid="231945">
+                      <p data-nodeid="231946">
+                        本节课的相关代码在源代码中的位置如下：<br />
+                        packages/runtime-core/src/componentSlots.ts<br />
+                        packages/runtime-core/src/vnode.ts<br />
+                        packages/runtime-core/src/renderer.ts<br />
+                        packages/runtime-core/src/helpers/withRenderContext.ts
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <div data-v-4bc80e00="" class="message-edit-empty">
+                  学习知识要善于思考，思考，再思考。—爱因斯坦
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

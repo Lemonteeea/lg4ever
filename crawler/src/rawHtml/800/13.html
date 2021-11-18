@@ -1,0 +1,2483 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/11:34"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="694"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/11:34</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            10.65M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/11:34
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="73493">
+                      在前面的课时中，我们多次提到回调函数是以一种调度的方式执行的，特别是当
+                      flush 不是 sync
+                      时，它会把回调函数执行的任务推到一个异步队列中执行。接下来，我们就来分析异步执行队列的设计。分析之前，我们先来思考一下，为什么会需要异步队列？
+                    </p>
+
+                    <h3 data-nodeid="72917">异步任务队列的设计</h3>
+                    <p data-nodeid="72918">我们把之前的例子简单修改一下：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { reactive, watch } from <span class="hljs-string">'vue'</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> state = reactive({ count: <span class="hljs-number">0</span> }) 
+</div></li><li><div class="code-word">watch(() =&gt; state.count, (count, prevCount) =&gt; { 
+</div></li><li><div class="code-word">  console.log(count) 
+</div></li><li><div class="code-word">}) 
+</div></li><li><div class="code-word">state.count++ 
+</div></li><li><div class="code-word">state.count++ 
+</div></li><li><div class="code-word">state.count++ 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72920">
+                      这里，我们修改了三次 state.count，那么 watcher
+                      的回调函数会执行三次吗？
+                    </p>
+                    <p data-nodeid="72921">
+                      答案是不会，实际上只输出了一次 count
+                      的值，也就是最终计算的值
+                      3。这在大多数场景下都是符合预期的，因为在一个
+                      Tick（宏任务执行的生命周期）内，即使多次修改侦听的值，它的回调函数也只执行一次。
+                    </p>
+                    <blockquote data-nodeid="75778">
+                      <p data-nodeid="75779" class="">
+                        <strong data-nodeid="75785">知识延伸</strong><br />
+                        组件的更新过程是异步的，我们知道修改模板中引用的响应式对象的值时，会触发组件的重新渲染，但是在一个
+                        Tick
+                        内，即使你多次修改多个响应式对象的值，组件的重新渲染也只执行一次。这是因为如果每次更新数据都触发组件重新渲染，那么重新渲染的次数和代价都太高了。
+                      </p>
+                    </blockquote>
+
+                    <p data-nodeid="72924">
+                      那么，这是怎么做到的呢？我们先从异步任务队列的创建说起。
+                    </p>
+                    <h4 data-nodeid="72925">异步任务队列的创建</h4>
+                    <p data-nodeid="72926">
+                      通过前面的分析我们知道，在创建一个 watcher 时，如果配置
+                      flush 为 pre 或不配置 flush ，那么 watcher
+                      的回调函数就会异步执行。此时分别是通过 queueJob 和
+                      queuePostRenderEffect 把回调函数推入异步队列中的。
+                    </p>
+                    <p data-nodeid="72927">
+                      在不涉及 suspense 的情况下，queuePostRenderEffect 相当于
+                      queuePostFlushCb，我们来看它们的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 异步任务队列 </span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> queue = [] 
+</div></li><li><div class="code-word"><span class="hljs-comment">// 队列任务执行完后执行的回调函数队列 </span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> postFlushCbs = [] 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">queueJob</span><span class="hljs-params">(job)</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!queue.includes(job)) { 
+</div></li><li><div class="code-word">    queue.push(job) 
+</div></li><li><div class="code-word">    queueFlush() 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">queuePostFlushCb</span><span class="hljs-params">(cb)</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isArray(cb)) { 
+</div></li><li><div class="code-word">    postFlushCbs.push(cb) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> { 
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 如果是数组，把它拍平成一维 </span>
+</div></li><li><div class="code-word">    postFlushCbs.push(...cb) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  queueFlush() 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72929">
+                      Vue.js 内部维护了一个 queue 数组和一个 postFlushCbs
+                      数组，其中 queue 数组用作异步任务队列， postFlushCbs
+                      数组用作异步任务队列执行完毕后的回调函数队列。
+                    </p>
+                    <p data-nodeid="72930">
+                      执行 queueJob 时会把这个任务 job 添加到 queue
+                      的队尾，而执行 queuePostFlushCb 时，会把这个 cb
+                      回调函数添加到 postFlushCbs
+                      的队尾。它们在添加完毕后都执行了 queueFlush
+                      函数，我们接着看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> p = Promise.resolve() 
+</div></li><li><div class="code-word"><span class="hljs-comment">// 异步任务队列是否正在执行 </span>
+</div></li><li><div class="code-word">let isFlushing = <span class="hljs-keyword">false</span> 
+</div></li><li><div class="code-word"><span class="hljs-comment">// 异步任务队列是否等待执行 </span>
+</div></li><li><div class="code-word">let isFlushPending = <span class="hljs-function"><span class="hljs-keyword">false</span> 
+</span></div></li><li><div class="code-word">function <span class="hljs-title">nextTick</span><span class="hljs-params">(fn)</span> { 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> fn ? p.then(fn) : p 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">queueFlush</span><span class="hljs-params">()</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isFlushing &amp;&amp; !isFlushPending) { 
+</div></li><li><div class="code-word">    isFlushPending = <span class="hljs-function"><span class="hljs-keyword">true</span> 
+</span></div></li><li><div class="code-word">    <span class="hljs-title">nextTick</span><span class="hljs-params">(flushJobs)</span> 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72932">
+                      可以看到，Vue.js 内部还维护了 isFlushing 和 isFlushPending
+                      变量，用来控制异步任务的刷新逻辑。
+                    </p>
+                    <p data-nodeid="72933">
+                      在 queueFlush 首次执行时，isFlushing 和 isFlushPending
+                      都是 false，此时会把 isFlushPending 设置为 true，并且调用
+                      nextTick(flushJobs) 去执行队列里的任务。
+                    </p>
+                    <p data-nodeid="72934">
+                      因为 isFlushPending 的控制，这使得即使多次执行
+                      queueFlush，也不会多次去执行 flushJobs。另外 nextTick 在
+                      Vue.js 3.0 中的实现也是非常简单，通过
+                      Promise.resolve().then 去异步执行 flushJobs。
+                    </p>
+                    <p data-nodeid="72935">
+                      因为 JavaScript 是单线程执行的，这样的异步设计使你在一个
+                      Tick 内，可以多次执行 queueJob 或者 queuePostFlushCb
+                      去添加任务，也可以保证在宏任务执行完毕后的微任务阶段执行一次
+                      flushJobs。
+                    </p>
+                    <h4 data-nodeid="72936">异步任务队列的执行</h4>
+                    <p data-nodeid="72937">
+                      创建完任务队列后，接下来要异步执行这个队列，我们来看一下
+                      flushJobs 的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> getId = (job) =&gt; (job.id == <span class="hljs-keyword">null</span> ? Infinity : job.id) 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">flushJobs</span><span class="hljs-params">(seen)</span> </span>{ 
+</div></li><li><div class="code-word">  isFlushPending = <span class="hljs-keyword">false</span> 
+</div></li><li><div class="code-word">  isFlushing = <span class="hljs-function"><span class="hljs-keyword">true</span> 
+</span></div></li><li><div class="code-word">  let job 
+</div></li><li><div class="code-word">  <span class="hljs-title">if</span> <span class="hljs-params">((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)</span>) { 
+</div></li><li><div class="code-word">    seen = seen || <span class="hljs-keyword">new</span> Map() 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 组件的更新是先父后子 </span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 如果一个组件在父组件更新过程中卸载，它自身的更新应该被跳过 </span>
+</div></li><li><div class="code-word">  queue.sort((a, b) =&gt; getId(a) - getId(b)) 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">while</span> ((job = queue.shift()) !== undefined) { 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (job === <span class="hljs-keyword">null</span>) { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">continue</span> 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> ((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)) { 
+</div></li><li><div class="code-word">      checkRecursiveUpdates(seen, job) 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    callWithErrorHandling(job, <span class="hljs-keyword">null</span>, <span class="hljs-number">14</span> <span class="hljs-comment">/* SCHEDULER */</span>) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  flushPostFlushCbs(seen) 
+</div></li><li><div class="code-word">  isFlushing = <span class="hljs-keyword">false</span> 
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 一些 postFlushCb 执行过程中会再次添加异步任务，递归 flushJobs 会把它们都执行完毕 </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (queue.length || postFlushCbs.length) { 
+</div></li><li><div class="code-word">    flushJobs(seen) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72939">
+                      可以看到，flushJobs 函数开始执行的时候，会把
+                      isFlushPending 重置为 false，把 isFlushing 设置为 true
+                      来表示正在执行异步任务队列。
+                    </p>
+                    <p data-nodeid="72940">
+                      对于异步任务队列
+                      queue，在遍历执行它们前会先对它们做一次从小到大的排序，这是因为两个主要原因：
+                    </p>
+                    <ul data-nodeid="72941">
+                      <li data-nodeid="72942">
+                        <p data-nodeid="72943">
+                          我们创建组件的过程是由父到子，所以创建组件副作用渲染函数也是先父后子，父组件的副作用渲染函数的
+                          effect id 是小于子组件的，每次更新组件也是通过
+                          queueJob 把 effect 推入异步任务队列 queue
+                          中的。所以为了保证先更新父组再更新子组件，要对 queue
+                          做从小到大的排序。
+                        </p>
+                      </li>
+                      <li data-nodeid="72944">
+                        <p data-nodeid="72945">
+                          如果一个组件在父组件更新过程中被卸载，它自身的更新应该被跳过。所以也应该要保证先更新父组件再更新子组件，要对
+                          queue 做从小到大的排序。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="72946">
+                      接下来，就是遍历这个
+                      queue，依次执行队列中的任务了，在遍历过程中，注意有一个
+                      checkRecursiveUpdates
+                      的逻辑，它是用来在非生产环境下检测是否有循环更新的，它的作用我们稍后会提。
+                    </p>
+                    <p data-nodeid="72947">
+                      遍历完 queue 后，又会进一步执行 flushPostFlushCbs
+                      方法去遍历执行所有推入到 postFlushCbs 的回调函数：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"> <span class="hljs-function">function <span class="hljs-title">flushPostFlushCbs</span><span class="hljs-params">(seen)</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (postFlushCbs.length) { 
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 拷贝副本 </span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> cbs = [...<span class="hljs-function">new <span class="hljs-title">Set</span><span class="hljs-params">(postFlushCbs)</span>] 
+</span></div></li><li><div class="code-word">    postFlushCbs.length = <span class="hljs-number">0</span> 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> ((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)) { 
+</div></li><li><div class="code-word">      seen = seen || <span class="hljs-keyword">new</span> Map() 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">for</span> (let i = <span class="hljs-number">0</span>; i &lt; cbs.length; i++) { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> ((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)) {                                                       
+</div></li><li><div class="code-word">        checkRecursiveUpdates(seen, cbs[i]) 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">      cbs[i]() 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72949">
+                      注意这里遍历前会通过
+                      <code data-backticks="1" data-nodeid="73037"
+                        >const cbs = [...new Set(postFlushCbs)]</code
+                      >
+                      拷贝一个 postFlushCbs
+                      的副本，这是因为在遍历的过程中，可能某些回调函数的执行会再次修改
+                      postFlushCbs，所以拷贝一个副本循环遍历则不会受到
+                      postFlushCbs 修改的影响。
+                    </p>
+                    <p data-nodeid="72950">
+                      遍历完 postFlushCbs 后，会重置 isFlushing 为
+                      false，因为一些 postFlushCb
+                      执行过程中可能会再次添加异步任务，所以需要继续判断如果
+                      queue 或者 postFlushCbs 队列中还存在任务，则递归执行
+                      flushJobs 把它们都执行完毕。
+                    </p>
+                    <h4 data-nodeid="72951">检测循环更新</h4>
+                    <p data-nodeid="72952">
+                      前面我们提到了，在遍历执行异步任务和回调函数的过程中，都会在非生产环境下执行
+                      checkRecursiveUpdates
+                      检测是否有循环更新，它是用来解决什么问题的呢？
+                    </p>
+                    <p data-nodeid="72953">我们把之前的例子改写一下：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { reactive, watch } from <span class="hljs-string">'vue'</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> state = reactive({ count: <span class="hljs-number">0</span> }) 
+</div></li><li><div class="code-word">watch(() =&gt; state.count, (count, prevCount) =&gt; { 
+</div></li><li><div class="code-word">  state.count++ 
+</div></li><li><div class="code-word">  console.log(count) 
+</div></li><li><div class="code-word">}) 
+</div></li><li><div class="code-word">state.count++ 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72955">
+                      如果你去跑这个示例，你会在控制台看到输出了 101
+                      次值，然后报了错误：
+                      <code data-backticks="1" data-nodeid="73044"
+                        >Maximum recursive updates exceeded</code
+                      >
+                      。这是因为我们在 watcher
+                      的回调函数里更新了数据，这样会再一次进入回调函数，如果我们不加任何控制，那么回调函数会一直执行，直到把内存耗尽造成浏览器假死。<br />
+                      为了避免这种情况，Vue.js 实现了 checkRecursiveUpdates
+                      方法：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> RECURSION_LIMIT = <span class="hljs-number">100</span> 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">checkRecursiveUpdates</span><span class="hljs-params">(seen, fn)</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!seen.has(fn)) { 
+</div></li><li><div class="code-word">    seen.set(fn, <span class="hljs-number">1</span>) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> { 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> count = seen.get(fn) 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (count &gt; RECURSION_LIMIT) { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Maximum recursive updates exceeded. '</span> + 
+</div></li><li><div class="code-word">        <span class="hljs-string">"You may have code that is mutating state in your component's "</span> + 
+</div></li><li><div class="code-word">        <span class="hljs-string">'render function or updated hook or watcher source function.'</span>) 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> { 
+</div></li><li><div class="code-word">      seen.set(fn, count + <span class="hljs-number">1</span>) 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72957">
+                      通过前面的代码，我们知道 flushJobs 一开始便创建了
+                      seen，它是一个 Map 对象，然后在 checkRecursiveUpdates
+                      的时候会把任务添加到 seen 中，记录引用计数 count，初始值为
+                      1，如果 postFlushCbs 再次添加了相同的任务，则引用计数
+                      count 加 1，如果 count 大于我们定义的限制 100
+                      ，则说明一直在添加这个相同的任务并超过了 100
+                      次。那么，Vue.js
+                      会抛出这个错误，因为在正常的使用中，不应该出现这种情况，而我们上述的错误示例就会触发这种报错逻辑。
+                    </p>
+                    <h4 data-nodeid="72958">优化：只用一个变量</h4>
+                    <p data-nodeid="72959">
+                      到这里，异步队列的设计就介绍完毕了，你可能会对
+                      isFlushPending 和 isFlushing
+                      有些疑问，为什么需要两个变量来控制呢？
+                    </p>
+                    <p data-nodeid="72960">
+                      从语义上来看，isFlushPending 用于判断是否在等待 nextTick
+                      执行 flushJobs，而 isFlushing 是判断是否正在执行任务队列。
+                    </p>
+                    <p data-nodeid="72961">
+                      从功能上来看，它们的作用是为了确保以下两点：
+                    </p>
+                    <ol data-nodeid="72962">
+                      <li data-nodeid="72963">
+                        <p data-nodeid="72964">
+                          在一个 Tick
+                          内可以多次添加任务到队列中，但是任务队列会在 nextTick
+                          后执行；
+                        </p>
+                      </li>
+                      <li data-nodeid="72965">
+                        <p data-nodeid="72966">
+                          在执行任务队列的过程中，也可以添加新的任务到队列中，并且在当前
+                          Tick 去执行剩余的任务队列。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="72967">
+                      但实际上，这里我们可以进行优化。在我看来，这里用一个变量就足够了，我们来稍微修改一下源码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">queueFlush</span><span class="hljs-params">()</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isFlushing) { 
+</div></li><li><div class="code-word">    isFlushing = <span class="hljs-function"><span class="hljs-keyword">true</span> 
+</span></div></li><li><div class="code-word">    <span class="hljs-title">nextTick</span><span class="hljs-params">(flushJobs)</span> 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word">function <span class="hljs-title">flushJobs</span><span class="hljs-params">(seen)</span> { 
+</div></li><li><div class="code-word">  <span class="hljs-function">let job 
+</span></div></li><li><div class="code-word">  <span class="hljs-title">if</span> <span class="hljs-params">((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)</span>) { 
+</div></li><li><div class="code-word">    seen = seen || <span class="hljs-keyword">new</span> Map() 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  queue.sort((a, b) =&gt; getId(a) - getId(b)) 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">while</span> ((job = queue.shift()) !== undefined) { 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (job === <span class="hljs-keyword">null</span>) { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">continue</span> 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> ((process.env.NODE_ENV !== <span class="hljs-string">'production'</span>)) { 
+</div></li><li><div class="code-word">      checkRecursiveUpdates(seen, job) 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">    callWithErrorHandling(job, <span class="hljs-keyword">null</span>, <span class="hljs-number">14</span> <span class="hljs-comment">/* SCHEDULER */</span>) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  flushPostFlushCbs(seen) 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (queue.length || postFlushCbs.length) { 
+</div></li><li><div class="code-word">    flushJobs(seen) 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  isFlushing = <span class="hljs-keyword">false</span> 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72969">
+                      可以看到，我们只需要一个 isFlushing
+                      来控制就可以实现相同的功能了。在执行 queueFlush
+                      的时候，判断 isFlushing 为 false，则把它设置为 true，然后
+                      nextTick 会执行 flushJobs。在 flushJobs
+                      函数执行完成的最后，也就是所有的任务（包括后添加的）都执行完毕，再设置
+                      isFlushing 为 false。
+                    </p>
+                    <blockquote data-nodeid="72970">
+                      <p data-nodeid="72971">
+                        我这么修改源码后也跑通了 Vue.js 3.0
+                        的单元测试，如果你觉得这么实现有问题的话，欢迎在留言区评论与我讨论。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="72972">
+                      了解完 watch API
+                      和异步任务队列的设计后，我们再来学习侦听器提供的另一个
+                      API—— watchEffect API。
+                    </p>
+                    <h3 data-nodeid="72973">watchEffect API</h3>
+                    <p data-nodeid="72974">
+                      watchEffect API
+                      的作用是注册一个副作用函数，副作用函数内部可以访问到响应式对象，当内部响应式对象变化后再立即执行这个函数。
+                    </p>
+                    <p data-nodeid="72975">可以先来看一个示例：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { ref, watchEffect } from <span class="hljs-string">'vue'</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> count = ref(<span class="hljs-number">0</span>) 
+</div></li><li><div class="code-word">watchEffect(() =&gt; console.log(count.value)) 
+</div></li><li><div class="code-word">count.value++ 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72977">
+                      它的结果是依次输出 0 和 1。<br />
+                      watchEffect 和前面的 watch API 有哪些不同呢？主要有三点：
+                    </p>
+                    <ol data-nodeid="72978">
+                      <li data-nodeid="72979">
+                        <p data-nodeid="72980">
+                          <strong data-nodeid="73069">侦听的源不同</strong>
+                          。watch API
+                          可以侦听一个或多个响应式对象，也可以侦听一个 getter
+                          函数，而 watchEffect API
+                          侦听的是一个普通函数，只要内部访问了响应式对象即可，这个函数并不需要返回响应式对象。
+                        </p>
+                      </li>
+                      <li data-nodeid="72981">
+                        <p data-nodeid="72982">
+                          <strong data-nodeid="73074">没有回调函数</strong>
+                          。watchEffect API
+                          没有回调函数，副作用函数的内部响应式对象发生变化后，会再次执行这个副作用函数。
+                        </p>
+                      </li>
+                      <li data-nodeid="72983">
+                        <p data-nodeid="72984">
+                          <strong data-nodeid="73079">立即执行</strong>
+                          。watchEffect API 在创建好 watcher
+                          后，会立刻执行它的副作用函数，而 watch API 需要配置
+                          immediate 为 true，才会立即执行回调函数。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="72985">
+                      对 watchEffect API 有大体了解后，我们来看一下在我整理的
+                      watchEffect 场景下， doWatch 函数的简化版实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">watchEffect</span><span class="hljs-params">(effect, options)</span> </span>{ 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> doWatch(effect, <span class="hljs-keyword">null</span>, options); 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">doWatch</span><span class="hljs-params">(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ)</span> </span>{ 
+</div></li><li><div class="code-word">  instance = currentInstance; 
+</div></li><li><div class="code-word">  let getter; 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (isFunction(source)) { 
+</div></li><li><div class="code-word">    getter = () =&gt; { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.isUnmounted) { 
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span>; 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">       <span class="hljs-comment">// 执行清理函数 </span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (cleanup) { 
+</div></li><li><div class="code-word">        cleanup(); 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 执行 source 函数，传入 onInvalidate 作为参数 </span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> callWithErrorHandling(source, instance, <span class="hljs-number">3</span> <span class="hljs-comment">/* WATCH_CALLBACK */</span>, [onInvalidate]); 
+</div></li><li><div class="code-word">    }; 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  let cleanup; 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> onInvalidate = (fn) =&gt; { 
+</div></li><li><div class="code-word">    cleanup = runner.options.onStop = () =&gt; { 
+</div></li><li><div class="code-word">      callWithErrorHandling(fn, instance, <span class="hljs-number">4</span> <span class="hljs-comment">/* WATCH_CLEANUP */</span>); 
+</div></li><li><div class="code-word">    }; 
+</div></li><li><div class="code-word">  }; 
+</div></li><li><div class="code-word">  let scheduler; 
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 scheduler </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (flush === <span class="hljs-string">'sync'</span>) { 
+</div></li><li><div class="code-word">    scheduler = invoke; 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (flush === <span class="hljs-string">'pre'</span>) { 
+</div></li><li><div class="code-word">    scheduler = job =&gt; { 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (!instance || instance.isMounted) { 
+</div></li><li><div class="code-word">        queueJob(job); 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> { 
+</div></li><li><div class="code-word">        job(); 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">    }; 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> { 
+</div></li><li><div class="code-word">    scheduler = job =&gt; queuePostRenderEffect(job, instance &amp;&amp; instance.suspense); 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 runner </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> runner = effect(getter, { 
+</div></li><li><div class="code-word">    lazy: <span class="hljs-keyword">true</span>, 
+</div></li><li><div class="code-word">    computed: <span class="hljs-keyword">true</span>, 
+</div></li><li><div class="code-word">    onTrack, 
+</div></li><li><div class="code-word">    onTrigger, 
+</div></li><li><div class="code-word">    scheduler 
+</div></li><li><div class="code-word">  }); 
+</div></li><li><div class="code-word">  recordInstanceBoundEffect(runner); 
+</div></li><li><div class="code-word">   
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 立即执行 runner </span>
+</div></li><li><div class="code-word">  runner(); 
+</div></li><li><div class="code-word">   
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 返回销毁函数 </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> () =&gt; { 
+</div></li><li><div class="code-word">    stop(runner); 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (instance) { 
+</div></li><li><div class="code-word">      remove(instance.effects, runner); 
+</div></li><li><div class="code-word">    } 
+</div></li><li><div class="code-word">  }; 
+</div></li><li><div class="code-word">} 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72987">
+                      可以看到，getter 函数就是对 source
+                      函数的简单封装，它会先判断组件实例是否已经销毁，然后每次执行
+                      source 函数前执行 cleanup 清理函数。
+                    </p>
+                    <p data-nodeid="72988">
+                      watchEffect 内部创建的 runner 对应的 scheduler 对象就是
+                      scheduler 函数本身，这样它再次执行时，就会执行这个
+                      scheduler 函数，并且传入 runner
+                      函数作为参数，其实就是按照一定的调度方式去执行基于 source
+                      封装的 getter 函数。
+                    </p>
+                    <p data-nodeid="72989">
+                      创建完 runner 后就立刻执行了
+                      runner，其实就是内部同步执行了基于 source 封装的 getter
+                      函数。
+                    </p>
+                    <p data-nodeid="72990">
+                      在执行 source 函数的时候，会传入一个 onInvalidate
+                      函数作为参数，接下来我们就来分析它的作用。
+                    </p>
+                    <h4 data-nodeid="72991">注册无效回调函数</h4>
+                    <p data-nodeid="72992">
+                      有些时候，watchEffect
+                      会注册一个副作用函数，在函数内部可以做一些异步操作，但是当这个
+                      watcher
+                      停止后，如果我们想去对这个异步操作做一些额外事情（比如取消这个异步操作），我们可以通过
+                      onInvalidate 参数注册一个无效函数。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> {ref, watchEffect } from <span class="hljs-string">'vue'</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> id = ref(<span class="hljs-number">0</span>) 
+</div></li><li><div class="code-word">watchEffect(onInvalidate =&gt; { 
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 执行异步操作 </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> token = performAsyncOperation(id.value) 
+</div></li><li><div class="code-word">  onInvalidate(() =&gt; { 
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 如果 id 发生变化或者 watcher 停止了，则执行逻辑取消前面的异步操作 </span>
+</div></li><li><div class="code-word">    token.cancel() 
+</div></li><li><div class="code-word">  }) 
+</div></li><li><div class="code-word">}) 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72994">
+                      我们利用 watchEffect 注册了一个副作用函数，它有一个
+                      onInvalidate 参数。在这个函数内部通过
+                      performAsyncOperation 执行某些异步操作，并且访问了 id
+                      这个响应式对象，然后通过 onInvalidate 注册了一个回调函数。
+                    </p>
+                    <p data-nodeid="72995">
+                      如果 id 发生变化或者 watcher
+                      停止了，这个回调函数将会执行，然后执行 token.cancel
+                      取消之前的异步操作。
+                    </p>
+                    <p data-nodeid="72996">
+                      我们来回顾 onInvalidate 在 doWatch 中的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> onInvalidate = (fn) =&gt; { 
+</div></li><li><div class="code-word">  cleanup = runner.options.onStop = () =&gt; { 
+</div></li><li><div class="code-word">    callWithErrorHandling(fn, instance, <span class="hljs-number">4</span> <span class="hljs-comment">/* WATCH_CLEANUP */</span>); 
+</div></li><li><div class="code-word">  }; 
+</div></li><li><div class="code-word">}; 
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="72998">
+                      实际上，当你执行 onInvalidate 的时候，就是注册了一个
+                      cleanup 和 runner 的 onStop 方法，这个方法内部会执行
+                      fn，也就是你注册的无效回调函数。
+                    </p>
+                    <p data-nodeid="72999">
+                      也就是说当响应式数据发生变化，会执行 cleanup 方法，当
+                      watcher 被停止，会执行 onStop
+                      方法，这两者都会执行注册的无效回调函数 fn。
+                    </p>
+                    <p data-nodeid="73000">
+                      通过这种方式，Vue.js 就很好地实现了 watcher
+                      注册无效回调函数的需求。
+                    </p>
+                    <h3 data-nodeid="73001">总结</h3>
+                    <p data-nodeid="73002">
+                      好的，到这里我们这一节的学习也要结束啦，通过这节课的学习，你应该掌握了侦听器内部实现原理，了解侦听器支持的几种配置参数的作用，以及异步任务队列的设计原理。
+                    </p>
+                    <p data-nodeid="73003">
+                      你也应该掌握侦听器的常见应用场景：如何用 watch API
+                      观测数据的变化去执行一些逻辑，如何利用 watchEffect API
+                      去注册一些副作用函数，如何去注册无效回调函数，以及如何停止一个正在运行的
+                      watcher。
+                    </p>
+                    <p data-nodeid="73004">
+                      相比于计算属性，侦听器更适合用于在数据变化后执行某段逻辑的场景，而计算属性则用于一个数据依赖另外一些数据计算而来的场景。
+                    </p>
+                    <p data-nodeid="73005">
+                      最后，给你留一道思考题目，在组件中创建的自定义
+                      watcher，在组件销毁的时候会被销毁吗？是如何做的呢？欢迎你在留言区与我分享。
+                    </p>
+                    <blockquote data-nodeid="73006">
+                      <p data-nodeid="73007">
+                        <strong data-nodeid="73106"
+                          >本节课的相关代码在源代码中的位置如下：</strong
+                        ><br />
+                        packages/runtime-core/src/apiWatch.ts<br />
+                        packages/runtime-core/src/scheduler.ts
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <div data-v-4bc80e00="" class="message-edit-empty">
+                  学习知识要善于思考，思考，再思考。—爱因斯坦
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

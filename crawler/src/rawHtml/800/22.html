@@ -1,0 +1,2903 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  17 | 生成代码：AST 如何生成可运行的代码？（下）
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/11:20"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="680"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/11:20</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            10.43M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/11:20
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="71646">
+                      上节课，我们已经知道了在 AST 转换后，会执行 generate
+                      函数生成代码，而 generate
+                      主要做五件事情：创建代码生成上下文，生成预设代码，生成渲染函数，生成资源声明代码，以及生成创建
+                      VNode 树的表达式。这节课我们继续分析，来看生成创建 VNode
+                      树的表达式的过程。
+                    </p>
+                    <h3 data-nodeid="71647">生成创建 VNode 树的表达式</h3>
+                    <p data-nodeid="71648">我们先来看它的实现：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 生成创建 VNode 树的表达式</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (ast.codegenNode) {
+</div></li><li><div class="code-word">  genNode(ast.codegenNode, context);
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">  push(`<span class="hljs-keyword">null</span>`);
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71650">
+                      前面我们在转换过程中给根节点添加了
+                      codegenNode，所以接下来就是通过 genNode 生成创建 VNode
+                      树的表达式，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genNode</span><span class="hljs-params">(node, context)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (shared.isString(node)) {
+</div></li><li><div class="code-word">    context.push(node)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (shared.isSymbol(node)) {
+</div></li><li><div class="code-word">    context.push(context.helper(node))
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">switch</span> (node.type) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span>:
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">9</span> <span class="hljs-comment">/* IF */</span>:
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">11</span> <span class="hljs-comment">/* FOR */</span>:
+</div></li><li><div class="code-word">      genNode(node.codegenNode, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">2</span> <span class="hljs-comment">/* TEXT */</span>:
+</div></li><li><div class="code-word">      genText(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">4</span> <span class="hljs-comment">/* SIMPLE_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">5</span> <span class="hljs-comment">/* INTERPOLATION */</span>:
+</div></li><li><div class="code-word">      genInterpolation(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">12</span> <span class="hljs-comment">/* TEXT_CALL */</span>:
+</div></li><li><div class="code-word">      genNode(node.codegenNode, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">8</span> <span class="hljs-comment">/* COMPOUND_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genCompoundExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">3</span> <span class="hljs-comment">/* COMMENT */</span>:
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">13</span> <span class="hljs-comment">/* VNODE_CALL */</span>:
+</div></li><li><div class="code-word">      genVNodeCall(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">14</span> <span class="hljs-comment">/* JS_CALL_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genCallExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">15</span> <span class="hljs-comment">/* JS_OBJECT_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genObjectExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">17</span> <span class="hljs-comment">/* JS_ARRAY_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genArrayExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">18</span> <span class="hljs-comment">/* JS_FUNCTION_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genFunctionExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">19</span> <span class="hljs-comment">/* JS_CONDITIONAL_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genConditionalExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">20</span> <span class="hljs-comment">/* JS_CACHE_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genCacheExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-comment">// SSR only types</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">21</span> <span class="hljs-comment">/* JS_BLOCK_STATEMENT */</span>:
+</div></li><li><div class="code-word">      genNodeList(node.body, context, <span class="hljs-keyword">true</span>, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">22</span> <span class="hljs-comment">/* JS_TEMPLATE_LITERAL */</span>:
+</div></li><li><div class="code-word">      genTemplateLiteral(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">23</span> <span class="hljs-comment">/* JS_IF_STATEMENT */</span>:
+</div></li><li><div class="code-word">      genIfStatement(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">24</span> <span class="hljs-comment">/* JS_ASSIGNMENT_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genAssignmentExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">25</span> <span class="hljs-comment">/* JS_SEQUENCE_EXPRESSION */</span>:
+</div></li><li><div class="code-word">      genSequenceExpression(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> <span class="hljs-number">26</span> <span class="hljs-comment">/* JS_RETURN_STATEMENT */</span>:
+</div></li><li><div class="code-word">      genReturnStatement(node, context)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71652">
+                      genNode
+                      主要的思路就是根据不同的节点类型，生成不同的代码，这里有十几种情况，我就不全部讲一遍了，仍然是以我们的示例为主，来分析它们的实现，没有分析到的分支我的建议是大致了解即可，未来如果遇到相关的场景，你再来详细看它们的实现也不迟。
+                    </p>
+                    <p data-nodeid="71653">
+                      现在，我们来看一下根节点 codegenNode 的值：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">{
+</div></li><li><div class="code-word">  type: <span class="hljs-number">13</span>, <span class="hljs-comment">/* VNODE_CALL */</span>
+</div></li><li><div class="code-word">  tag: <span class="hljs-string">"div"</span>,
+</div></li><li><div class="code-word">  children: [
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 子节点</span>
+</div></li><li><div class="code-word">  ],
+</div></li><li><div class="code-word">  props: {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 属性表达式节点</span>
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  directives: undefined,
+</div></li><li><div class="code-word">  disableTracking: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">  dynamicProps: undefined,
+</div></li><li><div class="code-word">  isBlock: <span class="hljs-keyword">true</span>,
+</div></li><li><div class="code-word">  patchFlag: undefined
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71655">
+                      由于根节点的 codegenNode 类型是 13，也就是一个
+                      VNodeCall，所以会执行 genVNodeCall 生成创建 VNode
+                      节点的表达式代码，它的实现如下 :
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genVNodeCall</span><span class="hljs-params">(node, context)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { push, helper, pure } = context
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { tag, props, children, patchFlag, dynamicProps, directives, isBlock, disableTracking } = <span class="hljs-function">node
+</span></div></li><li><div class="code-word">  <span class="hljs-title">if</span> <span class="hljs-params">(directives)</span> {
+</div></li><li><div class="code-word">    push(helper(WITH_DIRECTIVES) + `(`)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (isBlock) {
+</div></li><li><div class="code-word">    push(`(${helper(OPEN_BLOCK)}(${disableTracking ? `<span class="hljs-keyword">true</span>` : ``}), `)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (pure) {
+</div></li><li><div class="code-word">    push(PURE_ANNOTATION)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  push(helper(isBlock ? CREATE_BLOCK : CREATE_VNODE) + `(`, node)
+</div></li><li><div class="code-word">  genNodeList(genNullableArgs([tag, props, children, patchFlag, dynamicProps]), context)
+</div></li><li><div class="code-word">  push(`)`)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (isBlock) {
+</div></li><li><div class="code-word">    push(`)`)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (directives) {
+</div></li><li><div class="code-word">    push(`, `)
+</div></li><li><div class="code-word">    genNode(directives, context)
+</div></li><li><div class="code-word">    push(`)`)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71657">
+                      根据我们的示例来看，directives 没定义，不用处理，isBlock
+                      为 true，disableTracking 为 false，那么生成如下打开 Block
+                      的代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock()
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71659">
+                      接着往下看，会判断 pure 是否为
+                      true，如果是则生成相关的注释，虽然这里的 pure 为
+                      false，但是之前我们在生成静态提升变量相关代码的时候 pure
+                      为 true，所以生成了注释代码 /<strong data-nodeid="71765"
+                        >#<strong data-nodeid="71764">PURE</strong></strong
+                      >/。
+                    </p>
+                    <p data-nodeid="71660">
+                      接下来会判断 isBlock，如果它为 true 则在生成创建 Block
+                      相关代码，如果它为 false，则生成创建 VNode 的相关代码。
+                    </p>
+                    <p data-nodeid="71661">
+                      因为这里 isBlock 为 true，所以生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71663">
+                      生成了一个_createBlock
+                      的函数调用后，下面就需要生成函数的参数，通过如下代码生成：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="yaml"><ol><li><div class="code-word"><span class="hljs-string">genNodeList(genNullableArgs([tag,</span> <span class="hljs-string">props,</span> <span class="hljs-string">children,</span> <span class="hljs-string">patchFlag,</span> <span class="hljs-string">dynamicProps]),</span> <span class="hljs-string">context)</span>
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71665">
+                      依据代码的执行顺序，我们先来看 genNullableArgs 的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genNullableArgs</span><span class="hljs-params">(args)</span> </span>{
+</div></li><li><div class="code-word">  let i = args.<span class="hljs-function">length
+</span></div></li><li><div class="code-word">  <span class="hljs-title">while</span> <span class="hljs-params">(i--)</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (args[i] != <span class="hljs-keyword">null</span>)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> args.slice(<span class="hljs-number">0</span>, i + <span class="hljs-number">1</span>).map(arg =&gt; arg || `<span class="hljs-keyword">null</span>`)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71667">
+                      这个方法很简单，就是倒序遍历参数数组，找到第一个不为空的参数，然后返回该参数前面的所有参数构成的新数组。
+                    </p>
+                    <p data-nodeid="71668">
+                      genNullableArgs 传入的参数数组依次是
+                      tag、props、children、patchFlag 和
+                      dynamicProps，对于我们的示例而言，此时 patchFlag 和
+                      dynamicProps 为 undefined，所以 genNullableArgs
+                      返回的是一个<code data-backticks="1" data-nodeid="71774"
+                        >[tag, props, children]</code
+                      >这样的数组。
+                    </p>
+                    <p data-nodeid="71669">
+                      其实这是很好理解的，对于一个 vnode
+                      节点而言，构成它的主要几个部分就是节点的标签 tag，属性
+                      props 以及子节点
+                      children，我们的目标就是生成类似下面的代码：<code
+                        data-backticks="1"
+                        data-nodeid="71777"
+                        >_createBlock(tag, props, children)</code
+                      >。
+                    </p>
+                    <p data-nodeid="71670">
+                      因此接下来，我们再通过 genNodeList
+                      来生成参数相关的代码，来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genNodeList</span><span class="hljs-params">(nodes, context, multilines = <span class="hljs-keyword">false</span>, comma = <span class="hljs-keyword">true</span>)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { push, newline } = <span class="hljs-function">context
+</span></div></li><li><div class="code-word">  <span class="hljs-title">for</span> <span class="hljs-params">(let i = <span class="hljs-number">0</span>; i &lt; nodes.length; i++)</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> node = nodes[i]
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (shared.isString(node)) {
+</div></li><li><div class="code-word">      push(node)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shared.isArray(node)) {
+</div></li><li><div class="code-word">      genNodeListAsArray(node, context)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      genNode(node, context)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (i &lt; nodes.length - <span class="hljs-number">1</span>) {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (multilines) {
+</div></li><li><div class="code-word">        comma &amp;&amp; push(<span class="hljs-string">','</span>)
+</div></li><li><div class="code-word">        newline()
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">        comma &amp;&amp; push(<span class="hljs-string">', '</span>)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71672">
+                      genNodeList 就是通过遍历 nodes，拿到每一个 node，然后判断
+                      node 的类型，如果 node
+                      是字符串，就直接添加到代码中；如果是一个数组，则执行
+                      genNodeListAsArray
+                      生成数组形式的代码，否则是一个对象，则递归执行 genNode
+                      生成节点代码。
+                    </p>
+                    <p data-nodeid="71673">
+                      我们还是根据示例代码走完这个流程，此时 nodes 的值如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">[<span class="hljs-string">'div'</span>, {
+</div></li><li><div class="code-word">  type: <span class="hljs-number">4</span>, <span class="hljs-comment">/* SIMPLE_EXPRESSION */</span>
+</div></li><li><div class="code-word">  content: <span class="hljs-string">'_hoisted_1'</span>,
+</div></li><li><div class="code-word">  isConstant: <span class="hljs-keyword">true</span>,
+</div></li><li><div class="code-word">  isStatic: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">  hoisted: {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 对象表达式节点</span>
+</div></li><li><div class="code-word">    },
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  [
+</div></li><li><div class="code-word">    {
+</div></li><li><div class="code-word">      type: <span class="hljs-number">9</span>, <span class="hljs-comment">/* IF */</span>
+</div></li><li><div class="code-word">      branches: [
+</div></li><li><div class="code-word">        <span class="hljs-comment">// v-if 解析出的 2 个分支对象</span>
+</div></li><li><div class="code-word">      ],
+</div></li><li><div class="code-word">      codegenNode: {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 代码生成节点</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  ]
+</div></li><li><div class="code-word">]
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71675">
+                      接下来我们依据 nodes 的值继续生成代码，首先 nodes
+                      第一个元素的值是 'div'
+                      字符串，根据前面的逻辑，直接把字符串添加到代码上即可，由于
+                      multilines 为 false，comma 为 true，因此生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>,
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71677">
+                      接下来看 nodes 第二个元素，它代表的是 vnode 的属性
+                      props，是一个简单的对象表达式，就会递归执行
+                      genNode，进一步执行 genExpression，来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genExpression</span><span class="hljs-params">(node, context)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { content, isStatic } = node
+</div></li><li><div class="code-word">  context.push(isStatic ? JSON.stringify(content) : content, node)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71679">
+                      这里 genExpression 非常简单，就是往代码中添加 content
+                      的内容。此时 node 中的 content 值是 _hoisted_1，再回到
+                      genNodeList，由于 multilines 为 false，comma 为
+                      true，因此生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1,
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71681">
+                      接下来我们再看 nodes 第三个元素，它代表的是子节点
+                      chidren，是一个数组，那么会执行
+                      genNodeListAsArray，来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genNodeListAsArray</span><span class="hljs-params">(nodes, context)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> multilines = nodes.length &gt; <span class="hljs-number">3</span> || nodes.some(n =&gt; isArray(n) || !isText$<span class="hljs-number">1</span>(n))
+</div></li><li><div class="code-word">  context.push(`[`)
+</div></li><li><div class="code-word">  multilines &amp;&amp; context.indent()
+</div></li><li><div class="code-word">  genNodeList(nodes, context, multilines);
+</div></li><li><div class="code-word">  multilines &amp;&amp; context.deindent()
+</div></li><li><div class="code-word">  context.push(`]`)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71683">
+                      genNodeListAsArray 主要是把一个 node
+                      列表生成一个类似数组形式的代码，所以前后会添加中括号，并且判断是否要生成多行代码，如果是多行，前后还需要加减代码的缩进，而中间部分的代码，则继续递归调用
+                      genNodeList 生成。
+                    </p>
+                    <p data-nodeid="71684">
+                      那么针对我们的示例，此时参数 nodes 的值如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">[
+</div></li><li><div class="code-word">  {
+</div></li><li><div class="code-word">    type: <span class="hljs-number">9</span>, <span class="hljs-comment">/* IF */</span>
+</div></li><li><div class="code-word">    branches: [
+</div></li><li><div class="code-word">      <span class="hljs-comment">// v-if 解析出的 2 个分支对象</span>
+</div></li><li><div class="code-word">    ],
+</div></li><li><div class="code-word">    codegenNode: {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 代码生成节点</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">]
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71686">
+                      它是一个长度为 1
+                      的数组，但是这个数组元素的类型是一个对象，所以 multilines
+                      为 true。那么在执行 genNodeList 之前，生成的代码是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71688">
+                      接下来就是递归执行 genNodeList 的过程，由于 nodes
+                      数组只有一个对象类型的元素，则执行
+                      genNode，并且这个对象的类型是 IF 表达式，回顾 genNode
+                      的实现，此时会执行到<code
+                        data-backticks="1"
+                        data-nodeid="71798"
+                        >genNode(node.codegenNode, context)</code
+                      >，也就是取节点的 codegenNode，进一步执行
+                      genNode，我们来看一下这个 codegenNode：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">{
+</div></li><li><div class="code-word">  type: <span class="hljs-number">19</span>, <span class="hljs-comment">/* JS_CONDITIONAL_EXPRESSION */</span>
+</div></li><li><div class="code-word">  consequent: {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 主逻辑</span>
+</div></li><li><div class="code-word">    type: <span class="hljs-number">13</span>, <span class="hljs-comment">/* VNODE_CALL */</span>
+</div></li><li><div class="code-word">    tag: <span class="hljs-string">"_component_hello"</span>,
+</div></li><li><div class="code-word">    children: undefined,
+</div></li><li><div class="code-word">    props: {
+</div></li><li><div class="code-word">       <span class="hljs-comment">// 属性表达式节点</span>
+</div></li><li><div class="code-word">    },
+</div></li><li><div class="code-word">    directives: undefined,
+</div></li><li><div class="code-word">    disableTracking: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">    dynamicProps: undefined,
+</div></li><li><div class="code-word">    isBlock: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">    patchFlag: undefined
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  alternate: {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 备选逻辑</span>
+</div></li><li><div class="code-word">    type: <span class="hljs-number">13</span>, <span class="hljs-comment">/* VNODE_CALL */</span>
+</div></li><li><div class="code-word">    tag: <span class="hljs-string">"div"</span>,
+</div></li><li><div class="code-word">    children: [
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 长度为 3 的子节点</span>
+</div></li><li><div class="code-word">    ],
+</div></li><li><div class="code-word">    props: {
+</div></li><li><div class="code-word">       <span class="hljs-comment">// 属性表达式节点</span>
+</div></li><li><div class="code-word">    },
+</div></li><li><div class="code-word">    directives: undefined,
+</div></li><li><div class="code-word">    disableTracking: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">    dynamicProps: undefined,
+</div></li><li><div class="code-word">    isBlock: <span class="hljs-keyword">true</span>,
+</div></li><li><div class="code-word">    patchFlag: undefined
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  test: {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 逻辑测试</span>
+</div></li><li><div class="code-word">    type: <span class="hljs-number">4</span>, <span class="hljs-comment">/* SIMPLE_EXPRESSION */</span>
+</div></li><li><div class="code-word">    content: <span class="hljs-string">"_ctx.flag"</span>,
+</div></li><li><div class="code-word">    isConstant: <span class="hljs-keyword">false</span>,
+</div></li><li><div class="code-word">    isStatic: <span class="hljs-keyword">false</span>
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  newline: <span class="hljs-keyword">true</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71690">
+                      它是一个条件表达式节点，它主要包括 3 个重要的属性，其中
+                      test 表示逻辑测试，它是一个表达式节点，consequent
+                      表示主逻辑，它是一个 vnode 调用节点，alternate
+                      表示备选逻辑，它也是一个 vnode 调用节点。
+                    </p>
+                    <p data-nodeid="71691">
+                      其实条件表达式节点要生成代码就是一个条件表达式，用伪代码表示是：<code
+                        data-backticks="1"
+                        data-nodeid="71802"
+                        >test ? consequent : alternate</code
+                      >。
+                    </p>
+                    <p data-nodeid="71692">
+                      genNode 遇到条件表达式节点会执行
+                      genConditionalExpression，我们来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">genConditionalExpression</span><span class="hljs-params">(node, context)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { test, consequent, alternate, newline: needNewline } = node
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { push, indent, deindent, newline } = context
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 生成条件表达式</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (test.type === <span class="hljs-number">4</span> <span class="hljs-comment">/* SIMPLE_EXPRESSION */</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> needsParens = !isSimpleIdentifier(test.content)
+</div></li><li><div class="code-word">    needsParens &amp;&amp; push(`(`)
+</div></li><li><div class="code-word">    genExpression(test, context)
+</div></li><li><div class="code-word">    needsParens &amp;&amp; push(`)`)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    push(`(`)
+</div></li><li><div class="code-word">    genNode(test, context)
+</div></li><li><div class="code-word">    push(`)`)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 换行加缩进</span>
+</div></li><li><div class="code-word">  needNewline &amp;&amp; indent()
+</div></li><li><div class="code-word">  context.indentLevel++
+</div></li><li><div class="code-word">  needNewline || push(` `)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 生成主逻辑代码</span>
+</div></li><li><div class="code-word">  push(`? `)
+</div></li><li><div class="code-word">  genNode(consequent, context)
+</div></li><li><div class="code-word">  context.indentLevel--
+</div></li><li><div class="code-word">  needNewline &amp;&amp; newline()
+</div></li><li><div class="code-word">  needNewline || push(` `)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 生成备选逻辑代码</span>
+</div></li><li><div class="code-word">  push(`: `)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> isNested = alternate.type === <span class="hljs-number">19</span> <span class="hljs-comment">/* JS_CONDITIONAL_EXPRESSION */</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isNested) {
+</div></li><li><div class="code-word">    context.indentLevel++
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  genNode(alternate, context)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isNested) {
+</div></li><li><div class="code-word">    context.indentLevel--
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  needNewline &amp;&amp; deindent(<span class="hljs-keyword">true</span> <span class="hljs-comment">/* without newline */</span>)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71694">
+                      genConditionalExpression
+                      的主要目的就是生成条件表达式代码，所以首先它会生成逻辑测试的代码。对于示例，我们这里是一个简单表达式节点，所以生成的代码是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71696">
+                      接下来就是生成一些换行和缩进，紧接着生成主逻辑代码，也就是把
+                      consequent 这个 vnode 调用节点通过 genNode
+                      转换生成代码，这又是一个递归过程，其中的细节我就不再赘述了，执行完后会生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li><li><div class="code-word">      ? _createVNode(_component_hello, { <span class="hljs-attr">key</span>: <span class="hljs-number">0</span> })
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71698">
+                      接下来就是生成备选逻辑的代码，即把 alternate 这个 vnode
+                      调用节点通过 genNode
+                      转换生成代码，同样内部的细节我就不赘述了，感兴趣同学可以自行调试。
+                    </p>
+                    <p data-nodeid="71699">
+                      需要注意的是，<strong data-nodeid="71817"
+                        >alternate 对应的节点的 isBlock 属性是 true</strong
+                      >，<strong data-nodeid="71818"
+                        >所以会生成创建 Block 相关的代码</strong
+                      >，最终生成的代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li><li><div class="code-word">      ? _createVNode(_component_hello, { <span class="hljs-attr">key</span>: <span class="hljs-number">0</span> })
+</div></li><li><div class="code-word">      : (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_2, [
+</div></li><li><div class="code-word">          _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"&gt;hello "</span> + _toDisplayString(_ctx.msg + _ctx.test), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>),
+</div></li><li><div class="code-word">          _hoisted_3,
+</div></li><li><div class="code-word">          _hoisted_4
+</div></li><li><div class="code-word">        ]))
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71701">
+                      接下来我们回到 genNodeListAsArray 函数，处理完
+                      children，那么下面就会减少缩进，并添加闭合的中括号，就会生成如下的代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li><li><div class="code-word">      ? _createVNode(_component_hello, { <span class="hljs-attr">key</span>: <span class="hljs-number">0</span> })
+</div></li><li><div class="code-word">      : (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_2, [
+</div></li><li><div class="code-word">          _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"&gt;hello "</span> + _toDisplayString(_ctx.msg + _ctx.test), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>),
+</div></li><li><div class="code-word">          _hoisted_3,
+</div></li><li><div class="code-word">          _hoisted_4
+</div></li><li><div class="code-word">        ]))
+</div></li><li><div class="code-word">  ]
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71703">
+                      genNodeListAsArray 处理完子节点后，回到
+                      genNodeList，发现所有 nodes 也处理完了，则回到
+                      genVNodeCall
+                      函数，接下来的逻辑就是补齐函数调用的右括号，此时生成的代码是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li><li><div class="code-word">      ? _createVNode(_component_hello, { <span class="hljs-attr">key</span>: <span class="hljs-number">0</span> })
+</div></li><li><div class="code-word">      : (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_2, [
+</div></li><li><div class="code-word">          _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"&gt;hello "</span> + _toDisplayString(_ctx.msg + _ctx.test), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>),
+</div></li><li><div class="code-word">          _hoisted_3,
+</div></li><li><div class="code-word">          _hoisted_4
+</div></li><li><div class="code-word">        ]))
+</div></li><li><div class="code-word">  ]))
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71705">
+                      那么至此，根节点 vnode 树的表达式就创建好了。我们再回到
+                      generate 函数，接下来就需要添加右括号 “}”
+                      来闭合渲染函数，最终生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { resolveComponent <span class="hljs-keyword">as</span> _resolveComponent, createVNode <span class="hljs-keyword">as</span> _createVNode, createCommentVNode <span class="hljs-keyword">as</span> _createCommentVNode, toDisplayString <span class="hljs-keyword">as</span> _toDisplayString, openBlock <span class="hljs-keyword">as</span> _openBlock, createBlock <span class="hljs-keyword">as</span> _createBlock } <span class="hljs-keyword">from</span> <span class="hljs-string">"vue"</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_1 = { <span class="hljs-attr">class</span>: <span class="hljs-string">"app"</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_2 = { <span class="hljs-attr">key</span>: <span class="hljs-number">1</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_3 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> _hoisted_4 = <span class="hljs-comment">/*#__PURE__*/</span>_createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"static"</span>, <span class="hljs-number">-1</span> <span class="hljs-comment">/* HOISTED */</span>)
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params">_ctx, _cache</span>) </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> _component_hello = _resolveComponent(<span class="hljs-string">"hello"</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_1, [
+</div></li><li><div class="code-word">    (_ctx.flag)
+</div></li><li><div class="code-word">      ? _createVNode(_component_hello, { <span class="hljs-attr">key</span>: <span class="hljs-number">0</span> })
+</div></li><li><div class="code-word">      : (_openBlock(), _createBlock(<span class="hljs-string">"div"</span>, _hoisted_2, [
+</div></li><li><div class="code-word">          _createVNode(<span class="hljs-string">"p"</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">"hello "</span> + _toDisplayString(_ctx.msg + _ctx.test), <span class="hljs-number">1</span> <span class="hljs-comment">/* TEXT */</span>),
+</div></li><li><div class="code-word">          _hoisted_3,
+</div></li><li><div class="code-word">          _hoisted_4
+</div></li><li><div class="code-word">        ]))
+</div></li><li><div class="code-word">  ]))
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71707">
+                      这就是示例 template
+                      编译生成的最终代码，虽然我们忽略了其中子节点的一些实现细节，但是整体流程还是很容易理解的，主要就是一个递归的思想，遇到不同类型的节点，执行相应的代码生成函数生成代码即可。
+                    </p>
+                    <p data-nodeid="71708">
+                      节点生成代码的所需的信息可以从节点的属性中获取，这完全得益于前面
+                      transform 的语法分析阶段生成的
+                      codegenNode，根据这些信息就能很容易地生成对应的代码了。
+                    </p>
+                    <p data-nodeid="71709">
+                      至此，我们已经了解了模板的编译到代码的全部流程。相比
+                      Vue.js 2.x，Vue.js 3.0 在编译阶段设计了 Block
+                      的概念，我们上述示例编译出来的代码就是通过创建一个 Block
+                      来创建对应的 vnode。
+                    </p>
+                    <p data-nodeid="71710">
+                      那么，这个 Block
+                      在运行时是怎么玩的呢？为什么它会对性能优化起到很大的作用呢？接下来我们就来分析它背后的实现原理。
+                    </p>
+                    <h3 data-nodeid="71711">运行时优化</h3>
+                    <p data-nodeid="71712">
+                      首先，我们来看一下 openBlock 的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> blockStack = []
+</div></li><li><div class="code-word">let currentBlock = <span class="hljs-function"><span class="hljs-keyword">null</span>
+</span></div></li><li><div class="code-word">function <span class="hljs-title">openBlock</span><span class="hljs-params">(disableTracking = <span class="hljs-keyword">false</span>)</span> {
+</div></li><li><div class="code-word">  blockStack.push((currentBlock = disableTracking ? <span class="hljs-keyword">null</span> : []));
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71714">
+                      Vue.js 3.0 在运行时设计了一个 blockStack 和
+                      currentBlock，其中 blockStack 表示一个 Block
+                      Tree，因为要考虑嵌套 Block 的情况，而currentBlock
+                      表示当前的 Block。
+                    </p>
+                    <p data-nodeid="71715">
+                      openBlock 的实现很简单，往当前 blockStack push 一个新的
+                      Block，作为 currentBlock。
+                    </p>
+                    <p data-nodeid="71716">
+                      那么设计 Block 的目的是什么呢？主要就是收集动态的 vnode
+                      的节点，这样才能在 patch 阶段只比对这些动态 vnode
+                      节点，避免不必要的静态节点的比对，优化了性能。
+                    </p>
+                    <p data-nodeid="71717">
+                      那么动态 vnode 节点是什么时候被收集的呢？其实是在
+                      createVNode 阶段，我们来回顾一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createVNode</span><span class="hljs-params">(type, props = <span class="hljs-keyword">null</span>
+</span></span></div></li><li><div class="code-word">,children = <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 处理 props 相关逻辑，标准化 class 和 style</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 对 vnode 类型信息编码 </span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 vnode 对象</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 标准化子节点，把不同数据类型的 children 转成数组或者文本类型。</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 添加动态 vnode 节点到 currentBlock 中</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (shouldTrack &gt; <span class="hljs-number">0</span> &amp;&amp;
+</div></li><li><div class="code-word">    !isBlockNode &amp;&amp;
+</div></li><li><div class="code-word">    currentBlock &amp;&amp;
+</div></li><li><div class="code-word">    patchFlag !== <span class="hljs-number">32</span> <span class="hljs-comment">/* HYDRATE_EVENTS */</span> &amp;&amp;
+</div></li><li><div class="code-word">    (patchFlag &gt; <span class="hljs-number">0</span> ||
+</div></li><li><div class="code-word">      shapeFlag &amp; <span class="hljs-number">128</span> <span class="hljs-comment">/* SUSPENSE */</span> ||
+</div></li><li><div class="code-word">      shapeFlag &amp; <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span> ||
+</div></li><li><div class="code-word">      shapeFlag &amp; <span class="hljs-number">4</span> <span class="hljs-comment">/* STATEFUL_COMPONENT */</span> ||
+</div></li><li><div class="code-word">      shapeFlag &amp; <span class="hljs-number">2</span> <span class="hljs-comment">/* FUNCTIONAL_COMPONENT */</span>)) {
+</div></li><li><div class="code-word">    currentBlock.push(vnode);
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71719">
+                      注释中写的前面几个过程，我们在之前的章节已经讲过了，我们来看函数的最后，这里会判断
+                      vnode 是不是一个动态节点，如果是则把它添加到 currentBlock
+                      中，这就是动态 vnode 节点的收集过程。
+                    </p>
+                    <p data-nodeid="71720">我们接着来看 createBlock 的实现：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createBlock</span><span class="hljs-params">(type, props, children, patchFlag, dynamicProps)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> vnode = createVNode(type, props, children, patchFlag, dynamicProps, <span class="hljs-keyword">true</span> <span class="hljs-comment">/* isBlock: 阻止这个 block 收集自身 */</span>)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 在 vnode 上保留当前 Block 收集的动态子节点</span>
+</div></li><li><div class="code-word">  vnode.dynamicChildren = currentBlock || EMPTY_ARR
+</div></li><li><div class="code-word">  blockStack.pop()
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 当前 Block 恢复到父 Block</span>
+</div></li><li><div class="code-word">  currentBlock = blockStack[blockStack.length - <span class="hljs-number">1</span>] || <span class="hljs-keyword">null</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 节点本身作为父 Block 收集的子节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (currentBlock) {
+</div></li><li><div class="code-word">    currentBlock.push(vnode)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71722">
+                      这时候你可能会好奇，为什么要设计 openBlock 和 createBlock
+                      两个函数呢？比如下面这个函数<code
+                        data-backticks="1"
+                        data-nodeid="71835"
+                        >render()</code
+                      >：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">render</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (openBlock(),createBlock(<span class="hljs-string">'div'</span>, <span class="hljs-keyword">null</span>, [<span class="hljs-comment">/*...*/</span>]))
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71724">
+                      为什么不把 openBlock 和 createBlock
+                      放在一个函数中执行呢，像下面这样：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">render</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (createBlock(<span class="hljs-string">'div'</span>, <span class="hljs-keyword">null</span>, [<span class="hljs-comment">/*...*/</span>]))
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createBlock</span><span class="hljs-params">(type, props, children, patchFlag, dynamicProps)</span> </span>{
+</div></li><li><div class="code-word">  openBlock()
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 vnode</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> vnode = createVNode(type, props, children, patchFlag, dynamicProps, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// ...  </span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="98160">
+                      这样是不行的！其中原因其实很简单，createBlock
+                      函数的第三个参数是 children，这些 children
+                      中的元素也是经过 createVNode
+                      创建的，显然一个函数的调用需要先去执行参数的计算，也就是优先去创建子节点的
+                      vnode，然后才会执行父节点的 createBlock 或者是
+                      createVNode。
+                    </p>
+                    <p data-nodeid="98161">
+                      所以在父节点的 createBlock 函数执行前，子节点就已经通过
+                      createVNode 创建了对应的 vnode ，如果把 openBlock
+                      的逻辑放在了 createBlock 中，就相当于在子节点创建后才创建
+                      currentBlock，这样就不能正确地收集子节点中的动态 vnode
+                      了。
+                    </p>
+
+                    <p data-nodeid="71727">
+                      再回到 createBlock
+                      函数内部，这个时候你要明白动态子节点已经被收集到
+                      currentBlock 中了。
+                    </p>
+                    <p data-nodeid="71728">
+                      函数首先会执行 createVNode 创建一个 vnode
+                      节点，注意最后一个参数是 true，这表明它是一个 Block
+                      node，所以就不会把自身当作一个动态 vnode 收集到
+                      currentBlock 中。
+                    </p>
+                    <p data-nodeid="71729">
+                      接着把收集动态子节点的 currentBlock 保留到当前的 Block
+                      vnode 的 dynamicChildren 中，为后续 patch
+                      过程访问这些动态子节点所用。
+                    </p>
+                    <p data-nodeid="71730">
+                      最后把当前 Block 恢复到父 Block，如果父 Block
+                      存在的话，则把当前这个 Block node 作为动态节点添加到父
+                      Block 中。
+                    </p>
+                    <p data-nodeid="71731">
+                      Block Tree
+                      的构造过程我们搞清楚了，那么接下来我们就来看它在 patch
+                      阶段具体是如何工作的。
+                    </p>
+                    <p data-nodeid="71732">
+                      我们之前分析过，在 patch 阶段更新节点元素的时候，会执行
+                      patchElement 函数，我们再来回顾一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> patchElement = (n1, n2, parentComponent, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> el = (n2.el = n1.el)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> oldProps = (n1 &amp;&amp; n1.props) || EMPTY_OBJ
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> newProps = n2.props || EMPTY_OBJ
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 更新 props</span>
+</div></li><li><div class="code-word">  patchProps(el, n2, oldProps, newProps, parentComponent, parentSuspense, isSVG)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> areChildrenSVG = isSVG &amp;&amp; n2.type !== <span class="hljs-string">'foreignObject'</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 更新子节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n2.dynamicChildren) {
+</div></li><li><div class="code-word">    patchBlockChildren(n1.dynamicChildren, n2.dynamicChildren, currentContainer, parentComponent, parentSuspense, isSVG);
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!optimized) {
+</div></li><li><div class="code-word">    patchChildren(n1, n2, currentContainer, currentAnchor, parentComponent, parentSuspense, isSVG);
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71734">
+                      我们在前面组件更新的章节分析过这个流程，在分析子节点更新的部分，当时并没有考虑到优化的场景，所以只分析了全量比对更新的场景。
+                    </p>
+                    <p data-nodeid="71735">
+                      而实际上，如果这个 vnode 是一个 Block
+                      vnode，那么我们不用去通过 patchChildren
+                      全量比对，只需要通过 patchBlockChildren 去比对并更新 Block
+                      中的动态子节点即可。
+                    </p>
+                    <p data-nodeid="71736">我们来看一下它的实现：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> patchBlockChildren = (oldChildren, newChildren, fallbackContainer, parentComponent, parentSuspense, isSVG) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">for</span> (let i = <span class="hljs-number">0</span>; i &lt; newChildren.length; i++) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> oldVNode = oldChildren[i]
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> newVNode = newChildren[i]
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 确定待更新节点的容器</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> container =
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 对于 Fragment，我们需要提供正确的父容器</span>
+</div></li><li><div class="code-word">      oldVNode.type === Fragment ||
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 在不同节点的情况下，将有一个替换节点，我们也需要正确的父容器</span>
+</div></li><li><div class="code-word">      !isSameVNodeType(oldVNode, newVNode) ||
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 组件的情况，我们也需要提供一个父容器</span>
+</div></li><li><div class="code-word">      oldVNode.shapeFlag &amp; <span class="hljs-number">6</span> <span class="hljs-comment">/* COMPONENT */</span>
+</div></li><li><div class="code-word">        ? hostParentNode(oldVNode.el)
+</div></li><li><div class="code-word">        :
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 在其他情况下，父容器实际上并没有被使用，所以这里只传递 Block 元素即可</span>
+</div></li><li><div class="code-word">        <span class="hljs-function">fallbackContainer
+</span></div></li><li><div class="code-word">    <span class="hljs-title">patch</span><span class="hljs-params">(oldVNode, newVNode, container, <span class="hljs-keyword">null</span>, parentComponent, parentSuspense, isSVG, <span class="hljs-keyword">true</span>)</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="71738">
+                      patchBlockChildren
+                      的实现很简单，遍历新的动态子节点数组，拿到对应的新旧动态子节点，并执行
+                      patch 更新子节点即可。
+                    </p>
+                    <p data-nodeid="71739">
+                      这样一来，更新的复杂度就变成和动态节点的数量正相关，而不与模板大小正相关，如果一个模板的动静比越低，那么性能优化的效果就越明显。
+                    </p>
+                    <h3 data-nodeid="71740">总结</h3>
+                    <p data-nodeid="71741">
+                      好的，到这里我们这一节的学习也要结束啦，通过这节课的学习，你应该了解了
+                      AST 是如何生成可运行的代码，也应该明白了 Vue.js 3.0
+                      是如何通过 Block 的方式实现了运行时组件更新的性能优化。
+                    </p>
+                    <p data-nodeid="71742">
+                      我也推荐你写一些其他的示例，通过断点调试的方式，看看不同的场景的代码生成过程。
+                    </p>
+                    <p data-nodeid="71743">
+                      最后，给你留一道思考题目，Block
+                      数组是一维的，但是动态的子节点可能有嵌套关系，patchBlockChildren
+                      内部也是递归执行了 patch
+                      函数，那么在整个更新的过程中，会出现子节点重复更新的情况吗，为什么？欢迎你在留言区与我分享。
+                    </p>
+                    <blockquote data-nodeid="71744">
+                      <p data-nodeid="71745">
+                        本节课的相关代码在源代码中的位置如下：<br />
+                        packages/compiler-core/src/codegen.ts<br />
+                        packages/runtime-core/src/vnode.ts<br />
+                        packages/runtime-core/src/renderer.ts
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <div data-v-4bc80e00="" class="message-edit-empty">
+                  学习知识要善于思考，思考，再思考。—爱因斯坦
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

@@ -717,6 +717,7 @@
                       class="
                         class-level-one
                         over-ellipsis
+                        isclick
                         class-level-one-detail
                       "
                     >
@@ -768,7 +769,6 @@
                       class="
                         class-level-one
                         over-ellipsis
-                        isclick
                         class-level-one-detail
                       "
                     >
@@ -1052,10 +1052,10 @@
             <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
               <div data-v-1605a430="">
                 <h1 data-v-1605a430="" class="main-title">
-                  15 | 提升开发效率：数据抽象与配置化
+                  12 | 单页应用与前端路由库设计原理
                 </h1>
                 <div data-v-1605a430="" class="main-tips">
-                  2021/05/24
+                  2021/05/12
                   <span data-v-1605a430="" class="auth">王贝珊（被删）</span>
                 </div>
                 <div data-v-1605a430="" class="media-player-wrap">
@@ -1094,12 +1094,12 @@
                                 "
                               ></div>
                               <div
-                                aria-valuetext="00:00/13:03"
+                                aria-valuetext="00:00/12:14"
                                 class="vue-slider-dot vue-slider-dot-hover"
                                 role="slider"
                                 aria-valuenow="0"
                                 aria-valuemin="0"
-                                aria-valuemax="783"
+                                aria-valuemax="734"
                                 aria-orientation="horizontal"
                                 tabindex="0"
                                 style="
@@ -1144,7 +1144,7 @@
                                     "
                                   >
                                     <span class="vue-slider-dot-tooltip-text"
-                                      >00:00/13:03</span
+                                      >00:00/12:14</span
                                     >
                                   </div>
                                 </div>
@@ -1154,10 +1154,10 @@
                         </div>
                         <div data-v-6ecd2302="" class="detail-wrap">
                           <div data-v-6ecd2302="" class="detail-one">
-                            34.03M
+                            31.93M
                           </div>
                           <div data-v-6ecd2302="" class="detail-two">
-                            00:00/13:03
+                            00:00/12:14
                           </div>
                         </div>
                       </div>
@@ -1175,430 +1175,415 @@
                 </div>
                 <div data-v-1605a430="" class="main-container">
                   <div data-v-1605a430="" class="rich-text-wrap">
-                    <p data-nodeid="3">
-                      上一讲介绍了如何对前端应用进行模块化和组件化设计，是一个对系统设计进行抽象的过程。实际上，我们在业务功能开发过程中，也会在很多地方使用到抽象的能力，比如将页面内容抽象为数据展示，将页面的呈现方式抽象为状态。
+                    <p data-nodeid="6859">
+                      在第 6 讲和第 8
+                      讲的内容中，我介绍了浏览器中页面是如何进行请求和渲染的。在单页应用出现以前，浏览器通过
+                      HTTP
+                      请求向服务端请求页面内容的时候，服务端会根据页面不同的 URL
+                      路由，拼接出相应的页面视图片段，最终以 HTML
+                      的方式返回给浏览器，浏览器再进行解析和渲染。
                     </p>
-                    <p data-nodeid="4">
-                      通过抽象的方式，我们可以将整个前端应用使用数据的方式来进行表达和描述，还可以配合配置化来减少硬编码、提升功能的灵活性。
+                    <p data-nodeid="6860">
+                      这种多个页面间没有关系、各自为完整页面的应用，称之为多页应用。我们熟悉的
+                      JSP、PHP 也都是通过拼接 HTML
+                      模板的方式，来给浏览器提供完整的页面内容。
                     </p>
-                    <p data-nodeid="5">
-                      今天我就主要介绍如何将应用抽象成数据，以及怎么配合配置化来提升代码的可维护性。
+                    <p data-nodeid="6861">
+                      如今，大多数的前端应用都使用单页应用的方式来实现。那么什么是单页应用呢？使用单页应用的优势是什么？为什么单页应用流行一段时间之后，现在又有人开始回到多页应用的方式呢？
                     </p>
-                    <h3 data-nodeid="1273" class="">如何将应用抽象成数据</h3>
-
-                    <p data-nodeid="7">
-                      要将应用抽象成数据，需要进行两个步骤：
+                    <p data-nodeid="6862">下面我们来一探究竟。</p>
+                    <h3 data-nodeid="6863">单页应用的出现</h3>
+                    <p data-nodeid="6864">
+                      首先，单页应用与多页应用的区别在于：
                     </p>
-                    <ol data-nodeid="8">
-                      <li data-nodeid="9">
-                        <p data-nodeid="10">将应用进行模块化和组件化划分；</p>
+                    <ul data-nodeid="6865">
+                      <li data-nodeid="6866">
+                        <p data-nodeid="6867">
+                          多页应用是由服务端进行 HTML
+                          模板拼接的，各个页面间没有直接关系；
+                        </p>
                       </li>
-                      <li data-nodeid="11">
-                        <p data-nodeid="12">
-                          将这些模块和组件用数据的方式进行表达。
+                      <li data-nodeid="6868">
+                        <p data-nodeid="6869">
+                          单页应用便是将页面内容的控制权交给前端来处理，通过使用一个前端页面+多个页面片段的方式进行渲染。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6870">
+                      当页面以多页应用的方式进行加载时，如果发生页面间的跳转，常常会导致整个页面都需要重新加载。这是因为当页面路由发生了变化，浏览器会重新向服务端获取相应的内容，而服务端则会根据新的
+                      URL 再次进行 HTML 模板拼接，并返回给前端。
+                    </p>
+                    <p data-nodeid="6871">
+                      在这个过程中，用户会看到页面重新变回了白屏，然后再出现内容，体验很糟糕。使用这种方式加载页面，整个页面都需要重新加载，导致体验不够友好。
+                    </p>
+                    <p data-nodeid="6872">
+                      除此之外，由于页面中整个 HTML
+                      内容都需要重新加载，多页应用还存在以下问题：
+                    </p>
+                    <ol data-nodeid="6873">
+                      <li data-nodeid="6874">
+                        <p data-nodeid="6875">
+                          静态资源无法有效复用，包括 Javascript 脚本和 CSS
+                          内容；
+                        </p>
+                      </li>
+                      <li data-nodeid="6876">
+                        <p data-nodeid="6877">
+                          原有的页面状态、用户状态无法保留，依赖
+                          URL、Cookie、本地缓存等获取用户数据。
                         </p>
                       </li>
                     </ol>
-                    <p data-nodeid="13">
-                      上一讲我介绍了对前端应用进行模块化和组件化划分的一些原则，下面我会直接介绍将页面划分成模块和组件的例子。
+                    <p data-nodeid="6878">
+                      其实在大多数情况下，对于同一个网站，不同 URL
+                      的页面其实整体骨架都很相似，像网站导航栏、顶部菜单栏、底部网站相关内容等都是相同的，使用多页应用的方式会导致这些内容也重新加载。
                     </p>
-                    <h4 data-nodeid="1779" class="">将页面划分成模块和组件</h4>
-
-                    <p data-nodeid="15">
-                      在进行系统设计和开发代码之前，产品经理首先会进行功能设计。产品经理在设计一个页面的时候，会根据内容和功能的不同，设计出不同的模块，将它们呈现在页面中。
+                    <p data-nodeid="6879">
+                      既然如此，那么是否可以使用页面局部刷新的方式来更新页面内容呢？在第
+                      10 讲中其实我也有介绍，如今流行的 Angular、React、Vue
+                      等这些前端框架都是通过将某个数据变量关联到页面的某块内容展示的方式，实现页面的局部更新。
                     </p>
-                    <p data-nodeid="16">
-                      对于前端开发来说，我们会拿到功能需求描述以及 UI
-                      设计图。此时我们需要结合功能说明以及交互稿或者设计图，来进行逆向拆解，即把一个页面按照功能和内容划分出一个个的模块。
+                    <p data-nodeid="6880">
+                      但只有局部刷新的能力还是不够的，因为即使页面内容更新了，如果页面的
+                      URL
+                      没有发生变化，当用户刷新页面的时候，可能会丢失当前的页面内容。因此，我们需要在前端配合控制路由的方式来控制页面展示，这就是单页应用。
                     </p>
-                    <p data-nodeid="17">以我自己的博客为例：</p>
-                    <p data-nodeid="2285" class="">
-                      <img
-                        src="https://s0.lgstatic.com/i/image6/M01/40/93/CioPOWCl05-AVWSrAAG_FZxtvbo772.png"
-                        alt="image.png"
-                        data-nodeid="2288"
-                      />
+                    <p data-nodeid="6881">
+                      显然，单页应用的出现带来以下的好处：
                     </p>
-
-                    <p data-nodeid="19">
-                      我们直观地根据视觉来划分模块，可以分为三大块。
-                    </p>
-                    <ul data-nodeid="20">
-                      <li data-nodeid="21">
-                        <p data-nodeid="22">头部：快速导航栏</p>
-                      </li>
-                      <li data-nodeid="23">
-                        <p data-nodeid="24">左侧：内容板块</p>
-                      </li>
-                      <li data-nodeid="25">
-                        <p data-nodeid="26">右侧：推广导航板块</p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="27">
-                      上一讲我们说过，组件可理解为带有界面渲染的特殊模块，因此上述这些模块也可以视作为组件。论坛类、博客类的页面结构大多如此，除此之外还有视频类、电商类等各种角色的网站，大都可以划分为内容模块（详情页/列表页）、导航模块（TAB/导航栏/工具栏）、功能组件（回到顶部/翻页组件）等。
-                    </p>
-                    <p data-nodeid="28">
-                      对应用进行模块划分之后，我们可以将划分后的模块抽象成数据的方式来表达。
-                    </p>
-                    <h4 data-nodeid="2797" class="">将模块/组件抽象成数据</h4>
-
-                    <p data-nodeid="30">
-                      通常来说，我们可以抽离出应用中存在变化的内容和动态获取的数据，再通过将这些数据与页面内容绑定的方式（比如使用前端框架进行绑定），来控制具体功能的展示。
-                    </p>
-                    <p data-nodeid="31">
-                      我们可以通过数据的来源，将其分成内部数据（状态数据）和外部数据（动态数据）两种。
-                    </p>
-                    <h5 data-nodeid="5346" class="">1. 内部数据（状态数据）</h5>
-
-                    <p data-nodeid="35">
-                      在一个应用的设计里，我们可能会有多个组件，每个组件又各自维护着自己的某些状态。其中，部分组件的状态会相互影响，所有状态的结合体便是应用最终的整体状态。这些状态维护在应用内部，可以通过数据的方式来表示，我们简单称之为内部数据（状态数据）。
-                    </p>
-                    <p data-nodeid="36">
-                      怎么定义内部数据呢？最浅显、最直观的办法就是，这些数据来自应用本身，同时影响应用的呈现状态。如对话框的出现和隐藏、标签的激活和失效、进度条的状态等，都可以作为状态数据。
-                    </p>
-                    <p data-nodeid="37">
-                      比如，用户在网页中的一些操作，点击某个按钮之后，会出现弹窗，这个弹窗的展示内容以及是否展示的状态可以用对象来描述。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> dialog = {
-</div></li><li><div class="code-word">  isShow: <span class="hljs-keyword">true</span>,
-</div></li><li><div class="code-word">  title: <span class="hljs-string">"弹窗标题"</span>,
-</div></li><li><div class="code-word">  content: <span class="hljs-string">"弹窗内容"</span>
-</div></li><li><div class="code-word">};
-</div></li></ol></code></pre>
-                    </div>
-                    <h5 data-nodeid="7845" class="">2. 外部数据（动态数据）</h5>
-
-                    <p data-nodeid="42">
-                      除了应用本身的状态数据，还有很多不属于应用状态的数据，比如文章内容、个人信息等，都是需要从其他地方（服务端、缓存、文件等）获取的。这些需要从外部获取，用于页面展示或是影响展示的一些数据，我们将它称作外部数据（动态数据）。
-                    </p>
-                    <p data-nodeid="43">
-                      外部数据不同于内部数据，它并不会跟随着应用的生命周期而改变，也不会随着应用的关闭而消失。这些数据独立存在于外部，通过动态获取和注入的方式进入应用，从而影响应用的展示内容和功能逻辑。
-                    </p>
-                    <p data-nodeid="44">
-                      举个例子，上面博客中的内容板块为列表页，这样的列表页可以用一个数组来表示：
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> articleList = [
-</div></li><li><div class="code-word">  { id: <span class="hljs-number">333</span>, title: <span class="hljs-string">"文章标题"</span>, brief: <span class="hljs-string">"文章简介"</span>, date: <span class="hljs-string">"日期"</span> }
-</div></li><li><div class="code-word">  <span class="hljs-comment">// ...</span>
-</div></li><li><div class="code-word">];
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="46">
-                      这些数据需要从本地数据库中读取，或者通过 HTTP
-                      请求从服务端获取，再根据获取结果渲染出每个列表的内容。
-                    </p>
-                    <p data-nodeid="47">
-                      我们在设计模块和组件的时候，需要将这些内部数据和外部数据抽离出来，其中内部数据在组件和模块内部进行维护。当应用启动的时候，再通过注入外部数据的方式，使其可以正常运行。
-                    </p>
-                    <h4 data-nodeid="8335" class="">将数据与应用抽离</h4>
-
-                    <p data-nodeid="49">
-                      要怎么理解将数据与应用抽离呢？如果将应用比作是一个公司，公司里所有的桌椅、电脑等设备都是静态的，每个工位可理解为一个组件，同时办公室也可以认为是大一点的组件或是模块。
-                    </p>
-                    <p data-nodeid="50">那么在我们这个公司里：</p>
-                    <ul data-nodeid="51">
-                      <li data-nodeid="52">
-                        <p data-nodeid="53">
-                          内部数据是椅子的位置、消耗的电量、办公室的照明和空调状态等；
+                    <ol data-nodeid="6882">
+                      <li data-nodeid="6883">
+                        <p data-nodeid="6884">
+                          通用的静态资源（比如 jQuery、Axios、Boostrap
+                          等）不需要重新加载；
                         </p>
                       </li>
-                      <li data-nodeid="54">
-                        <p data-nodeid="55">
-                          外部数据是行政人员、技术人员、设计人员等各种人员流动。
+                      <li data-nodeid="6885">
+                        <p data-nodeid="6886">
+                          页面的数据状态和用户状态依然保留；
                         </p>
                       </li>
-                    </ul>
-                    <p data-nodeid="56">
-                      每天上班的时候，一个个的工作人员来到公司里，开始干活，此时公司也开始运作。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"># 将公司和人分开（下班后）
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li><li><div class="code-word">                         公司
-</div></li><li><div class="code-word">---------------------------  ---------------------------
-</div></li><li><div class="code-word">|                                                      |  人           人
-</div></li><li><div class="code-word">|                                                      |      人          人
-</div></li><li><div class="code-word">|                         办公楼                        |           人
-</div></li><li><div class="code-word">|                                                      |   人     人     人  人
-</div></li><li><div class="code-word">|                                                      |   人      人   人
-</div></li><li><div class="code-word">---------------------------  ---------------------------
-</div></li><li><div class="code-word">
-</div></li><li><div class="code-word"># 在公司正常运作的时候
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li><li><div class="code-word">                         公司
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li><li><div class="code-word">|   人     人             人   人       人     人 人    |
-</div></li><li><div class="code-word">|           人            人   人     人          人    |
-</div></li><li><div class="code-word">|        人    人    办公楼   人   人          人       |
-</div></li><li><div class="code-word">|     人    人                人  人     人     人  人  |
-</div></li><li><div class="code-word">|     人     人         人      人     人      人   人  |
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="8825">
-                      当然，大家不只是站在工位里这么简单，我们会与各种物件进行交互和反馈（挪动桌椅、开灯开空调等），人与人之间也会相互交流和影响（对需求、方案评审等）。
-                    </p>
-                    <p data-nodeid="8826">
-                      如果我们每个人的工位都是随机的，在工作过程中会很不方便，所以大家会被有规律有组织地分别隔离到每个办公室、隔间里面。
-                    </p>
-
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"># 按照组织进行分隔
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li><li><div class="code-word">                         公司
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li><li><div class="code-word">|   人   |  人   人  |         | 人    人    |  人 人    |
-</div></li><li><div class="code-word">|   人   |     人    |         |    人  人   |   人  人  |
-</div></li><li><div class="code-word">|--------    人  人  |  办公楼  |  人    人    --------- |
-</div></li><li><div class="code-word">|     人 |  人       |         |  人     人  |   人  人  |
-</div></li><li><div class="code-word">|     人 |   人   人 |         | 人     人   |  人   人  |
-</div></li><li><div class="code-word">--------------------------------------------------------
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="60">
-                      同样的，我们在设计应用的时候，除了需要考虑如何划分模块、对应用数据进行抽象，还需要将其有规律地管理。当我们将模块和组件的状态和内容抽象成数据之后，就可以将这些数据独立出来进行管理，也可以更好地解决模块/组件间耦合、依赖、通信等问题。
-                    </p>
-                    <p data-nodeid="61">
-                      我们还能观察到，桌椅和其他办公设备其实也可以通过外部获取，也就是说，内部数据同样可以转换为外部数据，通过动态获取的方式来恢复应用之前的状态。比如某个表单在二次编辑的时候，需要恢复为提交时的状态，包括勾选框是否选中、输入框填写的内容等。
-                    </p>
-                    <p data-nodeid="62">
-                      那么，我们将这些数据和应用抽离之后，可以用来做些什么呢？我们可以通过变更数据的方式来更新应用的状态，在第
-                      9 讲中我们也有介绍数据驱动的编程方式。
-                    </p>
-                    <p data-nodeid="63">
-                      我们还可以通过设计合适的状态机，来解决像 Web
-                      页面这种天然异步系统中事件被多次触发问题，比如用户连续点击某个按钮，通过状态判断是否需要进行相应的逻辑处理等。
-                    </p>
-                    <p data-nodeid="64">
-                      除此之外，当我们对数据进行抽象和分离之后，还可以很方便地实现应用的配置化。
-                    </p>
-                    <h3 data-nodeid="9317" class="">实现应用的配置化</h3>
-
-                    <p data-nodeid="66">
-                      配置化的思想不仅仅存在于前端或者是某个领域，大多数的系统和功能设计，都可以用领域抽象、数据抽离、配置化等方式，减少需求开发和维护的成本。
-                    </p>
-                    <p data-nodeid="67">
-                      将应用中的数据抽离之后，我们可以对这些数据进行配置。
-                    </p>
-                    <h4 data-nodeid="9807" class="">可配置的数据</h4>
-
-                    <p data-nodeid="69">
-                      前面我们介绍了影响应用状态的数据，其中包括了与界面有关和与界面无关的数据。
-                    </p>
-                    <p data-nodeid="70">
-                      当我们希望对某个产品进行配置化调整的时候，一般会使用运营管理平台来进行运营和管理。通过搭起一整套的运营管理平台，我们可以通过平台进行配置，管理应用的状态和数据，包括：
-                    </p>
-                    <ul data-nodeid="71">
-                      <li data-nodeid="72">
-                        <p data-nodeid="73">
-                          界面展示内容，如活动文案、广告内容、推荐位等；
-                        </p>
-                      </li>
-                      <li data-nodeid="74">
-                        <p data-nodeid="75">
-                          功能逻辑，比如有效时间的计算、活动上线和下线、是否需要用户输入信息等。
-                        </p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="76">
-                      如果应用功能逻辑通用性较好、复杂程度较低，我们甚至可以通过配置的方式快速搭建出前端页面，比如活动类配置系统、表单类配置系统等。
-                    </p>
-                    <p data-nodeid="77">
-                      对于一些功能简单的页面，页面结构、功能比较相似，区别在于文案不一致、模块位置的调整、颜色的改变等。相比于通过复制粘贴然后调整逻辑，通过抽象和配置化的方式，我们节省重复性的工作，同时还避免了项目过多、重复代码难以维护等问题。
-                    </p>
-                    <p data-nodeid="78">
-                      以上这种简单页面的配置，基本上有两种实现方式：
-                    </p>
-                    <ol data-nodeid="79">
-                      <li data-nodeid="80">
-                        <p data-nodeid="81">
-                          根据配置生成静态页面的代码，直接加载生成的页面代码；
-                        </p>
-                      </li>
-                      <li data-nodeid="82">
-                        <p data-nodeid="83">
-                          实现通用的功能逻辑，在加载页面的时候动态加载配置数据，从而生成展示的页面。
+                      <li data-nodeid="6887">
+                        <p data-nodeid="6888">
+                          局部页面内容更新，页面切换快，用户体验好。
                         </p>
                       </li>
                     </ol>
-                    <p data-nodeid="84">
-                      配置化的核心大概是场景分析和功能拆解，所以抛开使用场景来做一个所谓“通用”的配置化是不现实的。为了做出合适的配置化功能，我们需要把问题范围局限在解决特定的场景，比如用于电商活动的页面、表单提交类的页面等。
+                    <p data-nodeid="6889">
+                      但是，单页应用同样存在着一些问题，这些问题会影响着项目的选型，也因此出现了服务端渲染等解决方案，我们一起来看一下。
                     </p>
-                    <p data-nodeid="85">
-                      以一个组件开发为例，我们来看看怎么实现组件的配置化。
+                    <h3 data-nodeid="6890">单页应用的问题</h3>
+                    <p data-nodeid="6891">
+                      由于要启用单页应用，浏览器在首次打开页面的时候，除了加载固定的脚本和样式文件以外，页面流程大概是这样的。
                     </p>
-                    <h4 data-nodeid="10297" class="">组件配置化</h4>
-
-                    <p data-nodeid="87">以下图中的卡片组件来作为例子：</p>
-                    <p data-nodeid="10787" class="">
-                      <img
-                        src="https://s0.lgstatic.com/i/image6/M01/40/8B/Cgp9HWCl09CAIEkdAACPdnXlKiI285.png"
-                        alt="image (1).png"
-                        data-nodeid="10794"
-                      />
+                    <ol data-nodeid="6892">
+                      <li data-nodeid="6893">
+                        <p data-nodeid="6894">
+                          浏览器请求服务端，服务端返回固定静态资源+基础的 HTML
+                          内容+前端路由库。
+                        </p>
+                      </li>
+                      <li data-nodeid="6895">
+                        <p data-nodeid="6896">
+                          由于是前端进行渲染，因此在一般情况下，服务端返回的
+                          HTML 内容基本上<code
+                            data-backticks="1"
+                            data-nodeid="6992"
+                            >&lt;body&gt;</code
+                          >为空。前端在页面进行加载的时候，需要继续向服务端发起
+                          Ajax 请求，获取页面渲染需要的数据。
+                        </p>
+                      </li>
+                      <li data-nodeid="6897">
+                        <p data-nodeid="6898">
+                          服务端根据请求内容，给前端返回相应的数据。
+                        </p>
+                      </li>
+                      <li data-nodeid="6899">
+                        <p data-nodeid="6900">
+                          前端拿到数据后，根据当前的 URL
+                          信息来生成相应的内容，进行页面的二次渲染，此时页面才最终加载完成。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="6901">
+                      可以看到，单页应用相比多页应用的优势主要在于页面切换时。在首次打开的时候，多页应用可以直接返回用于最终渲染的页面，而单页应用则需要自行进行计算和组装，中间过程很可能还涉及数据的二次请求，因此会比多页应用慢。
                     </p>
-
-                    <blockquote data-nodeid="89">
-                      <p data-nodeid="90">
-                        为了方便地表达数据绑定，后面的代码会基于 Vue 框架实现。
-                      </p>
-                    </blockquote>
-                    <p data-nodeid="91">
-                      我们可以实现以下的配置化能力：状态和展示内容可配置、样式可配置、功能逻辑可配置。
+                    <p data-nodeid="6902">
+                      除此之外，由于搜索引擎只识别 HTML 内容，单页应用更多依赖
+                      Javascript 进行 HTML 拼接，因此对 SEO（search engine
+                      optimization 简写为
+                      SEO，搜索引擎优化）的支持不友好，很可能会影响搜索引擎中的排名。
                     </p>
-                    <h5 data-nodeid="13302" class="">
-                      1. 状态和展示内容可配置
-                    </h5>
-
-                    <p data-nodeid="95">
-                      例如，我们需要一个对话框，其头部、正文文字、底部按钮等功能都可支持配置，我们可以用代码这样表示。
+                    <p data-nodeid="6903">
+                      基于这些原因，如今不少前端框架也支持服务端渲染（SSR，Server-Side-Rendering），通过提供
+                      Node.js
+                      服务的方式，在服务端完成页面内容的拼接，直接返回给前端。相对的，单页应用的渲染方式，也被称为客户端渲染（CSR，Client-Side-Rendering）。
+                    </p>
+                    <p data-nodeid="6904">
+                      服务端渲染听起来跟多页应用很相似，都是由服务端完成 HTML
+                      内容拼接的，那是否可以认为服务端渲染就是多页应用呢？
+                    </p>
+                    <p data-nodeid="6905">
+                      并不是，服务端渲染可以只用来控制首屏直出，而在页面进行切换的时候，依然使用单页应用的方式，这样的解决方案结合了多页应用和单页应用的优势，如今也在不少项目中使用。
+                    </p>
+                    <p data-nodeid="6906">
+                      那么，页面切换的时候，如何避免页面重新加载，又能正确渲染页面内容呢？大多数项目中都会使用前端路由库（比如
+                      ngRouter/vue-router/react-router
+                      等），这些路由库的设计原理又是怎样的呢？
+                    </p>
+                    <p data-nodeid="6907">我们一起来看一下。</p>
+                    <h3 data-nodeid="6908">前端路由库的设计与实现</h3>
+                    <p data-nodeid="6909">
+                      页面的跳转、局部内容的刷新是 Web
+                      应用中使用最多的场景。想象一下，如果我们只刷新了页面的内容，但是
+                      URL
+                      并没有改变，当用户刷新当前页面的时候，原先的内容会丢失，需要重新操作进入到对应的页面中，这是比较糟糕的一种体验。
+                    </p>
+                    <p data-nodeid="6910">
+                      所以，我们可以把页面的内容匹配到对应的路由信息中，即使是强制刷新，URL
+                      信息也不会丢，用户依然可以快速恢复原先的页面浏览信息，这也是我们项目中设计和使用路由的很重要的原因。
+                    </p>
+                    <p data-nodeid="6911">
+                      前面说到，单页应用使用了局部刷新的能力，配合路由信息变更的时候进行局部页面内容的刷新（而不是重新加载一个完整的页面），可以让用户获取更好的体验。
+                    </p>
+                    <p data-nodeid="6912">
+                      要实现前端路由，离不开浏览器提供的 History API、Location
+                      API 这些
+                      API，因此后面介绍路由能力实现时，我们也会进行一些介绍。
+                    </p>
+                    <p data-nodeid="6913">
+                      一般来说，前端路由的实现，会包括两种模式：
+                    </p>
+                    <ol data-nodeid="6914">
+                      <li data-nodeid="6915">
+                        <p data-nodeid="6916">History 模式</p>
+                      </li>
+                      <li data-nodeid="6917">
+                        <p data-nodeid="6918">Hash 模式</p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="6919">我们先来看看 History 模式。</p>
+                    <h4 data-nodeid="6920">History 模式</h4>
+                    <p data-nodeid="6921">
+                      History 的路由模式，依赖了一个关键的属性<code
+                        data-backticks="1"
+                        data-nodeid="7014"
+                        >window.history</code
+                      >，该属性可用来获取用于操作浏览器历史记录的 History
+                      对象。也就是说，通过使用<code
+                        data-backticks="1"
+                        data-nodeid="7016"
+                        >window.history</code
+                      >，我们可以实现以下与路由相关的重要能力。比如：
+                    </p>
+                    <ul data-nodeid="6922">
+                      <li data-nodeid="6923">
+                        <p data-nodeid="6924">在 history 中跳转</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6925">
+                      使用<code data-backticks="1" data-nodeid="7020"
+                        >window.history.back()</code
+                      >、<code data-backticks="1" data-nodeid="7022"
+                        >window.history.forward()</code
+                      >和<code data-backticks="1" data-nodeid="7024"
+                        >window.history.go()</code
+                      >方法，可以实现在用户历史记录中向后和向前的跳转。
+                    </p>
+                    <ul data-nodeid="6926">
+                      <li data-nodeid="6927">
+                        <p data-nodeid="6928">添加和修改历史记录中的条目</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6929">
+                      使用<code data-backticks="1" data-nodeid="7028"
+                        >history.pushState()</code
+                      >和<code data-backticks="1" data-nodeid="7030"
+                        >history.replaceState()</code
+                      >方法，它可以操作浏览器的历史栈，同时不会引起页面的刷新（可避免页面重新加载）。
+                    </p>
+                    <ul data-nodeid="6930">
+                      <li data-nodeid="6931">
+                        <p data-nodeid="6932">监听页面路由切换</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6933">
+                      当同一个页面在历史记录间切换时，就会产生<code
+                        data-backticks="1"
+                        data-nodeid="7034"
+                        >popstate</code
+                      >事件，可以通过<code data-backticks="1" data-nodeid="7036"
+                        >window.popstate</code
+                      >监听页面路由切换的情况。
+                    </p>
+                    <p data-nodeid="6934">
+                      也就是说，使用<code data-backticks="1" data-nodeid="7039"
+                        >pushState()</code
+                      >和<code data-backticks="1" data-nodeid="7041"
+                        >replaceState()</code
+                      >来修改路由信息，通过<code
+                        data-backticks="1"
+                        data-nodeid="7043"
+                        >popstate</code
+                      >事件监听页面路由变化，来进行页面的局部更新，这便是
+                      History 的路由模式。
+                    </p>
+                    <p data-nodeid="6935">
+                      但 History 的路由模式需要依赖 HTML5 History API（IE10
+                      以上），以及服务器的配置来支持，所以也有不少的开发者会使用
+                      Hash 模式来管理 Web 应用的路由。
+                    </p>
+                    <p data-nodeid="6936">那么 Hash 模式又是怎样的呢？</p>
+                    <h4 data-nodeid="6937">Hash 模式</h4>
+                    <p data-nodeid="6938">
+                      Hash 模式使用的是从井号(#)开始的 URL（锚）片段，主要依赖
+                      Location 对象的 hash 属性（<code
+                        data-backticks="1"
+                        data-nodeid="7049"
+                        >location.hash</code
+                      >）和<code data-backticks="1" data-nodeid="7051"
+                        >hashchange</code
+                      >事件，包括：
+                    </p>
+                    <ul data-nodeid="6939">
+                      <li data-nodeid="6940">
+                        <p data-nodeid="6941">
+                          使用<code data-backticks="1" data-nodeid="7054"
+                            >location.hash</code
+                          >来设置和获取 hash
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6942">
+                      <code data-backticks="1" data-nodeid="7056"
+                        >location.hash</code
+                      >的设置和获取，并不会造成页面重新加载，利用这一点，我们可以记录页面关键信息的同时，提升页面体验。
+                    </p>
+                    <ul data-nodeid="6943">
+                      <li data-nodeid="6944">
+                        <p data-nodeid="6945">
+                          监听<code data-backticks="1" data-nodeid="7059"
+                            >hashchange</code
+                          >事件
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="6946">
+                      当页面的 hash 改变时，<code
+                        data-backticks="1"
+                        data-nodeid="7062"
+                        >hashchange</code
+                      >事件会被触发，同时提供了两个属性：<code
+                        data-backticks="1"
+                        data-nodeid="7064"
+                        >newURL</code
+                      >（当前页面新的 URL）和<code
+                        data-backticks="1"
+                        data-nodeid="7066"
+                        >oldURL</code
+                      >（当前页面旧的 URL）。
+                    </p>
+                    <p data-nodeid="6947">
+                      部分浏览器不支持<code
+                        data-backticks="1"
+                        data-nodeid="7069"
+                        >onhashchange</code
+                      >事件，我们可以自行使用定时器检测和触发的方式来进行兼容，可以使用以下的代码逻辑来实现：
                     </p>
                     <div class="course-code-area">
                       <div class="copy-btn">
                         <div class="copy-icon"></div>
                         复制代码
                       </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;div class="my-dialog" :class="{'show': isShown}"&gt;
-</div></li><li><div class="code-word">  &lt;header v-if="cardInfo.hasTitle"&gt;{{cardInfo.title}}&lt;/header&gt;
-</div></li><li><div class="code-word">  &lt;section v-if="cardInfo.hasContent"&gt;{{cardInfo.content}}&lt;/section&gt;
-</div></li><li><div class="code-word">  &lt;footer&gt;
-</div></li><li><div class="code-word">    &lt;button v-for="button in cardInfo.buttons"&gt;{{button.text}}&lt;/button&gt;
-</div></li><li><div class="code-word">  &lt;/footer&gt;
-</div></li><li><div class="code-word">&lt;/div&gt;
+                      <pre><code data-language="java"><ol><li><div class="code-word">(function (window) {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 如果浏览器原生支持该事件，则退出</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (<span class="hljs-string">"onhashchange"</span> in window.document.body) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> location = window.location,
+</div></li><li><div class="code-word">    oldURL = location.href,
+</div></li><li><div class="code-word">    oldHash = location.hash;
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 每隔100ms检测一下location.hash是否发生变化</span>
+</div></li><li><div class="code-word">  setInterval(function () {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">var</span> newURL = location.href,
+</div></li><li><div class="code-word">      newHash = location.hash;
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 如果hash发生了变化，且绑定了处理函数...</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (newHash != oldHash &amp;&amp; typeof window.onhashchange === <span class="hljs-string">"function"</span>) {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 执行事件触发</span>
+</div></li><li><div class="code-word">      window.onhashchange({
+</div></li><li><div class="code-word">        type: <span class="hljs-string">"hashchange"</span>,
+</div></li><li><div class="code-word">        oldURL: oldURL,
+</div></li><li><div class="code-word">        newURL: newURL,
+</div></li><li><div class="code-word">      });
+</div></li><li><div class="code-word">      oldURL = newURL;
+</div></li><li><div class="code-word">      oldHash = newHash;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }, <span class="hljs-number">100</span>);
+</div></li><li><div class="code-word">})(window);
 </div></li></ol></code></pre>
                     </div>
-                    <p data-nodeid="97">通过这样的方式，我们可以：</p>
-                    <ul data-nodeid="98">
-                      <li data-nodeid="99">
-                        <p data-nodeid="100">
-                          通过<code data-backticks="1" data-nodeid="215"
-                            >cardInfo.hasTitle</code
-                          >来控制是否展示头部；
+                    <p data-nodeid="6949">
+                      我们可以看到，Hash 路由模式使用<code
+                        data-backticks="1"
+                        data-nodeid="7072"
+                        >location.hash</code
+                      >来设置和获取 hash，并通过<code
+                        data-backticks="1"
+                        data-nodeid="7074"
+                        >window.onhashchange</code
+                      >监听基于 hash 的路由变化，来进行页面更新处理的。
+                    </p>
+                    <h3 data-nodeid="6950">路由结合前端框架</h3>
+                    <p data-nodeid="6951">
+                      不管是 History 模式还是 Hash
+                      模式，路由的实现原理都很简单，因此一般来说大家也都会直接使用前端框架自带的路由库。
+                    </p>
+                    <p data-nodeid="6952">
+                      路由库结合前端框架的工作流程是这样的：
+                    </p>
+                    <ol data-nodeid="6953">
+                      <li data-nodeid="6954">
+                        <p data-nodeid="6955">
+                          设置监听器，监听<code
+                            data-backticks="1"
+                            data-nodeid="7080"
+                            >popstate</code
+                          >或者<code data-backticks="1" data-nodeid="7082"
+                            >hashchange</code
+                          >事件；
                         </p>
                       </li>
-                      <li data-nodeid="101">
-                        <p data-nodeid="102">
-                          通过<code data-backticks="1" data-nodeid="218"
-                            >cardInfo.buttons</code
-                          >来控制底部按钮的数量和文字。
+                      <li data-nodeid="6956">
+                        <p data-nodeid="6957">
+                          根据当前 URL
+                          信息匹配设置的路径，根据路由设置加载对应模块，通过前端框架进行更新和渲染；
                         </p>
                       </li>
-                    </ul>
-                    <p data-nodeid="103">
-                      通过这种配置方式，我们可以控制组件中具体某些功能的状态和展示内容。
-                    </p>
-                    <h5 data-nodeid="15761" class="">2. 样式可配置</h5>
-
-                    <p data-nodeid="107">
-                      样式的配置，通常是通过<code
-                        data-backticks="1"
-                        data-nodeid="226"
-                        >class</code
-                      >来实现的，比如可以使用条件语句进行判断，并绑定不同的<code
-                        data-backticks="1"
-                        data-nodeid="228"
-                        >class</code
-                      >：
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;!-- 自己拼接完整 class --&gt;
-</div></li><li><div class="code-word">&lt;button :class="'my-dialog__btn--' + (isA ctived ? 'actived' : 'inactived')"&gt;Submit&lt;/button&gt;
-</div></li><li><div class="code-word">&lt;!-- 也可以将 class 拆分 --&gt;
-</div></li><li><div class="code-word">&lt;button class="my-dialog__btn" :class="isActived ? 'actived' : 'inactived'"&gt;Submit&lt;/button&gt;
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="109">
-                      通过这样的方式，我们可以控制界面的展示样式。如今很多框架会通过在<code
-                        data-backticks="1"
-                        data-nodeid="231"
-                        >class</code
-                      >里添加随机 MD5 这样的方式，来保持局部作用域的<code
-                        data-backticks="1"
-                        data-nodeid="233"
-                        >class</code
-                      >样式不受其他地方影响。
-                    </p>
-                    <p data-nodeid="110">
-                      除了<code data-backticks="1" data-nodeid="236">class</code
-                      >之外，我们当然也可以直接将条件语句和<code
-                        data-backticks="1"
-                        data-nodeid="238"
-                        >style</code
-                      >进行绑定，来控制具体的某个样式。
-                    </p>
-                    <h5 data-nodeid="18170" class="">3. 功能逻辑可配置</h5>
-
-                    <p data-nodeid="114">
-                      举个例子，我们的这个卡片可以是视频、图片、文字三者其中之一的卡片。
-                    </p>
-                    <ul data-nodeid="115">
-                      <li data-nodeid="116">
-                        <p data-nodeid="117">视频：点击播放。</p>
-                      </li>
-                      <li data-nodeid="118">
-                        <p data-nodeid="119">图片：点击新窗口查看。</p>
-                      </li>
-                      <li data-nodeid="120">
-                        <p data-nodeid="121">文字：点击无效果。</p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="122">
-                      这种时候，我们可以使用这两种方式来实现功能逻辑的配置化。
-                    </p>
-                    <ul data-nodeid="123">
-                      <li data-nodeid="124">
-                        <p data-nodeid="125">
-                          通过控制 UI
-                          展示来控制点击事件的处理：每个模块（视频、图片、文字）绑定自己的点击事件，同时通过配置控制哪个模块的展示，从而控制事件的处理逻辑。
+                      <li data-nodeid="6958">
+                        <p data-nodeid="6959">
+                          页面更新的同时，使用<code
+                            data-backticks="1"
+                            data-nodeid="7086"
+                            >location.hash</code
+                          >或者<code data-backticks="1" data-nodeid="7088"
+                            >history.pushState/replaceState</code
+                          >更新页面的路由信息。
                         </p>
                       </li>
-                      <li data-nodeid="126">
-                        <p data-nodeid="127">
-                          通过逻辑判断来控制点击事件的处理：绑定的点击事件里，根据配置来进行不同的事件处理，展示不同的效果。
-                        </p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="128">
-                      可以看到，一个组件中可以通过配置的方式来控制它的状态、展示内容、样式，甚至是功能逻辑。而我们的应用常常是通过不同的组件和模块组成的，同样可以通过配置的方式来控制应用的各个状态、内容以及功能。
+                    </ol>
+                    <p data-nodeid="6960">
+                      以上是简单的实现，很多路由工具库还会提供除事件监听和通知之外的一些更高级的能力，比如与渲染层结合解析和处理的能力，以及路由的钩子、路由监听、路由鉴权、匹配和映射、懒加载打包等这种能力，减轻业务开发过程中的处理工作。
                     </p>
-                    <h3 data-nodeid="18642" class="te-preview-highlight">
-                      小结
-                    </h3>
-
-                    <p data-nodeid="130">
-                      今天我主要介绍了应用中常见的数据抽象，通过对应用进行合适的数据抽象，并将这些数据从应用中抽离从而实现应用的配置化，我们可以减少需要开发的代码量，提升系统的可维护性。
+                    <h3 data-nodeid="6961">小结</h3>
+                    <p data-nodeid="6962">
+                      其实，不管是单页应用/多页应用、服务端渲染/客户端渲染，还是前端路由的设计，都是在前端项目中使用频率很高的功能，也有很多成熟的解决方案和配套工具。
                     </p>
-                    <p data-nodeid="131">
-                      配置化的思想可以用在各个地方，我们也常常将其称为“一切皆可配置化”。
+                    <p data-nodeid="6963">
+                      但在了解一个工具如何使用的同时，我们更应该了解工具的实现、为什么需要这样来使用。只有掌握和理解了工具的设计原理、相关的解决方案，我们才可以将这些知识化为己用。
                     </p>
-                    <p data-nodeid="132">
-                      实际上，除了页面内容、应用状态的配置化，我们甚至可以实现接口的配置化，比如
-                      GraphQL 可用于自定义的接口 API 查询。
-                    </p>
-                    <p data-nodeid="133">
-                      除了这些，你觉得还有哪些问题可以通过配置化来解决的呢？欢迎在留言区进行讨论。
+                    <p data-nodeid="6964">
+                      你最近也有在用什么工具库吗？你是否有去了解其中的设计原理呢？欢迎在留言区留下你的思考。
                     </p>
                   </div>
                 </div>
@@ -1702,7 +1687,7 @@
                         data-v-4bc80e00=""
                         class="message-list-title-left-name"
                       >
-                        **航
+                        *鑫
                       </div>
                     </div>
                     <div data-v-4bc80e00="" class="message-list-title-right">
@@ -1716,12 +1701,14 @@
                       <div
                         data-v-4bc80e00=""
                         class="message-list-title-right-praise"
-                      ></div>
+                      >
+                        1
+                      </div>
                     </div>
                   </div>
                   <div data-v-4bc80e00="" class="message-list-container">
                     <div data-v-4bc80e00="" class="message-list-content">
-                      请教一个问题，比如有这样一种场景，在程序的入口调用了一个或多个接口，然后会根据这些接口的数据（有很多个字段）组合一起来做不同的判断走不同的路由，这样就要写很多个ifelse了，目前有没有一些好的优化方案呢
+                      小姐姐，那么ssr方案只能解决首屏seo问题吗？
                     </div>
                     <!---->
                   </div>
@@ -1730,8 +1717,9 @@
                     <span data-v-4bc80e00="" class="message-list-replay-name"
                       >讲师回复：</span
                     >
-                    一般来说，可以将这些判断逻辑按照一定的规则进行拆分，拆分到多个函数中，这样每个函数的职责会更加清晰。但这样并不解决你的判断条件数量，个人认为可以梳理下依赖的判断数据是否合理，可以进行调整。另外，还可以尝试将依赖的数据用一定方式组合，直接根据组合后的数据来判断，比如
-                    a_b_c 这样，可以将三个判断放在一个里。
+                    不只是这样哦，SSR
+                    可以有效地提升首屏渲染的性能，很多前端应用会使用 SSR
+                    来优化首屏耗时
                   </div>
                   <!---->
                   <!---->
@@ -1744,7 +1732,7 @@
                         data-v-4bc80e00=""
                         class="message-list-title-left-name"
                       >
-                        **0231
+                        *雨
                       </div>
                     </div>
                     <div data-v-4bc80e00="" class="message-list-title-right">
@@ -1763,7 +1751,7 @@
                   </div>
                   <div data-v-4bc80e00="" class="message-list-container">
                     <div data-v-4bc80e00="" class="message-list-content">
-                      微信小程序有什么方案可以配置化搭建页面吗？
+                      被删，nuxt页面刷新时是node服务器端直出，那页面切换时，是如何做到让数据出现在“查看源代码”中的呢？明明没走node服务器啊！
                     </div>
                     <!---->
                   </div>
@@ -1772,7 +1760,87 @@
                     <span data-v-4bc80e00="" class="message-list-replay-name"
                       >讲师回复：</span
                     >
-                    配置化的实现，很多时候其实都是针对自身的业务特点，划分出不同类型的组件将其组合，其实跟在哪个平台关系并不大。微信小程序可以结合自定义组件来做。
+                    有点没看懂让数据出现在“查看源代码”是什么意思，nuxt
+                    我也没研究过，但我理解路由异步加载的时候，也同样可以把数据直出在异步加载的代码里吧？
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **沫
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      更新太慢啦~被删小姐姐，每个星期都迫不及待啊！！！！不够看＞︿＜
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *聪
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      【部分浏览器不支持onhashchange事件，我们可以自行使用定时器检测和触发的方式来进行兼容】，既然不支持onhashchange事件了，为啥代码中还判断typeof
+                      window.onhashchange === "function"并执行呢？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这里 window.onhashchange
+                    是用来判断，业务代码中是否有依赖该事件的触发，如果有依赖但是浏览器又不支持的话，则需要手动触发该事件，达到
+                    onhashchange 的效果
                   </div>
                   <!---->
                   <!---->

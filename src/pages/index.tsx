@@ -1,6 +1,7 @@
 import axios from "axios"
 import React, { useEffect, useState } from "react"
-import { Link } from "gatsby"
+import { navigate } from "gatsby"
+import LinkButton from "../components/LinkButton"
 interface SectionData {
   title: string // 章节标题名
   filename: string // 章节文件名
@@ -21,14 +22,18 @@ export default function Home() {
       setCourseList(list)
     })
   }, [])
+  const selectCourse = (course: CourseData) =>
+    navigate("/course", {
+      state: course,
+    })
   return (
-    <div>
+    <div className=" mt-24">
       <ul>
         {courseList?.map(course => (
           <li key={course.id}>
-            <Link to="/course" state={course}>
+            <LinkButton size="lg" onClick={() => selectCourse(course)}>
               {course.title}
-            </Link>
+            </LinkButton>
           </li>
         ))}
       </ul>

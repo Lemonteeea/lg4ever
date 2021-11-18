@@ -1,0 +1,2595 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  导读 | 一文看懂 Vue.js 3.0 的优化
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/20:03"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="1203"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/20:03</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            11.55M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/20:03
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="4171" class="">
+                      我们的课程是要解读 Vue.js
+                      框架的源码，所以在进入课程之前我们先来了解一下 Vue.js
+                      框架演进的过程，也就是 Vue.js 3.0 主要做了哪些优化。
+                    </p>
+                    <p data-nodeid="4172">
+                      Vue.js 从 1.x 到 2.0 版本，最大的升级就是引入了虚拟 DOM
+                      的概念，它为后续做服务端渲染以及跨端框架 Weex 提供了基础。
+                    </p>
+                    <p data-nodeid="4173">
+                      Vue.js 2.x
+                      发展了很久，现在周边的生态设施都已经非常完善了，而且对于
+                      Vue.js
+                      用户而言，它几乎满足了我们日常开发的所有需求。你可能觉得
+                      Vue.js 2.x 已经足够优秀，但是在 Vue.js
+                      作者尤小右的眼中它还不够完美。在迭代 2.x
+                      版本的过程中，小右发现了很多需要解决的痛点，比如源码自身的维护性，数据量大后带来的渲染和更新的性能问题，一些想舍弃但为了兼容一直保留的鸡肋
+                      API
+                      等；另外，小右还希望能给开发人员带来更好的编程体验，比如更好的
+                      TypeScript
+                      支持、更好的逻辑复用实践等，所以他希望能从源码、性能和语法
+                      API 三个大的方面优化框架。
+                    </p>
+                    <p data-nodeid="4174">
+                      那么接下来，我们就一起来看一下 Vue.js 3.0
+                      具体做了哪些优化。相信你学习完这篇文章，不仅能知道 Vue.js
+                      3.0
+                      的升级给我们开发带来的收益，还能学习到一些设计思想和理念，并在自己的开发工作中应用，获得提升。
+                    </p>
+                    <h3 data-nodeid="4175">源码优化</h3>
+                    <p data-nodeid="4176">
+                      首先是源码优化，也就是小右对于 Vue.js
+                      框架本身开发的优化，它的目的是让代码更易于开发和维护。源码的优化主要体现在使用
+                      monorepo 和 TypeScript
+                      管理和开发源码，这样做的目标是提升自身代码可维护性。接下来我们就来看一下这两个方面的具体变化。
+                    </p>
+                    <h4 data-nodeid="4177">1. 更好的代码管理方式：monorepo</h4>
+                    <p data-nodeid="4178">
+                      首先，源码的优化体现在代码管理方式上。Vue.js 2.x
+                      的源码托管在 src 目录，然后依据功能拆分出了
+                      compiler（模板编译的相关代码）、core（与平台无关的通用运行时代码）、platforms（平台专有代码）、server（服务端渲染的相关代码）、sfc（.vue
+                      单文件解析相关代码）、shared（共享工具代码） 等目录：
+                    </p>
+                    <p data-nodeid="4179">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/DC/Ciqc1F8Cn6mAHaUrAACzRBFsL1g844.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="4308"
+                      />
+                    </p>
+                    <p data-nodeid="4180">
+                      而到了 Vue.js 3.0 ，整个源码是通过 monorepo
+                      的方式维护的，根据功能将不同的模块拆分到 packages
+                      目录下面不同的子目录中：
+                    </p>
+                    <p data-nodeid="4181">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/DC/Ciqc1F8Cn7KAELkqAAJkxFes1zw593.png"
+                        alt="Drawing 1.png"
+                        data-nodeid="4312"
+                      />
+                    </p>
+                    <p data-nodeid="4182">
+                      可以看出相对于 Vue.js 2.x 的源码组织方式，monorepo
+                      把这些模块拆分到不同的 package 中，每个 package 有各自的
+                      API、类型定义和测试。这样使得模块拆分更细化，职责划分更明确，模块之间的依赖关系也更加明确，开发人员也更容易阅读、理解和更改所有模块源码，提高代码的可维护性。
+                    </p>
+                    <p data-nodeid="4183">
+                      另外一些 package（比如 reactivity 响应式库）是可以独立于
+                      Vue.js 使用的，这样用户如果只想使用 Vue.js 3.0
+                      的响应式能力，可以单独依赖这个响应式库而不用去依赖整个
+                      Vue.js，减小了引用包的体积大小，而 Vue.js 2 .x
+                      是做不到这一点的。
+                    </p>
+                    <h4 data-nodeid="4184">
+                      2. 有类型的 JavaScript：TypeScript
+                    </h4>
+                    <p data-nodeid="4185">
+                      其次，源码的优化还体现在 Vue.js 3.0 自身采用了 TypeScript
+                      开发。Vue.js 1.x 版本的源码是没有用类型语言的，小右用
+                      JavaScript
+                      开发了整个框架，但对于复杂的框架项目开发，使用类型语言非常有利于代码的维护，因为它可以在编码期间帮你做类型检查，避免一些因类型问题导致的错误；也可以利于它去定义接口的类型，利于
+                      IDE 对变量类型的推导。
+                    </p>
+                    <p data-nodeid="4186">
+                      因此在重构 2.0 的时候，小右选型了 Flow，但是在 Vue.js 3.0
+                      的时候抛弃 Flow 转而采用 TypeScript
+                      重构了整个项目，这里有两方面原因，接下来我们具体说一下。
+                    </p>
+                    <p data-nodeid="4187">
+                      首先，Flow 是 Facebook 出品的 JavaScript
+                      静态类型检查工具，它可以以非常小的成本对已有的 JavaScript
+                      代码迁入，非常灵活，这也是 Vue.js 2.0
+                      当初选型它时一方面的考量。但是 Flow
+                      对于一些复杂场景类型的检查，支持得并不好。记得在看 Vue.js
+                      2.x 源码的时候，在某行代码的注释中看到了对 Flow
+                      的吐槽，比如在组件更新 props 的地方出现了：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> propOptions: any = vm.$options.props <span class="hljs-comment">// wtf flow?</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4189">
+                      什么意思呢？其实是由于这里 Flow 并没有正确推导出
+                      vm.$options.props 的类型 ，开发人员不得不强制申明
+                      propsOptions 的类型为
+                      any，显得很不合理；另外他也在社区平台吐槽过 Flow
+                      团队的烂尾。
+                    </p>
+                    <p data-nodeid="4190">
+                      其次，Vue.js 3.0 抛弃 Flow 后，使用 TypeScript
+                      重构了整个项目。
+                      TypeScript提供了更好的类型检查，能支持复杂的类型推导；由于源码就使用
+                      TypeScript 编写，也省去了单独维护 d.ts 文件的麻烦；就整个
+                      TypeScript 的生态来看，TypeScript
+                      团队也是越做越好，TypeScript
+                      本身保持着一定频率的迭代和更新，支持的 feature
+                      也越来越多。
+                    </p>
+                    <p data-nodeid="4191">
+                      此外，小右和 TypeScript
+                      团队也一直保持了良好的沟通，我们可以期待 TypeScript 对
+                      Vue.js 的支持会越来越好。
+                    </p>
+                    <h3 data-nodeid="4192">性能优化</h3>
+                    <p data-nodeid="4193">
+                      性能优化一直是前端老生常谈的问题。那么对于 Vue.js 2.x
+                      已经足够优秀的前端框架，它的性能优化可以从哪些方面进行突破呢？
+                    </p>
+                    <h4 data-nodeid="4194">1. 源码体积优化</h4>
+                    <p data-nodeid="4195">
+                      首先是源码体积优化，我们在平时工作中也经常会尝试优化静态资源的体积，因为
+                      JavaScript 包体积越小，意味着网络传输时间越短，JavaScript
+                      引擎解析包的速度也越快。
+                    </p>
+                    <p data-nodeid="4196">
+                      那么，Vue.js 3.0 在源码体积的减少方面做了哪些工作呢？
+                    </p>
+                    <ul data-nodeid="4197">
+                      <li data-nodeid="4198">
+                        <p data-nodeid="4199">
+                          首先，移除一些冷门的 feature（比如
+                          filter、inline-template 等）；
+                        </p>
+                      </li>
+                      <li data-nodeid="4200">
+                        <p data-nodeid="4201">
+                          其次，引入 tree-shaking 的技术，减少打包体积。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="4202">
+                      第一点很好理解，所以这里我们来看看
+                      tree-shaking，它的原理很简单，tree-shaking 依赖 ES2015
+                      模块语法的静态结构（即 import 和
+                      export），通过编译阶段的静态分析，找到没有引入的模块并打上标记。
+                    </p>
+                    <p data-nodeid="4203">
+                      举个例子，一个 math 模块定义了 2 个方法 square(x) 和
+                      cube(x) ：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">export function <span class="hljs-title">square</span><span class="hljs-params">(x)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> x * x
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function">export function <span class="hljs-title">cube</span><span class="hljs-params">(x)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> x * x * x
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4205">
+                      我们在这个模块外面只引入了 cube 方法：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { cube } from <span class="hljs-string">'./math.js'</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// do something with cube</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4207">
+                      最终 math 模块会被 webpack 打包生成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">/* 1 */</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">/***/</span> (function(<span class="hljs-keyword">module</span>, __webpack_exports__, __webpack_require__) {
+</div></li><li><div class="code-word">  <span class="hljs-string">'use strict'</span>;
+</div></li><li><div class="code-word">  <span class="hljs-comment">/* unused harmony export square */</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">/* harmony export (immutable) */</span> __webpack_exports__[<span class="hljs-string">'a'</span>] = cube;
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">square</span><span class="hljs-params">(x)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> x * x;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">cube</span><span class="hljs-params">(x)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> x * x * x;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4209">
+                      可以看到，未被引入的 square 模块被标记了，
+                      然后压缩阶段会利用例如 uglify-js、terser
+                      等压缩工具真正地删除这些没有用到的代码。
+                    </p>
+                    <p data-nodeid="4210">
+                      也就是说，利用 tree-shaking 技术，如果你在项目中没有引入
+                      Transition、KeepAlive
+                      等组件，那么它们对应的代码就不会打包，这样也就间接达到了减少项目引入的
+                      Vue.js 包体积的目的。
+                    </p>
+                    <h4 data-nodeid="4211">2. 数据劫持优化</h4>
+                    <p data-nodeid="4212">
+                      其次是数据劫持优化。Vue.js 区别于 React
+                      的一大特色是它的数据是响应式的，这个特性从 Vue.js 1.x
+                      版本就一直伴随着，这也是 Vue.js 粉喜欢 Vue.js
+                      的原因之一，DOM
+                      是数据的一种映射，数据发生变化后可以自动更新
+                      DOM，用户只需要专注于数据的修改，没有其余的心智负担。
+                    </p>
+                    <p data-nodeid="4213">
+                      在 Vue.js
+                      内部，想实现这个功能是要付出一定代价的，那就是必须劫持数据的访问和更新。其实这点很好理解，当数据改变后，为了自动更新
+                      DOM，那么就必须劫持数据的更新，也就是说当数据发生改变后能自动执行一些代码去更新
+                      DOM，那么问题来了，Vue.js 怎么知道更新哪一片 DOM
+                      呢？因为在渲染 DOM
+                      的时候访问了数据，我们可以对它进行访问劫持，这样就在内部建立了依赖关系，也就知道数据对应的
+                      DOM
+                      是什么了。以上只是大体的思路，具体实现要比这更复杂，内部还依赖了一个
+                      watcher 的数据结构做依赖管理，参考下图：
+                    </p>
+                    <p data-nodeid="4214">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/FF/CgqCHl8CudyAJc3tAAGkPxYyp9k501.png"
+                        alt="1.png"
+                        data-nodeid="4346"
+                      />
+                    </p>
+                    <p data-nodeid="4215">
+                      Vue.js 1.x 和 Vue.js 2.x 内部都是通过
+                      Object.defineProperty 这个 API 去劫持数据的 getter 和
+                      setter，具体是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">Object.defineProperty(data, <span class="hljs-string">'a'</span>,{
+</div></li><li><div class="code-word">  get(){
+</div></li><li><div class="code-word">    <span class="hljs-comment">// track</span>
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  set(){
+</div></li><li><div class="code-word">    <span class="hljs-comment">// trigger</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">})
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4217">
+                      但这个 API 有一些缺陷，它必须预先知道要拦截的 key
+                      是什么，所以它并不能检测对象属性的添加和删除。尽管 Vue.js
+                      为了解决这个问题提供了 $set 和 $delete
+                      实例方法，但是对于用户来说，还是增加了一定的心智负担。
+                    </p>
+                    <p data-nodeid="4218">
+                      另外 Object.defineProperty
+                      的方式还有一个问题，举个例子，比如这个嵌套层级比较深的对象：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">export <span class="hljs-keyword">default</span> {
+</div></li><li><div class="code-word">  data: {
+</div></li><li><div class="code-word">    a: {
+</div></li><li><div class="code-word">      b: {
+</div></li><li><div class="code-word">        c: {
+</div></li><li><div class="code-word">          d: <span class="hljs-number">1</span>
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4220">
+                      由于 Vue.js
+                      无法判断你在运行时到底会访问到哪个属性，所以对于这样一个嵌套层级较深的对象，如果要劫持它内部深层次的对象变化，就需要递归遍历这个对象，执行
+                      Object.defineProperty
+                      把每一层对象数据都变成响应式的。毫无疑问，如果我们定义的响应式数据过于复杂，这就会有相当大的性能负担。
+                    </p>
+                    <p data-nodeid="4221">
+                      为了解决上述 2 个问题，Vue.js 3.0 使用了 Proxy API
+                      做数据劫持，它的内部是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">observed = <span class="hljs-keyword">new</span> Proxy(data, {
+</div></li><li><div class="code-word">  get() {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// track</span>
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  set() {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// trigger</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">})
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4223">
+                      由于它劫持的是整个对象，那么自然对于对象的属性的增加和删除都能检测到。
+                    </p>
+                    <p data-nodeid="4224">
+                      但要注意的是，Proxy API
+                      并不能监听到内部深层次的对象变化，因此 Vue.js 3.0
+                      的处理方式是在 getter
+                      中去递归响应式，这样的好处是真正访问到的内部对象才会变成响应式，而不是无脑递归，这样无疑也在很大程度上提升了性能，我会在后面分析响应式章节详细介绍它的具体实现原理。
+                    </p>
+                    <h4 data-nodeid="4225">3. 编译优化</h4>
+                    <p data-nodeid="4226">
+                      最后是编译优化，为了便于理解，我们先来看一张图：
+                    </p>
+                    <p data-nodeid="4227">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/FF/CgqCHl8Cuf2AZw70AAEFU2EMA50521.png"
+                        alt="2.png"
+                        data-nodeid="4360"
+                      />
+                    </p>
+                    <p data-nodeid="4228">
+                      这是 Vue.js 2.x 从 new Vue 开始渲染成 DOM
+                      的流程，上面说过的响应式过程就发生在图中的 init 阶段，另外
+                      template compile to render function 的流程是可以借助
+                      vue-loader 在 webpack
+                      编译阶段离线完成，并非一定要在运行时完成。
+                    </p>
+                    <p data-nodeid="4229">
+                      所以想优化整个 Vue.js
+                      的运行时，除了数据劫持部分的优化，我们可以在耗时相对较多的
+                      patch 阶段想办法，Vue.js 3.0
+                      也是这么做的，并且它通过在编译阶段优化编译的结果，来实现运行时
+                      patch 过程的优化。
+                    </p>
+                    <p data-nodeid="4230">
+                      我们知道，通过数据劫持和依赖收集，Vue.js 2.x
+                      的数据更新并触发重新渲染的粒度是组件级的：
+                    </p>
+                    <p data-nodeid="4231">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/F4/Ciqc1F8CuhCADiJ1AAGMYHdzHa0498.png"
+                        alt="3.png"
+                        data-nodeid="4366"
+                      />
+                    </p>
+                    <p data-nodeid="4232">
+                      虽然 Vue
+                      能保证触发更新的组件最小化，但在单个组件内部依然需要遍历该组件的整个
+                      vnode 树，举个例子，比如我们要更新这个组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"content"</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text"</span>&gt;</span>static text<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text"</span>&gt;</span>static text<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text"</span>&gt;</span>{{message}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text"</span>&gt;</span>static text<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text"</span>&gt;</span>static text<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4234">整个 diff 过程如图所示：</p>
+                    <p data-nodeid="4235">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/6E/CE/Ciqc1F-zmN-AbAP_AAEJ0vicgdA415.png"
+                        alt="图片1.png"
+                        data-nodeid="4371"
+                      />
+                    </p>
+                    <p data-nodeid="4236">
+                      可以看到，因为这段代码中只有一个动态节点，所以这里有很多
+                      diff 和遍历其实都是不需要的，这就会导致 vnode
+                      的性能跟模版大小正相关，跟动态节点的数量无关，当一些组件的整个模版内只有少量动态节点时，这些遍历都是性能的浪费。
+                    </p>
+                    <p data-nodeid="4237">
+                      而对于上述例子，理想状态只需要 diff 这个绑定 message
+                      动态节点的 p 标签即可。
+                    </p>
+                    <p data-nodeid="4238">
+                      Vue.js 3.0
+                      做到了，它通过编译阶段对静态模板的分析，编译生成了 Block
+                      tree。Block tree
+                      是一个将模版基于动态节点指令切割的嵌套区块，每个区块内部的节点结构是固定的，而且每个区块只需要以一个
+                      Array 来追踪自身包含的动态节点。借助 Block tree，Vue.js 将
+                      vnode
+                      <strong data-nodeid="4383">更新性能</strong
+                      >由与模版整体大小相关提升为<strong data-nodeid="4384"
+                        >与动态内容的数量相关</strong
+                      >，这是一个非常大的性能突破，我会在后续的章节详细分析它是如何实现的。
+                    </p>
+                    <p data-nodeid="4239">
+                      除此之外，Vue.js 3.0 在编译阶段还包含了对 Slot
+                      的编译优化、事件侦听函数的缓存优化，并且在运行时重写了
+                      diff 算法，这些性能优化的内容我在后续特定的章节与你分享。
+                    </p>
+                    <h3 data-nodeid="4240">语法 API 优化：Composition API</h3>
+                    <p data-nodeid="4241">
+                      除了源码和性能方面，Vue.js 3.0
+                      还在语法方面进行了优化，主要是提供了 Composition
+                      API，那么我们一起来看一下它为我们提供了什么帮助。
+                    </p>
+                    <h4 data-nodeid="4242">1. 优化逻辑组织</h4>
+                    <p data-nodeid="4243">首先，是优化逻辑组织。</p>
+                    <p data-nodeid="4244">
+                      在 Vue.js 1.x 和 2.x
+                      版本中，编写组件本质就是在编写一个“包含了描述组件选项的对象”，我们把它称为
+                      Options
+                      API，它的好处是在于写法非常符合直觉思维，对于新手来说这样很容易理解，这也是很多人喜欢
+                      Vue.js 的原因之一。
+                    </p>
+                    <p data-nodeid="4245">
+                      Options API 的设计是按照 methods、computed、data、props
+                      这些不同的选项分类，当组件小的时候，这种分类方式一目了然；但是在大型组件中，一个组件可能有多个逻辑关注点，当使用
+                      Options API 的时候，每一个关注点都有自己的
+                      Options，如果需要修改一个逻辑点关注点，就需要在单个文件中不断上下切换和寻找。
+                    </p>
+                    <p data-nodeid="4246">
+                      举一个官方例子&nbsp;Vue CLI UI file
+                      explorer，它是&nbsp;vue-cli&nbsp;GUI
+                      应用程序中的一个复杂的文件浏览器组件。这个组件需要处理许多不同的逻辑关注点：
+                    </p>
+                    <ul data-nodeid="4247">
+                      <li data-nodeid="4248">
+                        <p data-nodeid="4249">跟踪当前文件夹状态并显示其内容</p>
+                      </li>
+                      <li data-nodeid="4250">
+                        <p data-nodeid="4251">
+                          处理文件夹导航（比如打开、关闭、刷新等）
+                        </p>
+                      </li>
+                      <li data-nodeid="4252">
+                        <p data-nodeid="4253">处理新文件夹的创建</p>
+                      </li>
+                      <li data-nodeid="4254">
+                        <p data-nodeid="4255">切换显示收藏夹</p>
+                      </li>
+                      <li data-nodeid="4256">
+                        <p data-nodeid="4257">切换显示隐藏文件夹</p>
+                      </li>
+                      <li data-nodeid="4258">
+                        <p data-nodeid="4259">处理当前工作目录的更改</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="4260">
+                      如果我们按照逻辑关注点做颜色编码，就可以看到当使用&nbsp;Options
+                      API&nbsp;去编写组件时，这些逻辑关注点是非常分散的：
+                    </p>
+                    <p data-nodeid="4261">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/DD/Ciqc1F8CoIeAToThAAG5J8trLZc593.png"
+                        alt="Drawing 6.png"
+                        data-nodeid="4404"
+                      />
+                    </p>
+                    <p data-nodeid="4262">
+                      Vue.js 3.0 提供了一种新的 API：Composition
+                      API，它有一个很好的机制去解决这样的问题，就是将某个逻辑关注点相关的代码全都放在一个函数里，这样当需要修改一个功能时，就不再需要在文件中跳来跳去。
+                    </p>
+                    <p data-nodeid="4263">
+                      通过下图，我们可以很直观地感受到 Composition API
+                      在逻辑组织方面的优势：
+                    </p>
+                    <p data-nodeid="4264">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2C/E9/CgqCHl8CoI-ACOXEAAM5NZiddQs980.png"
+                        alt="Drawing 7.png"
+                        data-nodeid="4409"
+                      />
+                    </p>
+                    <h4 data-nodeid="4265">2. 优化逻辑复用</h4>
+                    <p data-nodeid="4266">其次，是优化逻辑复用。</p>
+                    <p data-nodeid="4267">
+                      当我们开发项目变得复杂的时候，免不了需要抽象出一些复用的逻辑。在
+                      Vue.js 2.x 中，我们通常会用 mixins
+                      去复用逻辑，举一个鼠标位置侦听的例子，我们会编写如下函数
+                      mousePositionMixin：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> mousePositionMixin = {
+</div></li><li><div class="code-word">  data() {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">      x: <span class="hljs-number">0</span>,
+</div></li><li><div class="code-word">      y: <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  mounted() {
+</div></li><li><div class="code-word">    window.addEventListener(<span class="hljs-string">'mousemove'</span>, <span class="hljs-keyword">this</span>.update)
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  destroyed() {
+</div></li><li><div class="code-word">    window.removeEventListener(<span class="hljs-string">'mousemove'</span>, <span class="hljs-keyword">this</span>.update)
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  methods: {
+</div></li><li><div class="code-word">    update(e) {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">this</span>.x = e.pageX
+</div></li><li><div class="code-word">      <span class="hljs-keyword">this</span>.y = e.pageY
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">export <span class="hljs-keyword">default</span> mousePositionMixin
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4269">然后在组件中使用：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+</span></div></li><li><div class="code-word">    Mouse position: x {{ x }} / y {{ y }}
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li><li><div class="code-word"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+</span></span></div></li><li><div class="code-word"><span class="hljs-keyword">import</span> mousePositionMixin <span class="hljs-keyword">from</span> <span class="hljs-string">'./mouse'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+</div></li><li><div class="code-word">  <span class="hljs-attr">mixins</span>: [mousePositionMixin]
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4271">
+                      使用单个 mixin
+                      似乎问题不大，但是当我们一个组件混入大量不同的 mixins
+                      的时候，会存在两个非常明显的问题：命名冲突和数据来源不清晰。
+                    </p>
+                    <p data-nodeid="4272">
+                      首先每个 mixin 都可以定义自己的
+                      props、data，它们之间是无感的，所以很容易定义相同的变量，导致命名冲突。另外对组件而言，如果模板中使用不在当前组件中定义的变量，那么就会不太容易知道这些变量在哪里定义的，这就是数据来源不清晰。但是Vue.js
+                      3.0 设计的 Composition API，就很好地帮助我们解决了 mixins
+                      的这两个问题。
+                    </p>
+                    <p data-nodeid="4273">
+                      我们来看一下在 Vue.js 3.0 中如何书写这个示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { ref, onMounted, onUnmounted } from <span class="hljs-string">'vue'</span>
+</div></li><li><div class="code-word"><span class="hljs-function">export <span class="hljs-keyword">default</span> function <span class="hljs-title">useMousePosition</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> x = ref(<span class="hljs-number">0</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> y = ref(<span class="hljs-number">0</span>)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> update = e =&gt; {
+</div></li><li><div class="code-word">    x.value = e.pageX
+</div></li><li><div class="code-word">    y.value = e.pageY
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  onMounted(() =&gt; {
+</div></li><li><div class="code-word">    window.addEventListener(<span class="hljs-string">'mousemove'</span>, update)
+</div></li><li><div class="code-word">  })
+</div></li><li><div class="code-word">  onUnmounted(() =&gt; {
+</div></li><li><div class="code-word">    window.removeEventListener(<span class="hljs-string">'mousemove'</span>, update)
+</div></li><li><div class="code-word">  })
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> { x, y }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4275">
+                      这里我们约定 useMousePosition 这个函数为 hook
+                      函数，然后在组件中使用：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+</span></div></li><li><div class="code-word">    Mouse position: x {{ x }} / y {{ y }}
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li><li><div class="code-word"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+</span></span></div></li><li><div class="code-word">  <span class="hljs-keyword">import</span> useMousePosition <span class="hljs-keyword">from</span> <span class="hljs-string">'./mouse'</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+</div></li><li><div class="code-word">    setup() {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">const</span> { x, y } = useMousePosition()
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> { x, y }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4277">
+                      可以看到，整个数据来源清晰了，即使去编写更多的 hook
+                      函数，也不会出现命名冲突的问题。
+                    </p>
+                    <p data-nodeid="4278">
+                      Composition API
+                      除了在逻辑复用方面有优势，也会有更好的类型支持，因为它们都是一些函数，在调用函数时，自然所有的类型就被推导出来了，不像
+                      Options API 所有的东西使用 this。另外，Composition API 对
+                      tree-shaking 友好，代码也更容易压缩。
+                    </p>
+                    <p data-nodeid="4279">
+                      虽然 Composition API
+                      有诸多优势，它也不是一点缺点都没有，关于它的具体用法和设计原理，我们会在后续的章节详细说明。这里还需要说明的是，Composition
+                      API 属于 API 的增强，它并不是 Vue.js 3.0
+                      组件开发的范式，如果你的组件足够简单，你还是可以使用
+                      Options API。
+                    </p>
+                    <h3 data-nodeid="4280">引入 RFC：使每个版本改动可控</h3>
+                    <p data-nodeid="4281">
+                      作为一个流行开源框架的作者，小右可能每天都会收到各种各样的
+                      feature
+                      request。但并不是社区一有新功能的需求，框架就会立马支持，因为随着
+                      Vue.js
+                      的用户越来越多，小右会更加重视稳定性，会仔细考虑所做的每一个可能对最终用户影响的更改，以及有意识去防止新
+                      API 对框架本身实现带来的复杂性的提升。
+                    </p>
+                    <p data-nodeid="4282">
+                      因此在 Vue.js 2.x 版本开发到后期的阶段 ，小右就启用了 RFC
+                      ，它的全称是 Request For
+                      Comments，旨在为新功能进入框架提供一个一致且受控的路径。当社区有一些新需求的想法时，它可以提交一个
+                      RFC，然后由社区和 Vue.js 的核心团队一起讨论，如果这个 RFC
+                      最终被通过了，那么它才会被实现。比如 2.6 版本对于 slot 新
+                      API 的改动，就是<a
+                        href="https://github.com/vuejs/rfcs/blob/master/active-rfcs/0001-new-slot-syntax.md"
+                        data-nodeid="4428"
+                        >这条 RFC</a
+                      >
+                      里。
+                    </p>
+                    <p data-nodeid="4283">
+                      到了 Vue.js 3.0 ，小右在实现代码前就大规模启用
+                      RFC，来确保他的改动和设计都是经过讨论并确认的，这样可以避免走弯路。Vue.js
+                      3.0 版本有很多重大的改动，每一条改动都会有对应的
+                      RFC，通过阅读这些 RFC，你可以了解每一个 feature
+                      采用或被废弃掉的前因后果。
+                    </p>
+                    <p data-nodeid="4284">
+                      Vue.js 3.0 目前已被实现并合并的 RFC 都在<a
+                        href="https://github.com/vuejs/rfcs/pulls?q=is%3Apr+is%3Amerged+label%3A3.x"
+                        data-nodeid="4434"
+                        >这里</a
+                      >，通过阅读它们，你也可以大致了解 Vue.js 3.0
+                      的一些变化，以及为什么会产生这些变化，帮助你了解它的前因后果。
+                    </p>
+                    <h3 data-nodeid="4285">过渡期</h3>
+                    <p data-nodeid="4286">
+                      接下来，我想再带你来了解一下 Vue.js
+                      各版本迭代的过渡期，希望能够对你在 Vue.js
+                      的技术选型方面和学习方向上有所帮助。
+                    </p>
+                    <p data-nodeid="4287">
+                      通常框架的 major
+                      版本从升级到大规模投入使用，都需要经历相当长的一段过渡期。不过，
+                      Vue.js 1.x 到 Vue.js 2.0
+                      的升级过渡期不长，主要是因为那个时候 Vue.js
+                      的用户还不多，生态也不完善，很多用户都是直接上手的 2.0
+                      版本，没有旧项目的历史包袱。
+                    </p>
+                    <p data-nodeid="4288">
+                      而 Vue.js 2.x 的发展历经了 3
+                      年多的时间，用户众多，而且周边生态也已经非常完善了。通常
+                      major 版本的升级会有很多 breaking change，这就意味着想从
+                      2.x 升级到 3.0
+                      的项目需要改代码，而且不仅仅项目的代码要修改，所依赖的周边生态也需要升级。这其实是一个相当大的工作量，也需要承担一定的风险，所以如果你的项目非常庞大且已经相对稳定，没有什么特别的痛点，那么升级要慎重。
+                    </p>
+                    <p data-nodeid="4289">
+                      Vue.js 3.0 使用 ES2015 的语法开发，有些 API 如 Proxy
+                      是没有 polyfill 的，这就意味着官方需要单独出一个 IE11
+                      compat 版本来支持 IE11。如果你的项目需要兼容
+                      IE11，你就不得不小心使用某些
+                      API，这也就带来了一些额外的心智负担。
+                    </p>
+                    <p data-nodeid="4290">
+                      因此可能在 Vue.js 3.0
+                      出来的相当长的一段时间，复杂的大项目都不会考虑去升级，而一些小的、对浏览器兼容要求不高的新项目可以考虑尝鲜了。
+                    </p>
+                    <p data-nodeid="4291">
+                      官方会继续维护 Vue.js 2.x 版本 18
+                      个月，如果你的有些项目一辈子都不打算升级 Vue.js
+                      3.0，那么你应该去认真学习 Vue.js 2.x
+                      的源码，在官方不再维护的时候遇到问题你可以自己去修改它的源码来解决。
+                    </p>
+                    <p data-nodeid="4292">
+                      不过，虽然 Vue.js 3.0
+                      距离大规模应用还有相当长一段时间，但是越早开始学习你就越能在未来掌握主动权。这段时间里，你可以关注它的发展，去学习它的设计思想，也可以去为它的生态建设贡献代码，从而提升自己的技术能力。另外也可以尝试在一些小项目中应用
+                      Vue.js 3.0，不仅可以享受 Vue.js 3.0
+                      带来的性能方面的优势以及 Composition API
+                      在逻辑复用方面便利，也为了将来某一天全面升级 Vue.js 3.0
+                      做技术储备。
+                    </p>
+                    <h3 data-nodeid="4293">总结</h3>
+                    <p data-nodeid="4294">
+                      这节课我们主要讲解了 Vue.js 3.0
+                      升级做了几个方面的优化，以及为什么会需要这些优化。希望学习完后我们也可以像小右一样去审视自己的工作，有哪些痛点，找到可以改进和努力的方向并实施，只有这样你才能够不断提升自己的能力，工作上也会有不错的产出。
+                    </p>
+                    <p data-nodeid="4295" class="te-preview-highlight">
+                      Vue.js 3.0
+                      做了这么多改进，相信你也一定对它的实现细节非常感兴趣，那么在接下来的课程里，就让我对
+                      Vue.js 的源码抽丝剥茧，一层层为你揭开 Vue.js
+                      背后的实现原理和细节。那么还等什么，快上车吧！
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **昊
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      沙发
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

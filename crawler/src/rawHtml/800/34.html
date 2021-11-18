@@ -1,0 +1,2543 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  26 | Vue Router：如何实现一个前端路由？（上）
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/08:20"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="500"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/08:20</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">7.67M</div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/08:20
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="68116">
+                      相信对有一定基础的前端开发工程师来说，路由并不陌生，它最初源于服务端，在服务端中路由描述的是
+                      URL 与处理函数之间的映射关系。
+                    </p>
+
+                    <p data-nodeid="67684">
+                      而在 Web 前端单页应用 SPA 中，路由描述的是 URL
+                      与视图之间的映射关系，这种映射是单向的，即 URL
+                      变化会引起视图的更新。
+                    </p>
+                    <p data-nodeid="67685">
+                      相比于后端路由，前端路由的好处是无须刷新页面，减轻了服务器的压力，提升了用户体验。目前主流支持单页应用的前端框架，基本都有配套的或第三方的路由系统。相应的，Vue.js
+                      也提供了官方前端路由实现 Vue
+                      Router，那么这节课我们就来学习它的实现原理。
+                    </p>
+                    <blockquote data-nodeid="67686">
+                      <p data-nodeid="67687">
+                        Vue.js 3.0 配套的 Vue Router 源码在<a
+                          href="https://github.com/vuejs/vue-router-next"
+                          data-nodeid="67761"
+                          >这里</a
+                        >，建议你学习前先把源码 clone
+                        下来。如果你还不会使用路由，建议你先看它的<a
+                          href="https://next.router.vuejs.org/"
+                          data-nodeid="67765"
+                          >官网文档</a
+                        >，会使用后再来学习本节课。
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="67688">路由的基本用法</h3>
+                    <p data-nodeid="67689">
+                      我们先通过一个简单地示例来看路由的基本用法，希望你也可以使用
+                      Vue cli 脚手架创建一个 Vue.js 3.0 的项目，并安装 4.x
+                      版本的 Vue Router 把项目跑起来。
+                    </p>
+                    <p data-nodeid="67690">
+                      注意，为了让 Vue.js 可以在线编译模板，你需要在根目录下配置
+                      vue.config.js，并且设置 runtimeCompiler 为 true：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">module</span>.<span class="hljs-keyword">exports</span> = {
+</div></li><li><div class="code-word">  runtimeCompiler: <span class="hljs-keyword">true</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="67692">
+                      然后我们修改页面的 HTML 模板，加上如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;div id=<span class="hljs-string">"app"</span>&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Hello App!<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">router-link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">"/"</span>&gt;</span>Go to Home<span class="hljs-tag">&lt;/<span class="hljs-name">router-link</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">router-link</span> <span class="hljs-attr">to</span>=<span class="hljs-string">"/about"</span>&gt;</span>Go to About<span class="hljs-tag">&lt;/<span class="hljs-name">router-link</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">router-view</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">router-view</span>&gt;</span></span>
+</div></li><li><div class="code-word">&lt;/div&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="68401">
+                      其中，RouterLink 和 RouterView 是 Vue Router 内置的组件。
+                    </p>
+                    <p data-nodeid="68402">
+                      RouterLink 表示路由的导航组件，我们可以配置 to
+                      属性来指定它跳转的链接，它最终会在页面上渲染生成 a 标签。
+                    </p>
+                    <p data-nodeid="68403">
+                      RouterView 表示路由的视图组件，它会渲染路径对应的 Vue
+                      组件，也支持嵌套。
+                    </p>
+                    <p data-nodeid="68404">
+                      RouterLink 和 RouterView
+                      的具体实现，我们会放到后面去分析。
+                    </p>
+                    <p data-nodeid="68405">
+                      有了模板之后，我们接下来看如何初始化路由：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> { createApp } from <span class="hljs-string">'vue'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> { createRouter, createWebHashHistory } from <span class="hljs-string">'vue-router'</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// 1. 定义路由组件</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> Home = { template: <span class="hljs-string">'&lt;div&gt;Home&lt;/div&gt;'</span> }
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> About = { template: <span class="hljs-string">'&lt;div&gt;About&lt;/div&gt;'</span> }
+</div></li><li><div class="code-word"><span class="hljs-comment">// 2. 定义路由配置，每个路径映射一个路由视图组件</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> routes = [
+</div></li><li><div class="code-word">  { path: <span class="hljs-string">'/'</span>, component: Home },
+</div></li><li><div class="code-word">  { path: <span class="hljs-string">'/about'</span>, component: About },
+</div></li><li><div class="code-word">]
+</div></li><li><div class="code-word"><span class="hljs-comment">// 3. 创建路由实例，可以指定路由模式，传入路由配置对象</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> router = createRouter({
+</div></li><li><div class="code-word">  history: createWebHistory(),
+</div></li><li><div class="code-word">  routes
+</div></li><li><div class="code-word">})
+</div></li><li><div class="code-word"><span class="hljs-comment">// 4. 创建 app 实例</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> app = createApp({
+</div></li><li><div class="code-word">})
+</div></li><li><div class="code-word"><span class="hljs-comment">// 5. 在挂载页面 之前先安装路由</span>
+</div></li><li><div class="code-word">app.use(router)
+</div></li><li><div class="code-word"><span class="hljs-comment">// 6. 挂载页面</span>
+</div></li><li><div class="code-word">app.mount(<span class="hljs-string">'#app'</span>)
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="68407">
+                      可以看到，路由的初始化过程很简单，首先需要定义一个路由配置，这个配置主要用于描述路径和组件的映射关系，即什么路径下
+                      RouterView 应该渲染什么路由组件。
+                    </p>
+                    <p data-nodeid="68408">
+                      接着创建路由对象实例，传入路由配置对象，并且也可以指定路由模式，Vue
+                      Router 目前支持三种模式，hash 模式，HTML5 模式和 memory
+                      模式，我们常用的是前两种模式。
+                    </p>
+                    <p data-nodeid="68409">
+                      最后在挂载页面前，我们需要安装路由，这样我们就可以在各个组件中访问路由对象以及使用路由的内置组件
+                      RouterLink 和 RouterView 了。
+                    </p>
+                    <p data-nodeid="68410">
+                      知道了 Vue Router
+                      的基本用法后，接下来我们就可以探究它的实现原理了。由于 Vue
+                      Router
+                      源码加起来有几千行，限于篇幅，我会把重点放在整体的实现流程上，不会讲实现的细节。
+                    </p>
+                    <h3 data-nodeid="68411">路由的实现原理</h3>
+                    <p data-nodeid="68412">
+                      我们先从用户使用的角度来分析，先从路由对象的创建过程开始。
+                    </p>
+                    <h4 data-nodeid="68413">路由对象的创建</h4>
+                    <p data-nodeid="68414">
+                      Vue Router 提供了一个 createRouter
+                      API，你可以通过它来创建一个路由对象，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createRouter</span><span class="hljs-params">(options)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 定义一些辅助方法和变量 </span>
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">  <span class="hljs-comment">// ...</span>
+</div></li><li><div class="code-word">  
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 router 对象</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> router = {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 当前路径</span>
+</div></li><li><div class="code-word">    currentRoute,
+</div></li><li><div class="code-word">    addRoute,
+</div></li><li><div class="code-word">    removeRoute,
+</div></li><li><div class="code-word">    hasRoute,
+</div></li><li><div class="code-word">    getRoutes,
+</div></li><li><div class="code-word">    resolve,
+</div></li><li><div class="code-word">    options,
+</div></li><li><div class="code-word">    push,
+</div></li><li><div class="code-word">    replace,
+</div></li><li><div class="code-word">    go,
+</div></li><li><div class="code-word">    back: () =&gt; go(-<span class="hljs-number">1</span>),
+</div></li><li><div class="code-word">    forward: () =&gt; go(<span class="hljs-number">1</span>),
+</div></li><li><div class="code-word">    beforeEach: beforeGuards.add,
+</div></li><li><div class="code-word">    beforeResolve: beforeResolveGuards.add,
+</div></li><li><div class="code-word">    afterEach: afterGuards.add,
+</div></li><li><div class="code-word">    onError: errorHandlers.add,
+</div></li><li><div class="code-word">    isReady,
+</div></li><li><div class="code-word">    install(app) {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 安装路由函数</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> router
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="68416">
+                      我们省略了大部分代码，只保留了路由对象相关的代码，可以看到路由对象
+                      router 就是一个对象，它维护了当前路径
+                      currentRoute，且拥有很多辅助方法。
+                    </p>
+                    <p data-nodeid="68417">
+                      目前你只需要了解这么多，创建完路由对象后，我们现在来安装它。
+                    </p>
+                    <h4 data-nodeid="68418">路由的安装</h4>
+                    <p data-nodeid="68419">
+                      Vue Router 作为 Vue 的插件，当我们执行 app.use(router)
+                      的时候，实际上就是在执行 router 的 install
+                      方法来安装路由，并把 app 作为参数传入，来看它的定义：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> router = {
+</div></li><li><div class="code-word">  install(app) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> router = <span class="hljs-keyword">this</span>
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 注册路由组件</span>
+</div></li><li><div class="code-word">    app.component(<span class="hljs-string">'RouterLink'</span>, RouterLink)
+</div></li><li><div class="code-word">    app.component(<span class="hljs-string">'RouterView'</span>, RouterView)
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 全局配置定义 $router 和 $route</span>
+</div></li><li><div class="code-word">    app.config.globalProperties.$router = router
+</div></li><li><div class="code-word">    Object.defineProperty(app.config.globalProperties, <span class="hljs-string">'$route'</span>, {
+</div></li><li><div class="code-word">      get: () =&gt; unref(currentRoute),
+</div></li><li><div class="code-word">    })
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 在浏览器端初始化导航</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (isBrowser &amp;&amp;
+</div></li><li><div class="code-word">      !started &amp;&amp;
+</div></li><li><div class="code-word">      currentRoute.value === START_LOCATION_NORMALIZED) {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// see above</span>
+</div></li><li><div class="code-word">      started = <span class="hljs-function"><span class="hljs-keyword">true</span>
+</span></div></li><li><div class="code-word">      <span class="hljs-title">push</span><span class="hljs-params">(routerHistory.location)</span>.<span class="hljs-title">catch</span><span class="hljs-params">(err =&gt; {
+</span></div></li><li><div class="code-word">        warn(<span class="hljs-string">'Unexpected error when starting the router:'</span>, err)
+</div></li><li><div class="code-word">      })
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 路径变成响应式</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> reactiveRoute = {}
+</div></li><li><div class="code-word">    <span class="hljs-keyword">for</span> (let key in START_LOCATION_NORMALIZED) {
+</div></li><li><div class="code-word">      reactiveRoute[key] = computed(() =&gt; currentRoute.value[key])
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 全局注入 router 和 reactiveRoute</span>
+</div></li><li><div class="code-word">    app.provide(routerKey, router)
+</div></li><li><div class="code-word">    app.provide(routeLocationKey, reactive(reactiveRoute))
+</div></li><li><div class="code-word">    let unmountApp = app.unmount
+</div></li><li><div class="code-word">    installedApps.add(app)
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 应用卸载的时候，需要做一些路由清理工作</span>
+</div></li><li><div class="code-word">    app.unmount = function () {
+</div></li><li><div class="code-word">      installedApps.delete(app)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (installedApps.size &lt; <span class="hljs-number">1</span>) {
+</div></li><li><div class="code-word">        removeHistoryListener()
+</div></li><li><div class="code-word">        currentRoute.value = START_LOCATION_NORMALIZED
+</div></li><li><div class="code-word">        started = <span class="hljs-keyword">false</span>
+</div></li><li><div class="code-word">        ready = <span class="hljs-keyword">false</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      unmountApp.call(<span class="hljs-keyword">this</span>, arguments)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="68421">
+                      路由的安装的过程我们需要记住以下两件事情。
+                    </p>
+                    <ol data-nodeid="68422">
+                      <li data-nodeid="68423">
+                        <p data-nodeid="68424">
+                          全局注册 RouterView 和 RouterLink
+                          组件——这是你安装了路由后，可以在任何组件中去使用这俩个组件的原因，如果你使用
+                          RouterView 或者 RouterLink 的时候收到提示不能解析
+                          router-link 和
+                          router-view，这说明你压根就没有安装路由。
+                        </p>
+                      </li>
+                      <li data-nodeid="68425">
+                        <p data-nodeid="68426">
+                          通过 provide 方式全局注入 router 对象和 reactiveRoute
+                          对象，其中 router 表示用户通过 createRouter
+                          创建的路由对象，我们可以通过它去动态操作路由，reactiveRoute
+                          表示响应式的路径对象，它维护着路径的相关信息。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="68427">
+                      那么至此我们就已经了解了路由对象的创建，以及路由的安装，但是前端路由的实现，还需要解决几个核心问题：路径是如何管理的，路径和路由组件的渲染是如何映射的。
+                    </p>
+                    <p data-nodeid="68428">
+                      那么接下来，我们就来更细节地来看，依次来解决这两个问题。
+                    </p>
+                    <h4 data-nodeid="68429">路径的管理</h4>
+                    <p data-nodeid="68430">
+                      路由的基础结构就是一个路径对应一种视图，当我们切换路径的时候对应的视图也会切换，因此一个很重要的方面就是对路径的管理。
+                    </p>
+                    <p data-nodeid="68431">
+                      首先，我们需要维护当前的路径
+                      currentRoute，可以给它一个初始值
+                      START_LOCATION_NORMALIZED，如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> START_LOCATION_NORMALIZED = {
+</div></li><li><div class="code-word">  path: <span class="hljs-string">'/'</span>,
+</div></li><li><div class="code-word">  name: undefined,
+</div></li><li><div class="code-word">  params: {},
+</div></li><li><div class="code-word">  query: {},
+</div></li><li><div class="code-word">  hash: <span class="hljs-string">''</span>,
+</div></li><li><div class="code-word">  fullPath: <span class="hljs-string">'/'</span>,
+</div></li><li><div class="code-word">  matched: [],
+</div></li><li><div class="code-word">  meta: {},
+</div></li><li><div class="code-word">  redirectedFrom: undefined
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="68433">
+                      可以看到，路径对象包含了非常丰富的路径信息，具体含义我就不在这多说了，你可以参考<a
+                        href="https://next.router.vuejs.org/api/#meta-3"
+                        data-nodeid="68492"
+                        >官方文档</a
+                      >。
+                    </p>
+                    <p data-nodeid="68434">
+                      路由想要发生变化，就是通过改变路径完成的，路由对象提供了很多改变路径的方法，比如
+                      router.push、router.replace，它们的底层最终都是通过
+                      pushWithRedirect 完成路径的切换，我们来看一下它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">pushWithRedirect</span><span class="hljs-params">(to, redirectedFrom)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> targetLocation = (pendingLocation = resolve(to))
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> from = currentRoute.value
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> data = to.state
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> force = to.force
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> replace = to.replace === <span class="hljs-keyword">true</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> toLocation = targetLocation
+</div></li><li><div class="code-word">  toLocation.redirectedFrom = <span class="hljs-function">redirectedFrom
+</span></div></li><li><div class="code-word">  let failure
+</div></li><li><div class="code-word">  <span class="hljs-title">if</span> <span class="hljs-params">(!force &amp;&amp; isSameRouteLocation(stringifyQuery$<span class="hljs-number">1</span>, from, targetLocation)</span>) {
+</div></li><li><div class="code-word">    failure = createRouterError(<span class="hljs-number">16</span> <span class="hljs-comment">/* NAVIGATION_DUPLICATED */</span>, { to: toLocation, from })
+</div></li><li><div class="code-word">    handleScroll(from, from, <span class="hljs-keyword">true</span>, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> (failure ? Promise.resolve(failure) : navigate(toLocation, from))
+</div></li><li><div class="code-word">    .<span class="hljs-keyword">catch</span>((error) =&gt; {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (isNavigationFailure(error, <span class="hljs-number">4</span> <span class="hljs-comment">/* NAVIGATION_ABORTED */</span> |
+</div></li><li><div class="code-word">        <span class="hljs-number">8</span> <span class="hljs-comment">/* NAVIGATION_CANCELLED */</span> |
+</div></li><li><div class="code-word">        <span class="hljs-number">2</span> <span class="hljs-comment">/* NAVIGATION_GUARD_REDIRECT */</span>)) {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> error
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> triggerError(error)
+</div></li><li><div class="code-word">    })
+</div></li><li><div class="code-word">    .then((failure) =&gt; {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (failure) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理错误</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">        failure = finalizeNavigation(toLocation, from, <span class="hljs-keyword">true</span>, replace, data)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      triggerAfterEach(toLocation, from, failure)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> failure
+</div></li><li><div class="code-word">    })
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69779">
+                      我省略了一部分代码的实现，这里主要来看 pushWithRedirect
+                      的核心思路，首先参数 to
+                      可能有多种情况，可以是一个表示路径的字符串，也可以是一个路径对象，所以要先经过一层
+                      resolve
+                      返回一个新的路径对象，它比前面提到的路径对象多了一个
+                      matched 属性，它的作用我们后续会介绍。
+                    </p>
+                    <p data-nodeid="69780">
+                      得到新的目标路径后，接下来执行 navigate
+                      方法，它实际上是执行路由切换过程中的一系列导航守卫函数，我们后续会介绍。navigate
+                      成功后，会执行 finalizeNavigation
+                      完成导航，在这里完成真正的路径切换，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">finalizeNavigation</span><span class="hljs-params">(toLocation, from, isPush, replace, data)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> error = checkCanceledNavigation(toLocation, from)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (error)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> error
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> isFirstNavigation = from === START_LOCATION_NORMALIZED
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> state = !isBrowser ? {} : history.<span class="hljs-function">state
+</span></div></li><li><div class="code-word">  <span class="hljs-title">if</span> <span class="hljs-params">(isPush)</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (replace || isFirstNavigation)
+</div></li><li><div class="code-word">      routerHistory.replace(toLocation.fullPath, assign({
+</div></li><li><div class="code-word">        scroll: isFirstNavigation &amp;&amp; state &amp;&amp; state.scroll,
+</div></li><li><div class="code-word">      }, data))
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span>
+</div></li><li><div class="code-word">      routerHistory.push(toLocation.fullPath, data)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  currentRoute.value = <span class="hljs-function">toLocation
+</span></div></li><li><div class="code-word">  <span class="hljs-title">handleScroll</span><span class="hljs-params">(toLocation, from, isPush, isFirstNavigation)</span>
+</div></li><li><div class="code-word">  <span class="hljs-title">markAsReady</span><span class="hljs-params">()</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="70105">
+                      这里的 finalizeNavigation
+                      函数，我们重点关注两个逻辑，一个是更新当前的路径
+                      currentRoute 的值，一个是执行 routerHistory.push 或者是
+                      routerHistory.replace 方法更新浏览器的 URL 的记录。
+                    </p>
+                    <p data-nodeid="70106">
+                      每当我们切换路由的时候，会发现浏览器的 URL
+                      发生了变化，但是页面却没有刷新，它是怎么做的呢？
+                    </p>
+
+                    <p data-nodeid="69783">
+                      在我们创建 router 对象的时候，会创建一个 history
+                      对象，前面提到 Vue Router 支持三种模式，这里我们重点分析
+                      HTML5 的 history 的模式：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createWebHistory</span><span class="hljs-params">(base)</span> </span>{
+</div></li><li><div class="code-word">  base = normalizeBase(base)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> historyNavigation = useHistoryStateNavigation(base)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> historyListeners = useHistoryListeners(base, historyNavigation.state, historyNavigation.location, historyNavigation.replace)
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">go</span><span class="hljs-params">(delta, triggerListeners = <span class="hljs-keyword">true</span>)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (!triggerListeners)
+</div></li><li><div class="code-word">      historyListeners.pauseListeners()
+</div></li><li><div class="code-word">    history.go(delta)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> routerHistory = assign({
+</div></li><li><div class="code-word">    <span class="hljs-comment">// it's overridden right after</span>
+</div></li><li><div class="code-word">    location: <span class="hljs-string">''</span>,
+</div></li><li><div class="code-word">    base,
+</div></li><li><div class="code-word">    go,
+</div></li><li><div class="code-word">    createHref: createHref.bind(<span class="hljs-keyword">null</span>, base),
+</div></li><li><div class="code-word">  }, historyNavigation, historyListeners)
+</div></li><li><div class="code-word">  Object.defineProperty(routerHistory, <span class="hljs-string">'location'</span>, {
+</div></li><li><div class="code-word">    get: () =&gt; historyNavigation.location.value,
+</div></li><li><div class="code-word">  })
+</div></li><li><div class="code-word">  Object.defineProperty(routerHistory, <span class="hljs-string">'state'</span>, {
+</div></li><li><div class="code-word">    get: () =&gt; historyNavigation.state.value,
+</div></li><li><div class="code-word">  })
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> routerHistory
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69785">
+                      对于 routerHistory
+                      对象而言，它有两个重要的作用，一个是路径的切换，一个是监听路径的变化。
+                    </p>
+                    <p data-nodeid="69786">
+                      其中，路径切换主要通过 historyNavigation 来完成的，它是
+                      useHistoryStateNavigation 函数的返回值，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">useHistoryStateNavigation</span><span class="hljs-params">(base)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { history, location } = window
+</div></li><li><div class="code-word">  let currentLocation = {
+</div></li><li><div class="code-word">    value: createCurrentLocation(base, location),
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  let historyState = { value: history.state }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!historyState.value) {
+</div></li><li><div class="code-word">    changeLocation(currentLocation.value, {
+</div></li><li><div class="code-word">      back: <span class="hljs-keyword">null</span>,
+</div></li><li><div class="code-word">      current: currentLocation.value,
+</div></li><li><div class="code-word">      forward: <span class="hljs-keyword">null</span>,
+</div></li><li><div class="code-word">      position: history.length - <span class="hljs-number">1</span>,
+</div></li><li><div class="code-word">      replaced: <span class="hljs-keyword">true</span>,
+</div></li><li><div class="code-word">      scroll: <span class="hljs-keyword">null</span>,
+</div></li><li><div class="code-word">    }, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">changeLocation</span><span class="hljs-params">(to, state, replace)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> url = createBaseLocation() +
+</div></li><li><div class="code-word">      <span class="hljs-comment">// preserve any existing query when base has a hash</span>
+</div></li><li><div class="code-word">      (base.indexOf(<span class="hljs-string">'#'</span>) &gt; -<span class="hljs-number">1</span> &amp;&amp; location.search
+</div></li><li><div class="code-word">        ? location.pathname + location.search + <span class="hljs-string">'#'</span>
+</div></li><li><div class="code-word">        : base) +
+</div></li><li><div class="code-word">      to
+</div></li><li><div class="code-word">    <span class="hljs-keyword">try</span> {
+</div></li><li><div class="code-word">      history[replace ? <span class="hljs-string">'replaceState'</span> : <span class="hljs-string">'pushState'</span>](state, <span class="hljs-string">''</span>, url)
+</div></li><li><div class="code-word">      historyState.value = state
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">catch</span> (err) {
+</div></li><li><div class="code-word">      warn(<span class="hljs-string">'Error with push/replace State'</span>, err)
+</div></li><li><div class="code-word">      location[replace ? <span class="hljs-string">'replace'</span> : <span class="hljs-string">'assign'</span>](url)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">replace</span><span class="hljs-params">(to, data)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> state = assign({}, history.state, buildState(historyState.value.back,
+</div></li><li><div class="code-word">      <span class="hljs-comment">// keep back and forward entries but override current position</span>
+</div></li><li><div class="code-word">      to, historyState.value.forward, <span class="hljs-keyword">true</span>), data, { position: historyState.value.position })
+</div></li><li><div class="code-word">    changeLocation(to, state, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">    currentLocation.value = to
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">push</span><span class="hljs-params">(to, data)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> currentState = assign({},
+</div></li><li><div class="code-word">      historyState.value, history.state, {
+</div></li><li><div class="code-word">        forward: to,
+</div></li><li><div class="code-word">        scroll: computeScrollPosition(),
+</div></li><li><div class="code-word">      })
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> ( !history.state) {
+</div></li><li><div class="code-word">      warn(`history.state seems to have been manually replaced without preserving the necessary values. Make sure to preserve existing history state <span class="hljs-keyword">if</span> you are manually calling history.replaceState:\n\n` +
+</div></li><li><div class="code-word">        `history.replaceState(history.state, <span class="hljs-string">''</span>, url)\n\n` +
+</div></li><li><div class="code-word">        `You can find more information at https:<span class="hljs-comment">//next.router.vuejs.org/guide/migration/#usage-of-history-state.`)</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    changeLocation(currentState.current, currentState, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> state = assign({}, buildState(currentLocation.value, to, <span class="hljs-keyword">null</span>), { position: currentState.position + <span class="hljs-number">1</span> }, data)
+</div></li><li><div class="code-word">    changeLocation(to, state, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">    currentLocation.value = to
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">    location: currentLocation,
+</div></li><li><div class="code-word">    state: historyState,
+</div></li><li><div class="code-word">    push,
+</div></li><li><div class="code-word">    replace
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69788">
+                      该函数返回的 push 和 replace 函数，会添加给 routerHistory
+                      对象上，因此当我们调用 routerHistory.push 或者是
+                      routerHistory.replace
+                      方法的时候实际上就是在执行这两个函数。
+                    </p>
+                    <p data-nodeid="69789">
+                      push 和 replace 方法内部都是执行了 changeLocation
+                      方法，该函数内部执行了浏览器底层的 history.pushState 或者
+                      history.replaceState
+                      方法，会向当前浏览器会话的历史堆栈中添加一个状态，这样就在不刷新页面的情况下修改了页面的
+                      URL。
+                    </p>
+                    <p data-nodeid="69790">
+                      我们使用这种方法修改了路径，这个时候假设我们点击浏览器的回退按钮回到上一个
+                      URL，这需要恢复到上一个路径以及更新路由视图，因此我们还需要监听这种
+                      history 变化的行为，做一些相应的处理。
+                    </p>
+                    <p data-nodeid="69791">
+                      History 变化的监听主要是通过 historyListeners
+                      来完成的，它是 useHistoryListeners
+                      函数的返回值，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">useHistoryListeners</span><span class="hljs-params">(base, historyState, currentLocation, replace)</span> </span>{
+</div></li><li><div class="code-word">  let listeners = []
+</div></li><li><div class="code-word">  let teardowns = []
+</div></li><li><div class="code-word">  let pauseState = <span class="hljs-keyword">null</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> popStateHandler = ({ state, }) =&gt; {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> to = createCurrentLocation(base, location)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> from = currentLocation.value
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> fromState = historyState.value
+</div></li><li><div class="code-word">    let delta = <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (state) {
+</div></li><li><div class="code-word">      currentLocation.value = to
+</div></li><li><div class="code-word">      historyState.value = <span class="hljs-function">state
+</span></div></li><li><div class="code-word">      <span class="hljs-title">if</span> <span class="hljs-params">(pauseState &amp;&amp; pauseState === from)</span> {
+</div></li><li><div class="code-word">        pauseState = <span class="hljs-keyword">null</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      delta = fromState ? state.position - fromState.position : <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      replace(to)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    listeners.forEach(listener =&gt; {
+</div></li><li><div class="code-word">      listener(currentLocation.value, from, {
+</div></li><li><div class="code-word">        delta,
+</div></li><li><div class="code-word">        type: NavigationType.pop,
+</div></li><li><div class="code-word">        direction: delta
+</div></li><li><div class="code-word">          ? delta &gt; <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">            ? NavigationDirection.forward
+</div></li><li><div class="code-word">            : NavigationDirection.back
+</div></li><li><div class="code-word">          : NavigationDirection.unknown,
+</div></li><li><div class="code-word">      })
+</div></li><li><div class="code-word">    })
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">pauseListeners</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">    pauseState = currentLocation.value
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">listen</span><span class="hljs-params">(callback)</span> </span>{
+</div></li><li><div class="code-word">    listeners.push(callback)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> teardown = () =&gt; {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">const</span> index = listeners.indexOf(callback)
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (index &gt; -<span class="hljs-number">1</span>)
+</div></li><li><div class="code-word">        listeners.splice(index, <span class="hljs-number">1</span>)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    teardowns.push(teardown)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> teardown
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">beforeUnloadListener</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> { history } = <span class="hljs-function">window
+</span></div></li><li><div class="code-word">    <span class="hljs-title">if</span> <span class="hljs-params">(!history.state)</span>
+</div></li><li><div class="code-word">      return
+</div></li><li><div class="code-word">    history.<span class="hljs-title">replaceState</span><span class="hljs-params">(assign({}, history.state, { scroll: computeScrollPosition()</span> }), '')
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  function <span class="hljs-title">destroy</span><span class="hljs-params">()</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> teardown of teardowns)
+</div></li><li><div class="code-word">      teardown()
+</div></li><li><div class="code-word">    teardowns = []
+</div></li><li><div class="code-word">    window.removeEventListener(<span class="hljs-string">'popstate'</span>, popStateHandler)
+</div></li><li><div class="code-word">    window.removeEventListener(<span class="hljs-string">'beforeunload'</span>, beforeUnloadListener)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  window.addEventListener(<span class="hljs-string">'popstate'</span>, popStateHandler)
+</div></li><li><div class="code-word">  window.addEventListener(<span class="hljs-string">'beforeunload'</span>, beforeUnloadListener)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">    pauseListeners,
+</div></li><li><div class="code-word">    listen,
+</div></li><li><div class="code-word">    destroy
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69793">
+                      该函数返回了 listen 方法，允许你添加一些侦听器，侦听
+                      hstory 的变化，同时这个方法也被挂载到了 routerHistory
+                      对象上，这样外部就可以访问到了。
+                    </p>
+                    <p data-nodeid="69794">
+                      该函数内部还监听了浏览器底层 Window 的 popstate
+                      事件，当我们点击浏览器的回退按钮或者是执行了 history.back
+                      方法的时候，会触发事件的回调函数
+                      popStateHandler，进而遍历侦听器
+                      listeners，执行每一个侦听器函数。
+                    </p>
+                    <p data-nodeid="69795">
+                      那么，Vue Router
+                      是如何添加这些侦听器的呢？原来在安装路由的时候，会执行一次初始化导航，执行了
+                      push 方法进而执行了 finalizeNavigation 方法。
+                    </p>
+                    <p data-nodeid="69796">
+                      在 finalizeNavigation 的最后，会执行 markAsReady
+                      方法，我们来看它的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">markAsReady</span><span class="hljs-params">(err)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (ready)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">  ready = <span class="hljs-function"><span class="hljs-keyword">true</span>
+</span></div></li><li><div class="code-word">  <span class="hljs-title">setupListeners</span><span class="hljs-params">()</span>
+</div></li><li><div class="code-word">  readyHandlers
+</div></li><li><div class="code-word">    .<span class="hljs-title">list</span><span class="hljs-params">()</span>
+</div></li><li><div class="code-word">    .<span class="hljs-title">forEach</span><span class="hljs-params">(([resolve, reject])</span> =&gt; (err ? reject(err) : resolve()))
+</div></li><li><div class="code-word">  readyHandlers.reset()
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69798">
+                      markAsReady 内部会执行 setupListeners
+                      函数初始化侦听器，且保证只初始化一次。我们再接着来看
+                      setupListeners 的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">setupListeners</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  removeHistoryListener = routerHistory.listen((to, _from, info) =&gt; {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> toLocation = resolve(to)
+</div></li><li><div class="code-word">    pendingLocation = toLocation
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> from = currentRoute.<span class="hljs-function">value
+</span></div></li><li><div class="code-word">    <span class="hljs-title">if</span> <span class="hljs-params">(isBrowser)</span> {
+</div></li><li><div class="code-word">      saveScrollPosition(getScrollKey(from.fullPath, info.delta), computeScrollPosition())
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    navigate(toLocation, from)
+</div></li><li><div class="code-word">      .<span class="hljs-keyword">catch</span>((error) =&gt; {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (isNavigationFailure(error, <span class="hljs-number">4</span> <span class="hljs-comment">/* NAVIGATION_ABORTED */</span> | <span class="hljs-number">8</span> <span class="hljs-comment">/* NAVIGATION_CANCELLED */</span>)) {
+</div></li><li><div class="code-word">          <span class="hljs-keyword">return</span> error
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (isNavigationFailure(error, <span class="hljs-number">2</span> <span class="hljs-comment">/* NAVIGATION_GUARD_REDIRECT */</span>)) {
+</div></li><li><div class="code-word">          <span class="hljs-keyword">if</span> (info.delta)
+</div></li><li><div class="code-word">            routerHistory.go(-info.delta, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">          pushWithRedirect(error.to, toLocation
+</div></li><li><div class="code-word">          ).<span class="hljs-keyword">catch</span>(noop)
+</div></li><li><div class="code-word">          <span class="hljs-comment">// avoid the then branch</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">return</span> Promise.reject()
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (info.delta)
+</div></li><li><div class="code-word">          routerHistory.go(-info.delta, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> triggerError(error)
+</div></li><li><div class="code-word">      })
+</div></li><li><div class="code-word">      .then((failure) =&gt; {
+</div></li><li><div class="code-word">        failure =
+</div></li><li><div class="code-word">          failure ||
+</div></li><li><div class="code-word">          finalizeNavigation(
+</div></li><li><div class="code-word">            toLocation, from, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (failure &amp;&amp; info.delta)
+</div></li><li><div class="code-word">          routerHistory.go(-info.delta, <span class="hljs-keyword">false</span>)
+</div></li><li><div class="code-word">        triggerAfterEach(toLocation, from, failure)
+</div></li><li><div class="code-word">      })
+</div></li><li><div class="code-word">      .<span class="hljs-keyword">catch</span>(noop)
+</div></li><li><div class="code-word">  })
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="69800">
+                      侦听器函数也是执行 navigate
+                      方法，执行路由切换过程中的一系列导航守卫函数，在 navigate
+                      成功后执行 finalizeNavigation
+                      完成导航，完成真正的路径切换。这样就保证了在用户点击浏览器回退按钮后，可以恢复到上一个路径以及更新路由视图。
+                    </p>
+                    <p data-nodeid="70391">
+                      至此，我们就完成了路径管理，在内存中通过 currentRoute
+                      维护记录当前的路径，通过浏览器底层 API 实现了路径的切换和
+                      history 变化的监听。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <div data-v-4bc80e00="" class="message-edit-empty">
+                  学习知识要善于思考，思考，再思考。—爱因斯坦
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

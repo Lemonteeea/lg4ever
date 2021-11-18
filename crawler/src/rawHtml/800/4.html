@@ -1,0 +1,2909 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">Vue.js 3.0 核心源码内参 - 拉勾教育</h1>
+
+  <meta
+    content="关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,"
+    name="keywords"
+  />
+
+  <meta
+    content="Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。"
+    name="description"
+  />
+
+  <title>Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  Vue.js 3.0 核心源码内参
+                </div>
+                <div data-v-5f686215="" class="name">
+                  HuangYi
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  Zoom 前端架构师，前百度、滴滴资深技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 解析 Vue.js 源码，提升编码能力
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          导读 | 一文看懂 Vue.js 3.0 的优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：直击 Vue.js 核心组件的实现
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块一导读 | 组件的实现：直击 Vue 核心的实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组件更新：完整的 DOM diff 流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 组件更新：完整的 DOM diff 流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：学会新设计 Composition API
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块二导读 | 逻辑复用最佳实践：Composition API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | Setup：组件渲染前的初始化过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 响应式：响应式内部的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 计算属性：计算属性比普通函数好在哪里？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 侦听器：侦听器的实现原理和使用场景是什么？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 响应式：响应式内部的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 |
+                          生命周期：各个生命周期的执行时机和应用场景是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 依赖注入：子孙组件如何共享数据？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：编译过程和背后的优化思想
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 模板解析：构造 AST 的完整流程是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块三导读 | 编译和优化：了解编译过程和背后的优化思想
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 模板解析：构造 AST 的完整流程是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | AST 转换：AST 节点内部做了哪些转换？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | AST 转换：AST 节点内部做了哪些转换？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 生成代码：AST 如何生成可运行的代码？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 生成代码：AST 如何生成可运行的代码？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：探索更多实用特性背后的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块四导读 | 实用特性：探索更多实用特性背后的原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | Props：Props 的初始化和更新流程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 插槽：如何实现内容分发？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 指令：指令完整的生命周期是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | v-model：双向绑定到底是怎么实现的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块五：学习 Vue 内置组件的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          模块五导读 | 内置组件：学习 Vue 内置组件的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | Teleport 组件：如何脱离当前组件渲染子组件？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | KeepAlive 组件：如何让组件在内存中缓存和调度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | Transition
+                          组件：过渡动画的实现原理是怎样的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | Transition
+                          组件：过渡动画的实现原理是怎样的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 349px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    特别放送：研究 Vue 官方生态的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          特别放送导读 | 研究 Vue 官方生态的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | Vue Router：如何实现一个前端路由？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | Vue Router：如何实现一个前端路由？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 终点也是起点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  01 | 组件渲染：vnode 到真实 DOM 是如何转变的？
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">HuangYi</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/17:33"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="1053"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/17:33</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">10.1M</div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/17:33
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="38546" class="">
+                      在 Vue.js
+                      中，组件是一个非常重要的概念，整个应用的页面都是通过组件渲染来实现的，但是你知道当我们编写这些组件的时候，它的内部是如何工作的吗？从我们编写组件开始，到最终真实的
+                      DOM 又是怎样的一个转变过程呢？这节课，我们将会学习 Vue.js
+                      3.0
+                      中的组件是如何渲染的，通过学习，你的这些问题将会迎刃而解。
+                    </p>
+                    <p data-nodeid="38547">
+                      首先，组件是一个抽象的概念，它是对一棵 DOM
+                      树的抽象，我们在页面中写一个组件节点：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="html"><ol><li><div class="code-word"><span class="hljs-tag">&lt;<span class="hljs-name">hello-world</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">hello-world</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38549">
+                      这段代码并不会在页面上渲染一个<code
+                        data-backticks="1"
+                        data-nodeid="38691"
+                        >&lt;hello-world&gt;</code
+                      >标签，而它具体渲染成什么，取决于你怎么编写 HelloWorld
+                      组件的模板。举个例子，HelloWorld
+                      组件内部的模板定义是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="html"><ol><li><div class="code-word"><span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Hello World<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word"><span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38551">
+                      可以看到，模板内部最终会在页面上渲染一个 div，内部包含一个
+                      p 标签，用来显示 Hello World 文本。
+                    </p>
+                    <p data-nodeid="38552">
+                      所以，从表现上来看，组件的模板决定了组件生成的 DOM
+                      标签，而在 Vue.js 内部，一个组件想要真正的渲染生成
+                      DOM，还需要经历“创建 vnode - 渲染 vnode - 生成 DOM”
+                      这几个步骤：
+                    </p>
+                    <p data-nodeid="38553">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2D/FE/Ciqc1F8EO_OAOS86AABTGXEAHqA770.png"
+                        alt="1111.png"
+                        data-nodeid="38697"
+                      />
+                    </p>
+                    <p data-nodeid="38554">
+                      你可能会问，什么是
+                      vnode，它和组件什么关系呢？先不要着急，我们在后面会详细说明。这里，你只需要记住它就是一个可以描述组件信息的
+                      JavaScript 对象即可。
+                    </p>
+                    <p data-nodeid="38555">
+                      接下来，我们就从应用程序的入口开始，逐步来看 Vue.js 3.0
+                      中的组件是如何渲染的。
+                    </p>
+                    <h3 data-nodeid="38556">应用程序初始化</h3>
+                    <p data-nodeid="38557">
+                      一个组件可以通过“模板加对象描述”的方式创建，组件创建好以后是如何被调用并初始化的呢？因为整个组件树是由根组件开始渲染的，为了找到根组件的渲染入口，我们需要从应用程序的初始化过程开始分析。
+                    </p>
+                    <p data-nodeid="38558">
+                      在这里，我分别给出了通过 Vue.js 2.x 和 Vue.js 3.0
+                      来初始化应用的代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 在 Vue.js 2.x 中，初始化一个应用的方式如下</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> Vue from <span class="hljs-string">'vue'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> App from <span class="hljs-string">'./App'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> Vue({
+</div></li><li><div class="code-word">  render: h =&gt; h(App)
+</div></li><li><div class="code-word">})
+</div></li><li><div class="code-word">app.$mount(<span class="hljs-string">'#app'</span>)
+</div></li></ol></code></pre>
+                    </div>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 在 Vue.js 3.0 中，初始化一个应用的方式如下</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> { createApp } from <span class="hljs-string">'vue'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> App from <span class="hljs-string">'./app'</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> app = createApp(App)
+</div></li><li><div class="code-word">app.mount(<span class="hljs-string">'#app'</span>)
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38561">
+                      可以看到，Vue.js 3.0 初始化应用的方式和 Vue.js 2.x
+                      差别并不大，本质上都是把 App 组件挂载到 id 为 app 的 DOM
+                      节点上。
+                    </p>
+                    <p data-nodeid="38562">
+                      但是，在 Vue.js 3.0 中还导入了一个
+                      createApp，其实这是个入口函数，它是 Vue.js
+                      对外暴露的一个函数，我们来看一下它的内部实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> createApp = ((...args) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 app 对象</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> app = ensureRenderer().createApp(...args)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { mount } = app
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 重写 mount 方法</span>
+</div></li><li><div class="code-word">  app.mount = (containerOrSelector) =&gt; {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// ...</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> app
+</div></li><li><div class="code-word">})
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38564">
+                      从代码中可以看出 createApp 主要做了两件事情：创建 app
+                      对象和重写 app.mount
+                      方法。接下来，我们就具体来分析一下它们。
+                    </p>
+                    <h4 data-nodeid="38565">1. 创建 app 对象</h4>
+                    <p data-nodeid="38566">
+                      首先，我们使用 ensureRenderer().createApp() 来创建 app
+                      对象 ：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"> <span class="hljs-keyword">const</span> app = ensureRenderer().createApp(...args)
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38568">
+                      其中 ensureRenderer()
+                      用来创建一个渲染器对象，它的内部代码是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 渲染相关的一些配置，比如更新属性的方法，操作 DOM 的方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> rendererOptions = {
+</div></li><li><div class="code-word">  patchProp,
+</div></li><li><div class="code-word">  ...nodeOps
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">let renderer
+</div></li><li><div class="code-word"><span class="hljs-comment">// 延时创建渲染器，当用户只依赖响应式包的时候，可以通过 tree-shaking 移除核心渲染逻辑相关的代码</span>
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">ensureRenderer</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> renderer || (renderer = createRenderer(rendererOptions))
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createRenderer</span><span class="hljs-params">(options)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> baseCreateRenderer(options)
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">baseCreateRenderer</span><span class="hljs-params">(options)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-function">function <span class="hljs-title">render</span><span class="hljs-params">(vnode, container)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 组件渲染的核心逻辑</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> {
+</div></li><li><div class="code-word">    render,
+</div></li><li><div class="code-word">    createApp: createAppAPI(render)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createAppAPI</span><span class="hljs-params">(render)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-comment">// createApp createApp 方法接受的两个参数：根组件的对象和 prop</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> <span class="hljs-function">function <span class="hljs-title">createApp</span><span class="hljs-params">(rootComponent, rootProps = <span class="hljs-keyword">null</span>)</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> app = {
+</div></li><li><div class="code-word">      _component: rootComponent,
+</div></li><li><div class="code-word">      _props: rootProps,
+</div></li><li><div class="code-word">      mount(rootContainer) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 创建根组件的 vnode</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">const</span> vnode = createVNode(rootComponent, rootProps)
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 利用渲染器渲染 vnode</span>
+</div></li><li><div class="code-word">        render(vnode, rootContainer)
+</div></li><li><div class="code-word">        app._container = rootContainer
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> vnode.component.proxy
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> app
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38570">
+                      可以看到，这里先用 ensureRenderer()
+                      来延时创建渲染器，这样做的好处是当用户只依赖响应式包的时候，就不会创建渲染器，因此可以通过
+                      tree-shaking 的方式移除核心渲染逻辑相关的代码。
+                    </p>
+                    <p data-nodeid="38571">
+                      这里涉及了渲染器的概念，它是为跨平台渲染做准备的，之后我会在自定义渲染器的相关内容中详细说明。在这里，你可以简单地把渲染器理解为包含平台渲染核心逻辑的
+                      JavaScript 对象。
+                    </p>
+                    <p data-nodeid="38572">
+                      我们结合上面的代码继续深入，在 Vue.js 3.0 内部通过
+                      createRenderer 创建一个渲染器，这个渲染器内部会有一个
+                      createApp 方法，它是执行 createAppAPI
+                      方法返回的函数，接受了 rootComponent 和 rootProps
+                      两个参数，我们在应用层面执行 createApp(App) 方法时，会把
+                      App 组件对象作为根组件传递给
+                      rootComponent。这样，createApp 内部就创建了一个 app
+                      对象，它会提供 mount 方法，这个方法是用来挂载组件的。
+                    </p>
+                    <p data-nodeid="38573">
+                      在整个 app 对象创建过程中，Vue.js
+                      利用闭包和函数柯里化的技巧，很好地实现了参数保留。比如，在执行
+                      app.mount 的时候，并不需要传入渲染器
+                      render，这是因为在执行 createAppAPI 的时候渲染器 render
+                      参数已经被保留下来了。
+                    </p>
+                    <h4 data-nodeid="38574">2. 重写 app.mount 方法</h4>
+                    <p data-nodeid="38575">接下来，是重写 app.mount 方法。</p>
+                    <p data-nodeid="38576">
+                      根据前面的分析，我们知道 createApp 返回的 app
+                      对象已经拥有了 mount
+                      方法了，但在入口函数中，接下来的逻辑却是对 app.mount
+                      方法的重写。先思考一下，为什么要重写这个方法，而不把相关逻辑放在
+                      app 对象的 mount 方法内部来实现呢？
+                    </p>
+                    <p data-nodeid="38577">
+                      这是因为 Vue.js 不仅仅是为 Web
+                      平台服务，它的目标是支持跨平台渲染，而 createApp
+                      函数内部的 app.mount
+                      方法是一个标准的可跨平台的组件渲染流程：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">mount(rootContainer) {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建根组件的 vnode</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> vnode = createVNode(rootComponent, rootProps)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 利用渲染器渲染 vnode</span>
+</div></li><li><div class="code-word">  render(vnode, rootContainer)
+</div></li><li><div class="code-word">  app._container = rootContainer
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode.component.proxy
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38579">
+                      标准的跨平台渲染流程是先创建 vnode，再渲染 vnode。此外参数
+                      rootContainer 也可以是不同类型的值，比如，在 Web
+                      平台它是一个 DOM 对象，而在其他平台（比如 Weex
+                      和小程序）中可以是其他类型的值。所以这里面的代码不应该包含任何特定平台相关的逻辑，也就是说这些代码的执行逻辑都是与平台无关的。因此我们需要在外部重写这个方法，来完善
+                      Web 平台下的渲染逻辑。
+                    </p>
+                    <p data-nodeid="38580">
+                      接下来，我们再来看 app.mount 重写都做了哪些事情：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">app.mount = (containerOrSelector) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 标准化容器</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> container = normalizeContainer(containerOrSelector)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!container)
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> component = app._component
+</div></li><li><div class="code-word">   <span class="hljs-comment">// 如组件对象没有定义 render 函数和 template 模板，则取容器的 innerHTML 作为组件模板内容</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (!isFunction(component) &amp;&amp; !component.render &amp;&amp; !component.template) {
+</div></li><li><div class="code-word">    component.template = container.innerHTML
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 挂载前清空容器内容</span>
+</div></li><li><div class="code-word">  container.innerHTML = <span class="hljs-string">''</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 真正的挂载</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> mount(container)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38582">
+                      首先是通过 normalizeContainer
+                      标准化容器（这里可以传字符串选择器或者 DOM
+                      对象，但如果是字符串选择器，就需要把它转成 DOM
+                      对象，作为最终挂载的容器），然后做一个 if
+                      判断，如果组件对象没有定义 render 函数和 template
+                      模板，则取容器的 innerHTML
+                      作为组件模板内容；接着在挂载前清空容器内容，最终再调用
+                      app.mount 的方法走标准的组件渲染流程。
+                    </p>
+                    <p data-nodeid="38583">
+                      在这里，重写的逻辑都是和 Web
+                      平台相关的，所以要放在外部实现。此外，这么做的目的是既能让用户在使用
+                      API 时可以更加灵活，也兼容了 Vue.js 2.x 的写法，比如
+                      app.mount 的第一个参数就同时支持选择器字符串和 DOM
+                      对象两种类型。
+                    </p>
+                    <p data-nodeid="38584">
+                      从 app.mount
+                      开始，才算真正进入组件渲染流程，那么接下来，我们就重点看一下核心渲染流程做的两件事情：创建
+                      vnode 和渲染 vnode。
+                    </p>
+                    <h3 data-nodeid="38585">
+                      核心渲染流程：创建 vnode 和渲染 vnode
+                    </h3>
+                    <h4 data-nodeid="38586">1. 创建 vnode</h4>
+                    <p data-nodeid="38587">首先，是创建 vnode 的过程。</p>
+                    <p data-nodeid="38588">
+                      vnode 本质上是用来描述 DOM 的 JavaScript 对象，它在 Vue.js
+                      中可以描述不同类型的节点，比如普通元素节点、组件节点等。
+                    </p>
+                    <p data-nodeid="38589">
+                      什么是<strong data-nodeid="38741">普通元素节点</strong
+                      >呢？举个例子，在 HTML 中我们使用
+                      <code data-backticks="1" data-nodeid="38739"
+                        >&lt;button&gt;</code
+                      >
+                      标签来写一个按钮：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;button <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"btn"</span> style=<span class="hljs-string">"width:100px;height:50px"</span>&gt;click me&lt;/button&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38591">
+                      我们可以用 vnode 这样表示<code
+                        data-backticks="1"
+                        data-nodeid="38743"
+                        >&lt;button&gt;</code
+                      >标签：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> vnode = {
+</div></li><li><div class="code-word">  type: <span class="hljs-string">'button'</span>,
+</div></li><li><div class="code-word">  props: { 
+</div></li><li><div class="code-word">    <span class="hljs-string">'class'</span>: <span class="hljs-string">'btn'</span>,
+</div></li><li><div class="code-word">    style: {
+</div></li><li><div class="code-word">      width: <span class="hljs-string">'100px'</span>,
+</div></li><li><div class="code-word">      height: <span class="hljs-string">'50px'</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  },
+</div></li><li><div class="code-word">  children: <span class="hljs-string">'click me'</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38593">
+                      其中，type 属性表示 DOM 的标签类型，props 属性表示 DOM
+                      的一些附加信息，比如 style 、class 等，children 属性表示
+                      DOM 的子节点，它也可以是一个 vnode 数组，只不过 vnode
+                      可以用字符串表示简单的文本 。
+                    </p>
+                    <p data-nodeid="38594">
+                      什么是<strong data-nodeid="38751">组件节点</strong
+                      >呢？其实， vnode 除了可以像上面那样用于描述一个真实的
+                      DOM，也可以用来描述组件。
+                    </p>
+                    <p data-nodeid="38595">
+                      我们先在模板中引入一个组件标签
+                      <code data-backticks="1" data-nodeid="38753">
+                        &lt;custom-component&gt;</code
+                      >：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;custom-component msg=<span class="hljs-string">"test"</span>&gt;&lt;/custom-component&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38597">
+                      我们可以用 vnode 这样表示
+                      <code data-backticks="1" data-nodeid="38756"
+                        >&lt;custom-component&gt;</code
+                      >
+                      组件标签：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> CustomComponent = {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 在这里定义组件对象</span>
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> vnode = {
+</div></li><li><div class="code-word">  type: CustomComponent,
+</div></li><li><div class="code-word">  props: { 
+</div></li><li><div class="code-word">    msg: <span class="hljs-string">'test'</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38599">
+                      组件 vnode 其实是<strong data-nodeid="38765"
+                        >对抽象事物的描述</strong
+                      >，这是因为我们并不会在页面上真正渲染一个
+                      <code data-backticks="1" data-nodeid="38763"
+                        >&lt;custom-component&gt;</code
+                      >
+                      标签，而是渲染组件内部定义的 HTML 标签。
+                    </p>
+                    <p data-nodeid="38600">
+                      除了上两种 vnode 类型外，还有纯文本 vnode、注释 vnode
+                      等等，但鉴于我们的主线只需要研究组件 vnode 和普通元素
+                      vnode，所以我在这里就不赘述了。
+                    </p>
+                    <p data-nodeid="38601">
+                      另外，Vue.js 3.0 内部还针对 vnode 的
+                      type，做了更详尽的分类，包括 Suspense、Teleport 等，且把
+                      vnode 的类型信息做了编码，以便在后面的 patch
+                      阶段，可以根据不同的类型执行相应的处理逻辑：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> shapeFlag = isString(type)
+</div></li><li><div class="code-word">  ? <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span>
+</div></li><li><div class="code-word">  : isSuspense(type)
+</div></li><li><div class="code-word">    ? <span class="hljs-number">128</span> <span class="hljs-comment">/* SUSPENSE */</span>
+</div></li><li><div class="code-word">    : isTeleport(type)
+</div></li><li><div class="code-word">      ? <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>
+</div></li><li><div class="code-word">      : isObject(type)
+</div></li><li><div class="code-word">        ? <span class="hljs-number">4</span> <span class="hljs-comment">/* STATEFUL_COMPONENT */</span>
+</div></li><li><div class="code-word">        : isFunction(type)
+</div></li><li><div class="code-word">          ? <span class="hljs-number">2</span> <span class="hljs-comment">/* FUNCTIONAL_COMPONENT */</span>
+</div></li><li><div class="code-word">          : <span class="hljs-number">0</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38603">
+                      <strong data-nodeid="38771"
+                        >知道什么是 vnode 后，你可能会好奇，那么 vnode
+                        有什么优势呢？为什么一定要设计 vnode
+                        这样的数据结构呢？</strong
+                      >
+                    </p>
+                    <p data-nodeid="38604">
+                      首先是<strong data-nodeid="38777">抽象</strong>，引入
+                      vnode，可以把渲染过程抽象化，从而使得组件的抽象能力也得到提升。
+                    </p>
+                    <p data-nodeid="38605">
+                      其次是<strong data-nodeid="38783">跨平台</strong>，因为
+                      patch vnode 的过程不同平台可以有自己的实现，基于 vnode
+                      再做服务端渲染、Weex
+                      平台、小程序平台的渲染都变得容易了很多。
+                    </p>
+                    <p data-nodeid="38606">
+                      不过这里要特别注意，使用 vnode 并不意味着不用操作 DOM
+                      了，很多同学会误以为 vnode 的性能一定比手动操作原生 DOM
+                      好，这个其实是不一定的。
+                    </p>
+                    <p data-nodeid="38607">
+                      因为，首先这种基于 vnode 实现的 MVVM 框架，在每次 render
+                      to vnode 的过程中，渲染组件会有一定的 JavaScript
+                      耗时，特别是大组件，比如一个 1000 * 10 的 Table
+                      组件，render to vnode 的过程会遍历 1000 * 10 次去创建内部
+                      cell vnode，整个耗时就会变得比较长，加上 patch vnode
+                      的过程也会有一定的耗时，当我们去更新组件的时候，用户会感觉到明显的卡顿。虽然
+                      diff 算法在减少 DOM 操作方面足够优秀，但最终还是免不了操作
+                      DOM，所以说性能并不是 vnode 的优势。
+                    </p>
+                    <p data-nodeid="38608">
+                      <strong data-nodeid="38793"
+                        >那么，Vue.js 内部是如何创建这些 vnode 的呢？</strong
+                      >
+                    </p>
+                    <p data-nodeid="38609">
+                      回顾 app.mount 函数的实现，内部是通过 createVNode
+                      函数创建了根组件的 vnode ：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"> <span class="hljs-keyword">const</span> vnode = createVNode(rootComponent, rootProps)
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38611">
+                      我们来看一下 createVNode 函数的大致实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createVNode</span><span class="hljs-params">(type, props = <span class="hljs-keyword">null</span>
+</span></span></div></li><li><div class="code-word">,children = <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (props) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 处理 props 相关逻辑，标准化 class 和 style</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 对 vnode 类型信息编码</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> shapeFlag = isString(type)
+</div></li><li><div class="code-word">    ? <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span>
+</div></li><li><div class="code-word">    : isSuspense(type)
+</div></li><li><div class="code-word">      ? <span class="hljs-number">128</span> <span class="hljs-comment">/* SUSPENSE */</span>
+</div></li><li><div class="code-word">      : isTeleport(type)
+</div></li><li><div class="code-word">        ? <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>
+</div></li><li><div class="code-word">        : isObject(type)
+</div></li><li><div class="code-word">          ? <span class="hljs-number">4</span> <span class="hljs-comment">/* STATEFUL_COMPONENT */</span>
+</div></li><li><div class="code-word">          : isFunction(type)
+</div></li><li><div class="code-word">            ? <span class="hljs-number">2</span> <span class="hljs-comment">/* FUNCTIONAL_COMPONENT */</span>
+</div></li><li><div class="code-word">            : <span class="hljs-number">0</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> vnode = {
+</div></li><li><div class="code-word">    type,
+</div></li><li><div class="code-word">    props,
+</div></li><li><div class="code-word">    shapeFlag,
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 一些其他属性</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 标准化子节点，把不同数据类型的 children 转成数组或者文本类型</span>
+</div></li><li><div class="code-word">  normalizeChildren(vnode, children)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38613">
+                      通过上述代码可以看到，其实 createVNode
+                      做的事情很简单，就是：对 props 做标准化处理、对 vnode
+                      的类型信息编码、创建 vnode 对象，标准化子节点 children 。
+                    </p>
+                    <p data-nodeid="38614">
+                      我们现在拥有了这个 vnode
+                      对象，接下来要做的事情就是把它渲染到页面中去。
+                    </p>
+                    <h4 data-nodeid="38615">2. 渲染 vnode</h4>
+                    <p data-nodeid="38616">接下来，是渲染 vnode 的过程。</p>
+                    <p data-nodeid="38617">
+                      回顾 app.mount
+                      函数的实现，内部通过执行这段代码去渲染创建好的 vnode：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">render(vnode, rootContainer)
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> render = (vnode, container) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (vnode == <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 销毁组件</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (container._vnode) {
+</div></li><li><div class="code-word">      unmount(container._vnode, <span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 创建或者更新组件</span>
+</div></li><li><div class="code-word">    patch(container._vnode || <span class="hljs-keyword">null</span>, vnode, container)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 缓存 vnode 节点，表示已经渲染</span>
+</div></li><li><div class="code-word">  container._vnode = vnode
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38619">
+                      这个渲染函数 render 的实现很简单，如果它的第一个参数 vnode
+                      为空，则执行销毁组件的逻辑，否则执行创建或者更新组件的逻辑。
+                    </p>
+                    <p data-nodeid="38620">
+                      接下来我们接着看一下上面渲染 vnode 的代码中涉及的 patch
+                      函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> patch = (n1, n2, container, anchor = <span class="hljs-keyword">null</span>, parentComponent = <span class="hljs-keyword">null</span>, parentSuspense = <span class="hljs-keyword">null</span>, isSVG = <span class="hljs-keyword">false</span>, optimized = <span class="hljs-keyword">false</span>) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 如果存在新旧节点, 且新旧节点类型不同，则销毁旧节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n1 &amp;&amp; !isSameVNodeType(n1, n2)) {
+</div></li><li><div class="code-word">    anchor = getNextHostNode(n1)
+</div></li><li><div class="code-word">    unmount(n1, parentComponent, parentSuspense, <span class="hljs-keyword">true</span>)
+</div></li><li><div class="code-word">    n1 = <span class="hljs-keyword">null</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { type, shapeFlag } = <span class="hljs-function">n2
+</span></div></li><li><div class="code-word">  <span class="hljs-title">switch</span> <span class="hljs-params">(type)</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Text:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理文本节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Comment:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理注释节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Static:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理静态节点</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> Fragment:
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 处理 Fragment 元素</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">break</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">default</span>:
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">1</span> <span class="hljs-comment">/* ELEMENT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理普通 DOM 元素</span>
+</div></li><li><div class="code-word">        processElement(n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">6</span> <span class="hljs-comment">/* COMPONENT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理组件</span>
+</div></li><li><div class="code-word">        processComponent(n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">64</span> <span class="hljs-comment">/* TELEPORT */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理 TELEPORT</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">128</span> <span class="hljs-comment">/* SUSPENSE */</span>) {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 处理 SUSPENSE</span>
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38622">
+                      patch 本意是打补丁的意思，这个函数有两个功能，一个是根据
+                      vnode 挂载 DOM，一个是根据新旧 vnode 更新
+                      DOM。对于初次渲染，我们这里只分析创建过程，更新过程在后面的章节分析。
+                    </p>
+                    <p data-nodeid="38623">
+                      在创建的过程中，patch
+                      函数接受多个参数，这里我们目前只重点关注前三个：
+                    </p>
+                    <ol data-nodeid="38624">
+                      <li data-nodeid="38625">
+                        <p data-nodeid="38626">
+                          第一个参数
+                          <strong data-nodeid="38812">n1 表示旧的 vnode</strong
+                          >，当 n1 为 null 的时候，表示是一次挂载的过程；
+                        </p>
+                      </li>
+                      <li data-nodeid="38627">
+                        <p data-nodeid="38628">
+                          第二个参数
+                          <strong data-nodeid="38818"
+                            >n2 表示新的 vnode 节点</strong
+                          >，后续会根据这个 vnode 类型执行不同的处理逻辑；
+                        </p>
+                      </li>
+                      <li data-nodeid="38629">
+                        <p data-nodeid="38630">
+                          第三个参数
+                          <strong data-nodeid="38824"
+                            >container 表示 DOM 容器</strong
+                          >，也就是 vnode 渲染生成 DOM 后，会挂载到 container
+                          下面。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="38631">
+                      对于渲染的节点，我们这里重点关注两种类型节点的渲染逻辑：对组件的处理和对普通
+                      DOM 元素的处理。
+                    </p>
+                    <p data-nodeid="38632">
+                      <strong data-nodeid="38830">先来看对组件的处理</strong
+                      >。由于初始化渲染的是 App 组件，它是一个组件
+                      vnode，所以我们来看一下组件的处理逻辑是怎样的。首先是用来处理组件的
+                      processComponent 函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> processComponent = (n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n1 == <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">   <span class="hljs-comment">// 挂载组件</span>
+</div></li><li><div class="code-word">   mountComponent(n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 更新组件</span>
+</div></li><li><div class="code-word">    updateComponent(n1, n2, parentComponent, optimized)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38634">
+                      该函数的逻辑很简单，如果 n1 为
+                      null，则执行挂载组件的逻辑，否则执行更新组件的逻辑。
+                    </p>
+                    <p data-nodeid="38635">
+                      我们接着来看挂载组件的 mountComponent 函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建组件实例</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> instance = (initialVNode.component = createComponentInstance(initialVNode, parentComponent, parentSuspense))
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 设置组件实例</span>
+</div></li><li><div class="code-word">  setupComponent(instance)
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 设置并运行带副作用的渲染函数</span>
+</div></li><li><div class="code-word">  setupRenderEffect(instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38637">
+                      可以看到，挂载组件函数 mountComponent
+                      主要做三件事情：创建组件实例、设置组件实例、设置并运行带副作用的渲染函数。
+                    </p>
+                    <p data-nodeid="38638">
+                      首先是创建组件实例，Vue.js 3.0 虽然不像 Vue.js 2.x
+                      那样通过类的方式去实例化组件，但内部也通过对象的方式去创建了当前渲染的组件实例。
+                    </p>
+                    <p data-nodeid="38639">
+                      其次设置组件实例，instance
+                      保留了很多组件相关的数据，维护了组件的上下文，包括对
+                      props、插槽，以及其他实例的属性的初始化处理。
+                    </p>
+                    <p data-nodeid="38640">
+                      创建和设置组件实例这两个流程我们这里不展开讲，会在后面的章节详细分析。
+                    </p>
+                    <p data-nodeid="38641">
+                      最后是运行带副作用的渲染函数
+                      setupRenderEffect，我们重点来看一下这个函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建响应式的副作用渲染函数</span>
+</div></li><li><div class="code-word">  instance.update = effect(<span class="hljs-function">function <span class="hljs-title">componentEffect</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (!instance.isMounted) {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 渲染组件生成子树 vnode</span>
+</div></li><li><div class="code-word">      <span class="hljs-keyword">const</span> subTree = (instance.subTree = renderComponentRoot(instance))
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 把子树 vnode 挂载到 container 中</span>
+</div></li><li><div class="code-word">      patch(<span class="hljs-keyword">null</span>, subTree, container, anchor, instance, parentSuspense, isSVG)
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 保留渲染生成的子树根 DOM 节点</span>
+</div></li><li><div class="code-word">      initialVNode.el = subTree.el
+</div></li><li><div class="code-word">      instance.isMounted = <span class="hljs-keyword">true</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 更新组件</span>
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }, prodEffectOptions)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38643">
+                      该函数利用响应式库的 effect 函数创建了一个副作用渲染函数
+                      componentEffect （effect
+                      的实现我们后面讲响应式章节会具体说）。<strong
+                        data-nodeid="38843"
+                        >副作用</strong
+                      >，这里你可以简单地理解为，当组件的数据发生变化时，effect
+                      函数包裹的内部渲染函数 componentEffect
+                      会重新执行一遍，从而达到重新渲染组件的目的。
+                    </p>
+                    <p data-nodeid="38644">
+                      渲染函数内部也会判断这是一次初始渲染还是组件更新。这里我们只分析初始渲染流程。
+                    </p>
+                    <p data-nodeid="38645">
+                      <strong data-nodeid="38848"
+                        >初始渲染主要做两件事情：渲染组件生成 subTree、把
+                        subTree 挂载到 container 中。</strong
+                      >
+                    </p>
+                    <p data-nodeid="38646">
+                      首先，是渲染组件生成 subTree，它也是一个 vnode
+                      对象。这里要注意别把 subTree 和 initialVNode
+                      弄混了（其实在 Vue.js 3.0
+                      中，根据命名我们已经能很好地区分它们了，而在 Vue.js 2.x
+                      中它们分别命名为 _vnode 和
+                      $vnode）。我来举个例子说明，在父组件 App 中里引入了 Hello
+                      组件：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"app"</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is an app.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">hello</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">hello</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38648">
+                      在 Hello 组件中是
+                      <code data-backticks="1" data-nodeid="38853"
+                        >&lt;div&gt;</code
+                      >
+                      标签包裹着一个
+                      <code data-backticks="1" data-nodeid="38855"
+                        >&lt;p&gt;</code
+                      >
+                      标签：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="js"><ol><li><div class="code-word">&lt;template&gt;
+</div></li><li><div class="code-word">  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"hello"</span>&gt;</span>
+</span></div></li><li><div class="code-word">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Hello, Vue 3.0!<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</div></li><li><div class="code-word">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></li><li><div class="code-word">&lt;/template&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38650">
+                      在 App 组件中，
+                      <code data-backticks="1" data-nodeid="38858"
+                        >&lt;hello&gt;</code
+                      >
+                      节点渲染生成的 vnode ，对应的就是 Hello 组件的
+                      initialVNode ，为了好记，你也可以把它称作“组件 vnode”。而
+                      Hello 组件内部整个 DOM 节点对应的 vnode 就是执行
+                      renderComponentRoot 渲染生成对应的
+                      subTree，我们可以把它称作“子树 vnode”。
+                    </p>
+                    <p data-nodeid="38651">
+                      我们知道每个组件都会有对应的 render 函数，即使你写
+                      template，也会编译成 render 函数，而 renderComponentRoot
+                      函数就是去执行 render 函数创建整个组件树内部的
+                      vnode，把这个 vnode
+                      再经过内部一层标准化，就得到了该函数的返回结果：子树
+                      vnode。
+                    </p>
+                    <p data-nodeid="38652">
+                      渲染生成子树 vnode 后，接下来就是继续调用 patch 函数把子树
+                      vnode 挂载到 container 中了。
+                    </p>
+                    <p data-nodeid="38653">
+                      那么我们又再次回到了 patch 函数，会继续对这个子树 vnode
+                      类型进行判断，对于上述例子，App 组件的根节点是
+                      <code data-backticks="1" data-nodeid="38863"
+                        >&lt;div&gt;</code
+                      >
+                      标签，那么对应的子树 vnode 也是一个普通元素
+                      vnode，那么我们<strong data-nodeid="38868"
+                        >接下来看对普通 DOM 元素的处理流程。</strong
+                      >
+                    </p>
+                    <p data-nodeid="38654">
+                      首先我们来看一下处理普通 DOM元素的 processElement
+                      函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> processElement = (n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  isSVG = isSVG || n2.type === <span class="hljs-string">'svg'</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (n1 == <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">//挂载元素节点</span>
+</div></li><li><div class="code-word">    mountElement(n2, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">//更新元素节点</span>
+</div></li><li><div class="code-word">    patchElement(n1, n2, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38656">
+                      该函数的逻辑很简单，如果 n1 为
+                      null，走挂载元素节点的逻辑，否则走更新元素节点逻辑。
+                    </p>
+                    <p data-nodeid="38657">
+                      我们接着来看挂载元素的 mountElement 函数的实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> mountElement = (vnode, container, anchor, parentComponent, parentSuspense, isSVG, optimized) =&gt; {
+</div></li><li><div class="code-word">  let el
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> { type, props, shapeFlag } = vnode
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 创建 DOM 元素节点</span>
+</div></li><li><div class="code-word">  el = vnode.el = hostCreateElement(vnode.type, isSVG, props &amp;&amp; props.is)
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (props) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 处理 props，比如 class、style、event 等属性</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key in props) {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">if</span> (!isReservedProp(key)) {
+</div></li><li><div class="code-word">        hostPatchProp(el, key, <span class="hljs-keyword">null</span>, props[key], isSVG)
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">8</span> <span class="hljs-comment">/* TEXT_CHILDREN */</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 处理子节点是纯文本的情况</span>
+</div></li><li><div class="code-word">    hostSetElementText(el, vnode.children)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (shapeFlag &amp; <span class="hljs-number">16</span> <span class="hljs-comment">/* ARRAY_CHILDREN */</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 处理子节点是数组的情况</span>
+</div></li><li><div class="code-word">    mountChildren(vnode.children, el, <span class="hljs-keyword">null</span>, parentComponent, parentSuspense, isSVG &amp;&amp; type !== <span class="hljs-string">'foreignObject'</span>, optimized || !!vnode.dynamicChildren)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 把创建的 DOM 元素节点挂载到 container 上</span>
+</div></li><li><div class="code-word">  hostInsert(el, container, anchor)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38659">
+                      可以看到，挂载元素函数主要做四件事：创建 DOM
+                      元素节点、处理 props、处理 children、挂载 DOM 元素到
+                      container 上。
+                    </p>
+                    <p data-nodeid="38660">
+                      首先是创建 DOM 元素节点，通过 hostCreateElement
+                      方法创建，这是一个平台相关的方法，我们来看一下它在 Web
+                      环境下的定义：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">createElement</span><span class="hljs-params">(tag, isSVG, is)</span> </span>{
+</div></li><li><div class="code-word">  isSVG ? document.createElementNS(svgNS, tag)
+</div></li><li><div class="code-word">    : document.createElement(tag, is ? { is } : undefined)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38662">
+                      它调用了底层的 DOM API document.createElement
+                      创建元素，所以本质上 Vue.js 强调不去操作 DOM
+                      ，只是希望用户不直接碰触
+                      DOM，它并没有什么神奇的魔法，底层还是会操作 DOM。
+                    </p>
+                    <p data-nodeid="38663">
+                      另外，如果是其他平台比如 Weex，hostCreateElement
+                      方法就不再是操作 DOM ，而是平台相关的 API
+                      了，这些平台相关的方法是在创建渲染器阶段作为参数传入的。
+                    </p>
+                    <p data-nodeid="38664">
+                      创建完 DOM 节点后，接下来要做的是判断如果有 props
+                      的话，给这个 DOM 节点添加相关的 class、style、event
+                      等属性，并做相关的处理，这些逻辑都是在 hostPatchProp
+                      函数内部做的，这里就不展开讲了。
+                    </p>
+                    <p data-nodeid="38665">
+                      接下来是对子节点的处理，我们知道 DOM 是一棵树，vnode
+                      同样也是一棵树，并且它和 DOM 结构是一一映射的。
+                    </p>
+                    <p data-nodeid="38666">
+                      如果子节点是纯文本，则执行 hostSetElementText 方法，它在
+                      Web 环境下通过设置 DOM 元素的 textContent 属性设置文本：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">setElementText</span><span class="hljs-params">(el, text)</span> </span>{
+</div></li><li><div class="code-word">  el.textContent = text
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38668">
+                      如果子节点是数组，则执行 mountChildren 方法：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> mountChildren = (children, container, anchor, parentComponent, parentSuspense, isSVG, optimized, start = <span class="hljs-number">0</span>) =&gt; {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">for</span> (let i = start; i &lt; children.length; i++) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 预处理 child</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> child = (children[i] = optimized
+</div></li><li><div class="code-word">      ? cloneIfMounted(children[i])
+</div></li><li><div class="code-word">      : normalizeVNode(children[i]))
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 递归 patch 挂载 child</span>
+</div></li><li><div class="code-word">    patch(<span class="hljs-keyword">null</span>, child, container, anchor, parentComponent, parentSuspense, isSVG, optimized)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38670">
+                      子节点的挂载逻辑同样很简单，遍历 children 获取到每一个
+                      child，然后递归执行 patch 方法挂载每一个 child
+                      。注意，这里有对 child
+                      做预处理的情况（后面编译优化的章节会详细分析）。
+                    </p>
+                    <p data-nodeid="38671">
+                      可以看到，mountChildren 函数的第二个参数是
+                      container，而我们调用 mountChildren
+                      方法传入的第二个参数是在 mountElement 时创建的 DOM
+                      节点，这就很好地建立了父子关系。
+                    </p>
+                    <p data-nodeid="38672">
+                      另外，通过递归 patch
+                      这种深度优先遍历树的方式，我们就可以构造完整的 DOM
+                      树，完成组件的渲染。
+                    </p>
+                    <p data-nodeid="38673">
+                      处理完所有子节点后，最后通过 hostInsert 方法把创建的 DOM
+                      元素节点挂载到 container 上，它在 Web 环境下这样定义：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">insert</span><span class="hljs-params">(child, parent, anchor)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (anchor) {
+</div></li><li><div class="code-word">    parent.insertBefore(child, anchor)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    parent.appendChild(child)
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="38675">
+                      这里会做一个 if 判断，如果有参考元素 anchor，就执行
+                      parent.insertBefore ，否则执行 parent.appendChild 来把
+                      child 添加到 parent 下，完成节点的挂载。
+                    </p>
+                    <p data-nodeid="38676">
+                      因为 insert
+                      的执行是在处理子节点后，所以挂载的顺序是先子节点，后父节点，最终挂载到最外层的容器上。
+                    </p>
+                    <blockquote data-nodeid="38677">
+                      <p data-nodeid="38678">
+                        <strong data-nodeid="38891">知识延伸：嵌套组件</strong
+                        ><br />
+                        细心的你可能会发现，在 mountChildren 的时候递归执行的是
+                        patch 函数，而不是 mountElement
+                        函数，这是因为子节点可能有其他类型的 vnode，比如组件
+                        vnode。
+                      </p>
+                      <p data-nodeid="38679">
+                        在真实开发场景中，嵌套组件场景是再正常不过的了，前面我们举的
+                        App 和 Hello 组件的例子就是嵌套组件的场景。组件 vnode
+                        主要维护着组件的定义对象，组件上的各种
+                        props，而组件本身是一个抽象节点，它自身的渲染其实是通过执行组件定义的
+                        render 函数渲染生成的子树 vnode 来完成，然后再 patch
+                        。通过这种递归的方式，无论组件的嵌套层级多深，都可以完成整个组件树的渲染。
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="38680">总结</h3>
+                    <p data-nodeid="41875" class="">
+                      OK，到这里我们这一节的学习也要结束啦，这节课我们主要分析了组件的渲染流程，从入口开始，一层层分析组件渲染。
+                    </p>
+
+                    <p data-nodeid="38682">
+                      你可能发现了，文中提到的很多技术点我会放在后面的章节去讲，这样做是为了让我们不跑题，重点放在理解组件的渲染流程上。下节课我将会带你具体分析一下组件的更新过程。
+                    </p>
+                    <p data-nodeid="38683">
+                      这里，我用一张图来带你更加直观地感受下整个组件渲染流程：
+                    </p>
+                    <p data-nodeid="38684">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/2E/0A/CgqCHl8EPLKAF8u5AAJHdNl56bM640.png"
+                        alt="122.png"
+                        data-nodeid="38899"
+                      />
+                    </p>
+                    <p data-nodeid="38685">
+                      最后，给你留一道思考题目，我们平时开发页面就是把页面拆成一个个组件，那么组件的拆分粒度是越细越好吗？为什么呢？欢迎你在留言区与我分享。
+                    </p>
+                    <blockquote data-nodeid="38686">
+                      <p data-nodeid="38687" class="">
+                        <strong data-nodeid="38914"
+                          >本节课的相关代码在源代码中的位置如下：</strong
+                        ><br />
+                        packages/runtime-dom/src/index.ts<br />
+                        packages/runtime-core/src/apiCreateApp.ts<br />
+                        packages/runtime-core/src/vnode.ts<br />
+                        packages/runtime-core/src/renderer.ts<br />
+                        packages/runtime-dom/src/nodeOps.ts
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Vue.js 3.0 核心源码内参</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <div data-v-4bc80e00="" class="message-edit-empty">
+                  学习知识要善于思考，思考，再思考。—爱因斯坦
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 946,
+      courseCId: "",
+      courseName: "Vue.js 3.0 核心源码内参",
+      teachers: [
+        {
+          id: 696,
+          teacherName: "HuangYi",
+          position: "Zoom 前端架构师，前百度、滴滴资深技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">现任 Zoom 前端架构师，主要负责推进前后端分离架构方案和 Zoom 自研组件库，不仅将Vue.js 带入 Zoom，而且通过魔改 Vue.js 源码开发了 Vue.js 2.x 的 CSP 兼容版本，并稳定服务于几十个用 Vue.js 做增强开发的页面。之前，他先后在百度和滴滴担任前端资深技术专家，并曾使用 Vue.js 重构了滴滴出行WebApp，主导开发 Vue.js 开源组件库 cube-ui。</span></p><p><span style="color: rgb(43, 47, 54); font-family: LarkEmojiFont, LarkChineseQuote, -apple-system, system-ui, &quot;Helvetica Neue&quot;, Tahoma, &quot;PingFang SC&quot;, &quot;Microsoft Yahei&quot;, Arial, &quot;Hiragino Sans GB&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 14px; font-variant-ligatures: none; white-space: pre-wrap; background-color: rgb(255, 255, 255);"><br/></span></p>',
+        },
+      ],
+      totalCourseTime: 28,
+      totalDuration: 440,
+      sales: 768,
+      price: "0",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/41/62/CioPOWCrp-6Aapx_AAArHqFn_nM169.png",
+      sellGoodsId: 1004,
+      sellGoodsPriceId: 40841,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Vue.js 作为前端最火的三大主流框架之一，越来越多的公司将其作为项目开发的技术栈，抑或将原有项目迁移过来。对于从业者和求职者来说，学会阅读Vue.sj 源码有助于从底层逻辑学习框架原理，这很大程度上帮助前端开发者提高工作效率。",
+      seoKeywords:
+        "关键词：前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,",
+      seoTitle: "Vue.js 3.0 核心源码解析 - 前百度、滴滴资深技术专家 - 拉勾教育",
+      shareTitle: "Vue.js 3.0 核心源码解析，新鲜出炉！",
+      shareDescription: "前百度、滴滴资深技术专家带你成为高阶前端！",
+      brief: "深入分析核心源码，透彻理解 Vue.js 3.0 实现原理",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/41/5A/Cgp9HWCrqJeAfHpMAAEhcFmUStA456.png",
+      courseType: 1,
+      previewFirstField: "共28讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 942,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 942,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "b6ab25786e164c088d2551b21ab5d605"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

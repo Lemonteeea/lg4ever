@@ -1,0 +1,2495 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">趣学设计模式 - 拉勾教育</h1>
+
+  <meta
+    content="Java设计模式,单一原则,简单原则,最少原则,表达原则,职责原则,面向对象原则,反转原则,惯例原则,分离原则,契约原则,单例模式,建造者模式,抽象工厂模式,工厂方法模式,原型模式,适配器模式,桥接模式,组合模式,装饰模式,门面模式,享元模式,代理模式,访问者模式"
+    name="keywords"
+  />
+
+  <meta
+    content="如何让你的代码高效优雅可复用？除了不断迭代，学习设计模式是最佳捷径。这个专栏为你设计了最简洁的学习路径，提炼实用的编程技巧，结合实际业务场景，拆解每个模式背后的原理，帮你把抽象的知识，转化为实际的技能。"
+    name="description"
+  />
+
+  <title>趣学设计模式 - 前京东资深系统架构师 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="趣学设计模式 - 前京东资深系统架构师 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M01/19/FA/Cgp9HWBK3LmAVdb-AAAr4wTUvlg055.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">趣学设计模式</div>
+                <div data-v-5f686215="" class="name">
+                  黄靖锋
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  前京东资深系统架构师
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 设计模式：程序员的基本功，你离及格还差多少？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 595px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：理解软件编程背后的系统化思维
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 学习思维：怎样才能学好 Java 设计模式？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 组合思维：Unix
+                          哲学到底给现代编程带来哪些重要启示？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 分层思维：为什么要做代码分层架构？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 工程思维：如何用软件工程方法解决开发难题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 对象思维：面向对象编程有哪些优势？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 迭代思维：如何高效编程？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 923px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：从设计原则中领悟编程技能
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 单一原则：如何跳出错误抽象的误区？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 简单原则：如何写出“简单”代码？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 最少原则：如何实现“最少知识”代码？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 表达原则：如何让源代码成为一种逻辑线索？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 职责原则：如何在代码设计中实现职责分离？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 面向对象原则：面向对象编程框架到底长什么样？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 反转原则：如何减少代码间的相互影响？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 惯例原则：如何提升编程中的沟通效率？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 分离原则：如何将复杂问题拆分成小问题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 契约原则：如何做好 API 接口设计？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 1989px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：拆解 23 种 Java 设计模式的实现原理
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 单例模式：如何有效进行程序初始化？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 建造者模式：如何创建不同形式的复杂对象？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 抽象工厂模式：如何统一不同代码风格下的代码级别？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 工厂方法模式：如何解决生成对象时的不确定性？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | 原型模式：什么场景下需要用到对象拷贝？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | 适配器模式：如何处理不同 API 接口的兼容性？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | 桥接模式：如何实现抽象协议与不同实现的绑定？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          24 | 组合模式：如何用树形结构处理对象之间的复杂关系？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          25 | 装饰模式：如何在基础组件上扩展新功能？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          26 | 门面模式：如何实现 API 网关的高可用性？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          27 | 享元模式：如何通过共享对象减少内存加载消耗？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          28 | 代理模式：如何控制和管理对象的访问？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          29 | 访问者模式：如何实现对象级别的矩阵结构？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          30 | 模板方法模式：如何实现同一模板框架下的算法扩展？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          31 | 策略模式：如何解决不同活动策略的营销推荐场景？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          32 |
+                          状态模式：如何通过有限状态机监控功能的“状态变化”？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          33 | 观察者模式：如何发送消息变化的通知？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          34 | 备忘录模式：如何在聊天会话中记录历史消息？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          35 | 中介者模式：如何通过中间层来解决耦合过多的问题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          36 | 迭代器模式：如何实现遍历数据时的职责分离？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          37 | 解释器模式：如何实现一个自定义配置规则功能？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          38 | 命令模式：如何在一次请求中封装多个参数？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          39 | 责任链模式：如何解决审核、过滤场景问题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 扬帆起航，从心开始
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  39 | 责任链模式：如何解决审核、过滤场景问题？
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/07/26
+                  <span data-v-1605a430="" class="auth">黄靖锋</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/11:07"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="667"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/11:07</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            29.01M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/11:07
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="1089" class="">
+                      相较而言，责任链模式是一个使用频率很高的模式，它是我们所讲的最后一个行为型设计模式了，并且这也是整个课程的最后一讲。今天，我除了会带你搞清楚责任链模式的原理和实现外，还会对行为型设计模式做一次整体的总结。
+                    </p>
+                    <p data-nodeid="1090">话不多说，让我们开始今天的学习吧。</p>
+                    <h3 data-nodeid="1091">模式原理分析</h3>
+                    <p data-nodeid="1092">
+                      责任链模式的原始定义是：通过为多个对象提供处理请求的机会，避免将请求的发送者与其接收者耦合。链接接收对象并沿着链传递请求，直到对象处理它。
+                    </p>
+                    <p data-nodeid="1093">
+                      这个定义读起来还是有点抽象难懂，实际上它只说了一个关键点：<strong
+                        data-nodeid="1191"
+                        >通过构建一个处理流水线来对一次请求进行多次的处理</strong
+                      >。
+                    </p>
+                    <p data-nodeid="1094">
+                      这里我们结合购物的例子来解释下：当你收到了购买的商品后，发现商品有质量问题，于是你打电话询问客服关于退货的流程，客服接到你的电话后，会先打开订单系统查询你提供的订单信息并确认是否正确，确认后再使用物流系统通知快递小哥上门取件，快递小哥取件后会返回商品让仓储系统进行确认，并通知商品系统……这样的一个过程就是责任链模式的真实应用。
+                    </p>
+                    <p data-nodeid="1637">
+                      那么，我们先来看看责任链模式的 UML 图：
+                    </p>
+                    <p data-nodeid="2197">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/4F/B4/Cgp9HWD6qceAZgzWAAFnVYgF1Ak441.jpg"
+                        alt="设计模式 39 插图 01.jpg"
+                        data-nodeid="2201"
+                      />
+                    </p>
+                    <div data-nodeid="2752" class="te-preview-highlight">
+                      <p style="text-align: center">责任链模式的 UML 图</p>
+                    </div>
+
+                    <p data-nodeid="1097">
+                      从该 UML 图中，我们能看出责任链模式其实只有两个关键角色。
+                    </p>
+                    <ul data-nodeid="1098">
+                      <li data-nodeid="1099">
+                        <p data-nodeid="1100">
+                          <strong data-nodeid="1200">处理类（Handler）</strong
+                          >：可以是一个接口，用于接收请求并将请求分派到处理程序链条中（实际上就是一个数组链表），其中，会先将链中的第一个处理程序放入开头来处理。
+                        </p>
+                      </li>
+                      <li data-nodeid="1101">
+                        <p data-nodeid="1102">
+                          <strong data-nodeid="1205"
+                            >具体处理类（HandlerA、B、C）</strong
+                          >：按照链条顺序对请求进行具体处理。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="1103">
+                      下面我们再来看看该 UML 对应的代码实现：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">public interface Handler {
+</div></li><li><div class="code-word">    void setNext(Handler handler);
+</div></li><li><div class="code-word">    void handle(Request request);
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class Request {
+</div></li><li><div class="code-word">    private String data;
+</div></li><li><div class="code-word">    public String getData() {
+</div></li><li><div class="code-word">        return data;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    public void setData(String data) {
+</div></li><li><div class="code-word">        this.data = data;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class HandlerA implements Handler{
+</div></li><li><div class="code-word">    private Handler next;
+</div></li><li><div class="code-word">    public HandlerA() {
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Handler handler) {
+</div></li><li><div class="code-word">        this.next = handler;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Request request) {
+</div></li><li><div class="code-word">        System.out.println("HandlerA 执行 代码逻辑，处理："+request.getData());
+</div></li><li><div class="code-word">        request.setData(request.getData().replace("AB",""));
+</div></li><li><div class="code-word">        if (null != next) {
+</div></li><li><div class="code-word">            next.handle(request);
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            System.out.println("执行中止！");
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class HandlerB implements Handler {
+</div></li><li><div class="code-word">    private Handler next;
+</div></li><li><div class="code-word">    public HandlerB() {
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Handler handler) {
+</div></li><li><div class="code-word">        this.next = handler;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Request request) {
+</div></li><li><div class="code-word">        System.out.println("HandlerB 执行 代码逻辑，处理："+request.getData());
+</div></li><li><div class="code-word">        request.setData(request.getData().replace("CD",""));
+</div></li><li><div class="code-word">        if (null != next) {
+</div></li><li><div class="code-word">            next.handle(request);
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            System.out.println("执行中止！");
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class HandlerC implements Handler{
+</div></li><li><div class="code-word">    private Handler next;
+</div></li><li><div class="code-word">    public HandlerC() {
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Handler handler) {
+</div></li><li><div class="code-word">        this.next = handler;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Request request) {
+</div></li><li><div class="code-word">        System.out.println("HandlerC 执行 代码逻辑，处理："+request.getData());
+</div></li><li><div class="code-word">        if (null != next) {
+</div></li><li><div class="code-word">            next.handle(request);
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            System.out.println("执行中止！");
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class Demo {
+</div></li><li><div class="code-word">    public static void main(String[] args) {
+</div></li><li><div class="code-word">        Handler h1 = new HandlerA();
+</div></li><li><div class="code-word">        Handler h2 = new HandlerB();
+</div></li><li><div class="code-word">        Handler h3 = new HandlerC();
+</div></li><li><div class="code-word">        h1.setNext(h2);
+</div></li><li><div class="code-word">        h2.setNext(h3);
+</div></li><li><div class="code-word">        Request request = new Request();
+</div></li><li><div class="code-word">        request.setData("请求数据ABCDE");
+</div></li><li><div class="code-word">        h1.handle(request);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">//输出结果
+</div></li><li><div class="code-word">HandlerA 执行 代码逻辑，处理：请求数据ABCDE
+</div></li><li><div class="code-word">HandlerB 执行 代码逻辑，处理：请求数据CDE
+</div></li><li><div class="code-word">HandlerC 执行 代码逻辑，处理：请求数据E
+</div></li><li><div class="code-word">执行中止！
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1105">
+                      从这段代码实现可以看出，责任链模式的实现非常简单，每一个具体的处理类都会保存在它之后的下一个处理类。当处理完成后，就会调用设置好的下一个处理类，直到最后一个处理类不再设置下一个处理类，这时处理链条全部完成。在代码示例中，HandlerA
+                      删除掉字符串 ABCDE 中的 AB，并交给 HandlerB 处理；HandlerB
+                      删除掉 CDE 中的 CD，并交给 HandlerC；HandlerC
+                      处理完后，整个执行过程中止。
+                    </p>
+                    <h3 data-nodeid="1106">使用场景分析</h3>
+                    <p data-nodeid="1107">
+                      责任链模式常见的使用场景有以下几种情况。
+                    </p>
+                    <ul data-nodeid="1108">
+                      <li data-nodeid="1109">
+                        <p data-nodeid="1110">
+                          <strong data-nodeid="1214"
+                            >在运行时需要动态使用多个关联对象来处理同一次请求时</strong
+                          >。比如，请假流程、员工入职流程、编译打包发布上线流程等。
+                        </p>
+                      </li>
+                      <li data-nodeid="1111">
+                        <p data-nodeid="1112">
+                          <strong data-nodeid="1219"
+                            >不想让使用者知道具体的处理逻辑时</strong
+                          >。比如，做权限校验的登录拦截器。
+                        </p>
+                      </li>
+                      <li data-nodeid="1113">
+                        <p data-nodeid="1114">
+                          <strong data-nodeid="1224"
+                            >需要动态更换处理对象时</strong
+                          >。比如，工单处理系统、网关 API 过滤规则系统等。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="1115">
+                      为了帮助你更好地理解责任链模式的使用场景，下面我们通过一个简单的例子来为你演示。
+                    </p>
+                    <p data-nodeid="1116">
+                      这里我们要创建一个获取数字并判断正负或零的程序，程序接收一个数字的请求，在链条上进行处理并打印对应的处理结果。
+                    </p>
+                    <p data-nodeid="1117">
+                      我们先创建一个链条
+                      Chain，并设置起始的处理类，如下代码所示：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">public class Chain {
+</div></li><li><div class="code-word">    Excutor chain;
+</div></li><li><div class="code-word">    public Chain(){
+</div></li><li><div class="code-word">        buildChain();
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    private void buildChain(){
+</div></li><li><div class="code-word">        Excutor e1 = new NegativeExcutor();
+</div></li><li><div class="code-word">        Excutor e2 = new ZeroExcutor();
+</div></li><li><div class="code-word">        Excutor e3 = new PositiveExcutor();
+</div></li><li><div class="code-word">        e1.setNext(e2);
+</div></li><li><div class="code-word">        e2.setNext(e3);
+</div></li><li><div class="code-word">        this.chain = e1;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    public void process(Integer num) {
+</div></li><li><div class="code-word">        chain.handle(num);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1119">
+                      接下来我们创建抽象的处理类 Excutor，声明两个方法：setNext
+                      用于设置下一个处理类，handle 是具体的业务逻辑。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">public interface Excutor {
+</div></li><li><div class="code-word">    void setNext(Excutor excutor);
+</div></li><li><div class="code-word">    void handle(Integer num);
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1121">
+                      NegativeExcutor、PositiveExcutor 和 ZeroExcutor
+                      分别代表处理负数、正数和零。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">public class NegativeExcutor implements Excutor {
+</div></li><li><div class="code-word">    private Excutor next;
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Excutor excutor) {
+</div></li><li><div class="code-word">        this.next = excutor;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Integer num) {
+</div></li><li><div class="code-word">        if (null!= num &amp;&amp; num &lt; 0) {
+</div></li><li><div class="code-word">            System.out.println("NegativeExcutor获取数字："+num+" ,处理完成！");
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            if (null != next) {
+</div></li><li><div class="code-word">                System.out.println("===经过NegativeExcutor");
+</div></li><li><div class="code-word">                next.handle(num);
+</div></li><li><div class="code-word">            } else {
+</div></li><li><div class="code-word">                System.out.println("处理中止！-NegativeExcutor");
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class PositiveExcutor implements Excutor{
+</div></li><li><div class="code-word">    private Excutor next;
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Excutor excutor) {
+</div></li><li><div class="code-word">        this.next = excutor;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Integer num) {
+</div></li><li><div class="code-word">        if (null!= num &amp;&amp; num &gt; 0) {
+</div></li><li><div class="code-word">            System.out.println("PositiveExcutor获取数字："+num+" ,处理完成！");
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            if (null != next) {
+</div></li><li><div class="code-word">                System.out.println("===经过PositiveExcutor");
+</div></li><li><div class="code-word">                next.handle(num);
+</div></li><li><div class="code-word">            } else {
+</div></li><li><div class="code-word">                System.out.println("处理中止！-PositiveExcutor");
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">public class ZeroExcutor implements Excutor{
+</div></li><li><div class="code-word">    private Excutor next;
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void setNext(Excutor excutor) {
+</div></li><li><div class="code-word">        this.next = excutor;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    @Override
+</div></li><li><div class="code-word">    public void handle(Integer num) {
+</div></li><li><div class="code-word">        if (null!= num &amp;&amp; num == 0) {
+</div></li><li><div class="code-word">            System.out.println("ZeroExcutor获取数字："+num+" ,处理完成！");
+</div></li><li><div class="code-word">        } else {
+</div></li><li><div class="code-word">            if (null != next) {
+</div></li><li><div class="code-word">                System.out.println("===经过ZeroExcutor");
+</div></li><li><div class="code-word">                next.handle(num);
+</div></li><li><div class="code-word">            } else {
+</div></li><li><div class="code-word">                System.out.println("处理中止！- ZeroExcutor");
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1123">最后，运行一个单元测试：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="plain"><ol><li><div class="code-word">public class Client {
+</div></li><li><div class="code-word">    public static void main(String[] args) {
+</div></li><li><div class="code-word">        Chain chain = new Chain();
+</div></li><li><div class="code-word">        chain.process(99);
+</div></li><li><div class="code-word">        System.out.println("------");
+</div></li><li><div class="code-word">        chain.process(-11);
+</div></li><li><div class="code-word">        System.out.println("------");
+</div></li><li><div class="code-word">        chain.process(0);
+</div></li><li><div class="code-word">        System.out.println("------");
+</div></li><li><div class="code-word">        chain.process(null);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">//输出结果
+</div></li><li><div class="code-word">===经过NegativeExcutor
+</div></li><li><div class="code-word">===经过ZeroExcutor
+</div></li><li><div class="code-word">PositiveExcutor获取数字：99 ,处理完成！
+</div></li><li><div class="code-word">------
+</div></li><li><div class="code-word">NegativeExcutor获取数字：-11 ,处理完成！
+</div></li><li><div class="code-word">------
+</div></li><li><div class="code-word">===经过NegativeExcutor
+</div></li><li><div class="code-word">ZeroExcutor获取数字：0 ,处理完成！
+</div></li><li><div class="code-word">------
+</div></li><li><div class="code-word">===经过NegativeExcutor
+</div></li><li><div class="code-word">===经过ZeroExcutor
+</div></li><li><div class="code-word">处理中止！-PositiveExcutor
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1125">
+                      从最后的结果可以看到，当我们输入不同的数时，都会经过一整个链条的流转，直到最终的处理对象完成处理。
+                    </p>
+                    <p data-nodeid="1126">
+                      所以说，责任链模式就像工厂的流水线作业一样，按照某一个标准化的流程来执行，用于规则过滤、Web
+                      请求协议解析等具备链条式的场景中，通过拆分不同的处理节点来完成整个流程的处理。
+                    </p>
+                    <h3 data-nodeid="1127">为什么使用责任链模式？</h3>
+                    <p data-nodeid="1128">
+                      分析完责任链模式的原理和使用场景后，我们再来说说使用责任链模式的原因，可总结为以下三个。
+                    </p>
+                    <p data-nodeid="1129">
+                      <strong data-nodeid="1239"
+                        >第一个，解耦使用者和后台庞大的流程化处理</strong
+                      >。我们都知道，在线购物订单里包含了物流、商品、支付、会员等多个系统的处理逻辑，如果让使用者一一和它们对接，势必会造成使用困难、系统之间调用混乱的情况发生，而通过订单建立一个订单的状态变更流程，就能将这些系统很好地串联在一起，这不仅能够让使用者只需要关注订单流程这一个入口，同时还能够让不同的系统按照各自的职责来发挥作用。比如，订单在未完成支付前，商品系统是不会通知物流系统进行商品发货的。
+                    </p>
+                    <p data-nodeid="1130">
+                      <strong data-nodeid="1244"
+                        >第二个，为了动态更换流程处理中的处理对象</strong
+                      >。比如，在请假流程中，申请人一般会提交申请给直接领导审批，但有时直接领导可能无法进行审批操作，这时系统就可以更换审批人到其他审批人，这样就不会阻塞请假流程的审批。
+                    </p>
+                    <p data-nodeid="1131">
+                      <strong data-nodeid="1249"
+                        >第三个，为了处理一些需要递归遍历的对象列表</strong
+                      >。比如，权限的规则过滤。对于不同部门不同级别人员的权限，就可以采用一个过滤链条来进行权限的管控。
+                    </p>
+                    <h3 data-nodeid="1132">收益什么？损失什么？</h3>
+                    <p data-nodeid="1133">
+                      通过上述分析，我们就可以总结出使用责任链模式的优点。
+                    </p>
+                    <ul data-nodeid="1134">
+                      <li data-nodeid="1135">
+                        <p data-nodeid="1136">
+                          <strong data-nodeid="1256"
+                            >降低客户端对象与处理链条上对象之间的耦合度</strong
+                          >。比如，提交上线审核，提交人只知道最开始申请的处理人是谁，而后续是否需要别的审核人其实是由处理链条来控制的。
+                        </p>
+                      </li>
+                      <li data-nodeid="1137">
+                        <p data-nodeid="1138">
+                          <strong data-nodeid="1261">提升系统扩展性</strong
+                          >。对于需要多次处理的同一个请求，可以在链条上增加新的具体处理类，满足开闭原则，能极大地提升系统扩展性。
+                        </p>
+                      </li>
+                      <li data-nodeid="1139">
+                        <p data-nodeid="1140">
+                          <strong data-nodeid="1266"
+                            >增强了具体处理类的职责独立性</strong
+                          >。即便链条上的工作流程发生了变化，也可以动态地改变具体处理类的调用次序和增加类的新的职责。每个类只需要处理自己该处理的工作，不该处理的就传递给下一个对象完成，明确各类的责任范围，同时也符合类的单一职责原则。
+                        </p>
+                      </li>
+                      <li data-nodeid="1141">
+                        <p data-nodeid="1142">
+                          <strong data-nodeid="1271"
+                            >简化了对象之间前后关联处理的复杂性</strong
+                          >。每个对象只需存储一个指向后继者的引用，不需保持其他所有处理者的引用，这避免了使用众多的
+                          if 或者 if···else 语句。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="1143">同样，责任链模式也有一些缺点。</p>
+                    <ul data-nodeid="1144">
+                      <li data-nodeid="1145">
+                        <p data-nodeid="1146">
+                          <strong data-nodeid="1277">降低性能</strong
+                          >。由于每一个请求都需要经历一次完整的链条上具体处理类的处理，系统性能势必会受到一定影响，比如，依赖更多的代码行或依赖更复杂的代码逻辑。
+                        </p>
+                      </li>
+                      <li data-nodeid="1147">
+                        <p data-nodeid="1148">
+                          <strong data-nodeid="1282">调试难度增大</strong
+                          >。调试代码需要验证每个具体处理者是否都能接收到请求，一旦出现错误，排查与修改也变得更加麻烦。
+                        </p>
+                      </li>
+                      <li data-nodeid="1149">
+                        <p data-nodeid="1150">
+                          <strong data-nodeid="1287">容易出现死锁异常</strong
+                          >。一旦某一个对象设置后继者出现错误，就会出现循环调用，进而导致堆栈溢出的错误。
+                        </p>
+                      </li>
+                    </ul>
+                    <h3 data-nodeid="1151">总结</h3>
+                    <p data-nodeid="1152">
+                      在实际的软件开发中，责任链模式的应用非常广泛，可以说只要是与流程相关的软件系统都能够使用责任链模式来构建，一方面可以用在代码中实现松散耦合，另一方面可以动态增删子处理流程。
+                    </p>
+                    <p data-nodeid="1153">
+                      责任链模式的原理和实现虽然都非常简单，但是在实际使用中还需要<strong
+                        data-nodeid="1295"
+                        >注意维护上下文关系的正确性</strong
+                      >，一旦出现循环调用，很容易死锁而导致程序崩溃。
+                    </p>
+                    <p data-nodeid="1154">
+                      另外，要<strong data-nodeid="1301"
+                        >注意控制责任链中的处理对象数量</strong
+                      >。如果处理对象的数量过多，比如超过 20
+                      个，容易让代码变得难以维护，这时还是应该尽可能减少处理对象的数量，将其合并到相类似的处理对象中去。
+                    </p>
+                    <p data-nodeid="1155">
+                      到此，我们的行为型设计模式的课程就学习完了。最后，我再总结一下行为型设计模式的要点。
+                    </p>
+                    <p data-nodeid="1156">
+                      行为型设计模式共有 11
+                      种，每一种的要点可简单提炼和总结为如下，你可以对比理解和记忆。
+                    </p>
+                    <ul data-nodeid="1157">
+                      <li data-nodeid="1158">
+                        <p data-nodeid="1159">
+                          <strong data-nodeid="1308">访问者模式</strong
+                          >，在对象级别中实际为树型结构，与抽象工厂模式类似。它给使用者提供了一种统一访问树结构中数据节点的方式，因此具备灵活扩展的特性。
+                        </p>
+                      </li>
+                      <li data-nodeid="1160">
+                        <p data-nodeid="1161">
+                          <strong data-nodeid="1313">模板方法模式</strong
+                          >，定义一个算法模板，并将具体的执行步骤延迟到子类中实现。
+                        </p>
+                      </li>
+                      <li data-nodeid="1162">
+                        <p data-nodeid="1163">
+                          <strong data-nodeid="1318">策略模式</strong
+                          >，将多个不同的算法封装成策略，让它们可以互相替换，适合应用于对计算效率有一定要求的系统。策略模式通常会和工厂方法模式配合使用，为使用者提供一组使用策略。
+                        </p>
+                      </li>
+                      <li data-nodeid="1164">
+                        <p data-nodeid="1165">
+                          <strong data-nodeid="1323">状态模式</strong
+                          >，最常用的实现方式是状态机，大量应用于需要控制状态流转的系统中。常用在游戏、工作流引擎、购物流程等系统开发中。
+                        </p>
+                      </li>
+                      <li data-nodeid="1166">
+                        <p data-nodeid="1167">
+                          <strong data-nodeid="1328">观察者模式</strong>，是经典
+                          MVC
+                          模式的变形，与中介者模式的结构很类似，在结构上都是星形结构，但侧重点不同。观察者模式侧重于将观察者和被观察者代码解耦，中介者则侧重于充当两个对象之间的新媒介。观察者模式的应用场景非常广泛，比如，邮件订阅、公众号推送、RSS、消息中间件等。
+                        </p>
+                      </li>
+                      <li data-nodeid="1168">
+                        <p data-nodeid="1169">
+                          <strong data-nodeid="1333">备忘录模式</strong
+                          >，也叫快照模式，通常用于捕获一个对象的内部状态，比如保存、打开、关闭等状态，并在执行对象之外保存一个副本状态，方便用于之后恢复对象到某一个时间状态。
+                        </p>
+                      </li>
+                      <li data-nodeid="1170">
+                        <p data-nodeid="1171">
+                          <strong data-nodeid="1338">中介者模式</strong
+                          >，最大的作用在于解耦对象之间的直接引用，在结构上体现为将网状的结构变成以中介者为中心的星形结构，从而保证了对象行为上的稳定性，即不会因为新对象的引入造成大量类之间引用的修改。它的设计思想和分层思想很像，通过引入一个中间层，将层与层之间的多对多关系变为一对多关系。不过要注意，中间层不能设计得过于复杂而变成另一种过度依赖的层。
+                        </p>
+                      </li>
+                      <li data-nodeid="1172">
+                        <p data-nodeid="1173">
+                          <strong data-nodeid="1343">迭代器模式</strong
+                          >，大量应用于基础类库中，对重复遍历操作进行封装。现在大部分编程语言都提供了现成的迭代器可以使用，我们不需要从零开始开发。
+                        </p>
+                      </li>
+                      <li data-nodeid="1174">
+                        <p data-nodeid="1175">
+                          <strong data-nodeid="1348">解释器模式</strong
+                          >，为某个语言（编程语言也是语言）定义它的语法表示，比如
+                          if-else 语法，并定义一个解释器用来处理这个语法。
+                        </p>
+                      </li>
+                      <li data-nodeid="1176">
+                        <p data-nodeid="1177">
+                          <strong data-nodeid="1353">命令模式</strong
+                          >，将某个命令（函数方法）封装成对象进行传递，关注的维度是命令，比如，打开、关闭文件的命令。用于处理多个命令调用和使用远程服务的场景。另外，它还会与备忘录模式结合在一起用于撤销和重做等场景。
+                        </p>
+                      </li>
+                      <li data-nodeid="1178">
+                        <p data-nodeid="1179">
+                          <strong data-nodeid="1358">责任链模式</strong
+                          >，用于链条状结构，将处理请求沿链条进行传递，动态指定职责的承担对象，由各自对象实现对应职责。比如，一个请求先经过
+                          A 拦截器处理，然后再把请求传递给 B 拦截器，B
+                          拦截器处理完后再传递给 C
+                          拦截器，以此类推，形成一个链条，因此也叫拦截器模式。
+                        </p>
+                      </li>
+                    </ul>
+                    <h3 data-nodeid="1180">课后思考</h3>
+                    <p data-nodeid="1181" class="">
+                      学完这 23
+                      种设计模式后，你能第一时间使用的模式有哪些？还有哪些关于课程的疑问？欢迎你在留言区与我分享。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >趣学设计模式</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **生
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      打卡学习，恭喜完结
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    恭喜，也很感谢你一路陪伴和支持。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **航
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      感谢
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    也非常感谢你的一路陪伴和支持。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **航
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      完结撒花
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 710,
+      courseCId: "",
+      courseName: "趣学设计模式",
+      teachers: [
+        {
+          id: 637,
+          teacherName: "黄靖锋",
+          position: "前京东资深系统架构师",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/1C/E7/CioPOWBO_IuACstYAAAFzt8Pbsc000.png",
+          description:
+            '<p><span style="caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-family: &quot;Microsoft YaHei&quot;, 微软雅黑, sans-serif; text-size-adjust: auto; background-color: rgb(255, 255, 255); font-size: 16px;">毕业于成都电子科技大学计算机专业，先后在华为、京东工作，深入研究算法与编程近十年。作为前京东资深系统架构师，从事过工具&amp;算法平台、运营平台、AI 智能客服、性能优化等相关系统的研发工作。现任某互联网公司资深系统架构师，负责公司核心业务的架构设计和开发工作。</span></p>',
+        },
+      ],
+      totalCourseTime: 39,
+      totalDuration: 500,
+      sales: 16037,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/1C/E7/CioPOWBO_IuACstYAAAFzt8Pbsc000.png",
+      sellGoodsId: 810,
+      sellGoodsPriceId: 46819,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "如何让你的代码高效优雅可复用？除了不断迭代，学习设计模式是最佳捷径。这个专栏为你设计了最简洁的学习路径，提炼实用的编程技巧，结合实际业务场景，拆解每个模式背后的原理，帮你把抽象的知识，转化为实际的技能。",
+      seoKeywords:
+        "Java设计模式,单一原则,简单原则,最少原则,表达原则,职责原则,面向对象原则,反转原则,惯例原则,分离原则,契约原则,单例模式,建造者模式,抽象工厂模式,工厂方法模式,原型模式,适配器模式,桥接模式,组合模式,装饰模式,门面模式,享元模式,代理模式,访问者模式",
+      seoTitle: "趣学设计模式 - 前京东资深系统架构师 - 拉勾教育",
+      shareTitle: "如何写出更好的代码？这个解答是我见过最实用的",
+      shareDescription: "编程的艺术都在设计模式里了",
+      brief: "告别烂代码，成为编程“艺术家”",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M01/19/FA/Cgp9HWBK3LmAVdb-AAAr4wTUvlg055.png",
+      courseType: 1,
+      previewFirstField: "共39讲",
+      previewSecondField: "每周一、四更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 708,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 708,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "0098808bb7fd449f8dd395d58ce50125"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

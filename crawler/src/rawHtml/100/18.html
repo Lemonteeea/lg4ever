@@ -768,6 +768,7 @@
                       class="
                         class-level-one
                         over-ellipsis
+                        isclick
                         class-level-one-detail
                       "
                     >
@@ -837,7 +838,6 @@
                       class="
                         class-level-one
                         over-ellipsis
-                        isclick
                         class-level-one-detail
                       "
                     >
@@ -1052,10 +1052,10 @@
             <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
               <div data-v-1605a430="">
                 <h1 data-v-1605a430="" class="main-title">
-                  18 | 如何设计合适的状态管理方案？
+                  15 | 提升开发效率：数据抽象与配置化
                 </h1>
                 <div data-v-1605a430="" class="main-tips">
-                  2021/06/02
+                  2021/05/24
                   <span data-v-1605a430="" class="auth">王贝珊（被删）</span>
                 </div>
                 <div data-v-1605a430="" class="media-player-wrap">
@@ -1094,12 +1094,12 @@
                                 "
                               ></div>
                               <div
-                                aria-valuetext="00:00/13:14"
+                                aria-valuetext="00:00/13:03"
                                 class="vue-slider-dot vue-slider-dot-hover"
                                 role="slider"
                                 aria-valuenow="0"
                                 aria-valuemin="0"
-                                aria-valuemax="794"
+                                aria-valuemax="783"
                                 aria-orientation="horizontal"
                                 tabindex="0"
                                 style="
@@ -1144,7 +1144,7 @@
                                     "
                                   >
                                     <span class="vue-slider-dot-tooltip-text"
-                                      >00:00/13:14</span
+                                      >00:00/13:03</span
                                     >
                                   </div>
                                 </div>
@@ -1154,10 +1154,10 @@
                         </div>
                         <div data-v-6ecd2302="" class="detail-wrap">
                           <div data-v-6ecd2302="" class="detail-one">
-                            34.52M
+                            34.03M
                           </div>
                           <div data-v-6ecd2302="" class="detail-two">
-                            00:00/13:14
+                            00:00/13:03
                           </div>
                         </div>
                       </div>
@@ -1175,346 +1175,430 @@
                 </div>
                 <div data-v-1605a430="" class="main-container">
                   <div data-v-1605a430="" class="rich-text-wrap">
-                    <p data-nodeid="2295" class="">
-                      在前端应用的开发过程中，对于规模较小、各个模块间依赖较少的项目，一般不会引入复杂的状态管理工具。
+                    <p data-nodeid="3">
+                      上一讲介绍了如何对前端应用进行模块化和组件化设计，是一个对系统设计进行抽象的过程。实际上，我们在业务功能开发过程中，也会在很多地方使用到抽象的能力，比如将页面内容抽象为数据展示，将页面的呈现方式抽象为状态。
                     </p>
-                    <p data-nodeid="2296">
-                      但实际上，业务的发展和变化很快，随着我们项目在不断地变大、各个页面中需要共享和通信的内容越来越多，与此同时项目也加入了新成员、不同开发的习惯不一致，项目到后期可能会出现事件的传递、全局数据满天飞的情况。
+                    <p data-nodeid="4">
+                      通过抽象的方式，我们可以将整个前端应用使用数据的方式来进行表达和描述，还可以配合配置化来减少硬编码、提升功能的灵活性。
                     </p>
-                    <p data-nodeid="2297">
-                      这样会有什么隐患呢？当我们想要改某个状态数据的时候，无法直观确认这些改动会不会影响到其他地方。更让人头疼的是，在测试的时候并没有发现存在问题（毕竟有在项目规模较大的情况下，回归测试的成本也会越来越重），然后触发了线上事故。
+                    <p data-nodeid="5">
+                      今天我就主要介绍如何将应用抽象成数据，以及怎么配合配置化来提升代码的可维护性。
                     </p>
-                    <p data-nodeid="2298">
-                      这是否又意味着所有项目都应该在最初的时候引入状态管理方案呢？除非项目在最初就已经定位为大型或复杂的应用，否则我们则需要根据预期来选型、根据需要引进不同的工具库来进行管理。同时，如果我们的项目在不断的发展和迭代过程中，则可能需要进行状态管理方案的变更。
+                    <h3 data-nodeid="1273" class="">如何将应用抽象成数据</h3>
+
+                    <p data-nodeid="7">
+                      要将应用抽象成数据，需要进行两个步骤：
                     </p>
-                    <p data-nodeid="2299">
-                      关于技术选型和项目设计的内容，我会在后续介绍。因为在掌握如何进行方案选型之前，我们还需要了解现有的各种方案。所以，今天我们主要来认识下常见的前端状态管理方案。
+                    <ol data-nodeid="8">
+                      <li data-nodeid="9">
+                        <p data-nodeid="10">将应用进行模块化和组件化划分；</p>
+                      </li>
+                      <li data-nodeid="11">
+                        <p data-nodeid="12">
+                          将这些模块和组件用数据的方式进行表达。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="13">
+                      上一讲我介绍了对前端应用进行模块化和组件化划分的一些原则，下面我会直接介绍将页面划分成模块和组件的例子。
                     </p>
-                    <p data-nodeid="2300">
-                      要介绍数据在前端应用中是怎么流动的，首先我们要了解数据是如何管理的。
+                    <h4 data-nodeid="1779" class="">将页面划分成模块和组件</h4>
+
+                    <p data-nodeid="15">
+                      在进行系统设计和开发代码之前，产品经理首先会进行功能设计。产品经理在设计一个页面的时候，会根据内容和功能的不同，设计出不同的模块，将它们呈现在页面中。
                     </p>
-                    <h3 data-nodeid="2301">数据管理</h3>
-                    <p data-nodeid="2302">
-                      一般来说，各个组件的数据都会在组件自身的实例当中进行维护。但如果一些数据涉及跨组件共享、全局共享的情况，则需要对数据进行统一的保存和维护，大多数情况下我们都会使用共享对象的方式。
+                    <p data-nodeid="16">
+                      对于前端开发来说，我们会拿到功能需求描述以及 UI
+                      设计图。此时我们需要结合功能说明以及交互稿或者设计图，来进行逆向拆解，即把一个页面按照功能和内容划分出一个个的模块。
                     </p>
-                    <h4 data-nodeid="2303">共享对象</h4>
-                    <p data-nodeid="2304">
-                      共享对象的原理很简单，当我们需要多个地方使用相同的数据，我们就把它们放置在一个地方，大家都去那里获取和更新。
-                    </p>
-                    <p data-nodeid="2305">
+                    <p data-nodeid="17">以我自己的博客为例：</p>
+                    <p data-nodeid="2285" class="">
                       <img
-                        src="https://s0.lgstatic.com/i/image6/M01/41/D6/CioPOWCuGYCAcCV7AAFJrG6f1rY836.png"
-                        alt="Drawing 0.png"
-                        data-nodeid="2398"
+                        src="https://s0.lgstatic.com/i/image6/M01/40/93/CioPOWCl05-AVWSrAAG_FZxtvbo772.png"
+                        alt="image.png"
+                        data-nodeid="2288"
                       />
-                    </p>
-                    <p data-nodeid="2306">
-                      比如，我们可以简单用一个叫<code
-                        data-backticks="1"
-                        data-nodeid="2400"
-                        >globalData.js</code
-                      >的文件来管理全局用的数据。
-                    </p>
-                    <div class="course-code-area">
-                      <div class="copy-btn">
-                        <div class="copy-icon"></div>
-                        复制代码
-                      </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// globalData.js</span>
-</div></li><li><div class="code-word"><span class="hljs-comment">// globalData 用来存全局数据</span>
-</div></li><li><div class="code-word">let globalData = {};
-</div></li><li><div class="code-word"><span class="hljs-comment">// 获取全局数据</span>
-</div></li><li><div class="code-word"><span class="hljs-comment">// 传 key 获取对应的值</span>
-</div></li><li><div class="code-word"><span class="hljs-comment">// 不传 key 获取全部值</span>
-</div></li><li><div class="code-word"><span class="hljs-function">export function <span class="hljs-title">getGlobalData</span><span class="hljs-params">(key)</span> </span>{
-</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> key ? globalData[key] : globalData;
-</div></li><li><div class="code-word">}
-</div></li><li><div class="code-word"><span class="hljs-comment">// 设置全局数据</span>
-</div></li><li><div class="code-word"><span class="hljs-function">export function <span class="hljs-title">setGlobalData</span><span class="hljs-params">(key, value)</span> </span>{
-</div></li><li><div class="code-word">  <span class="hljs-comment">// 需要传键值对</span>
-</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (key === undefined || value === undefined) {
-</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>;
-</div></li><li><div class="code-word">  }
-</div></li><li><div class="code-word">  globalData = { ...globalData, [key]: value };
-</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> globalData;
-</div></li><li><div class="code-word">}
-</div></li></ol></code></pre>
-                    </div>
-                    <p data-nodeid="2308">
-                      除了全局数据以外，局部数据的管理同样可以使用共享对象的方式进行，我们将需要共享的数据维护在一个对象中，需要的时候则主动进行获取。<br />
-                      那如果应用中存在多个共享对象，我们又该怎样管理这些对象呢？
-                    </p>
-                    <h4 data-nodeid="2309">根据模块进行划分</h4>
-                    <p data-nodeid="2310">
-                      在大型应用中，维护的全局数据也会更加复杂，通过合适的方式进行拆分，可以更方便地进行管理，比如根据数据的类型、使用场景、涉及的功能，从而拆分模块的方式来进行管理。
-                    </p>
-                    <p data-nodeid="2311">
-                      除此之外，我们还可以使用树状结构的方式来管理这些全局对象。
-                    </p>
-                    <h4 data-nodeid="2312">使用树状结构管理数据</h4>
-                    <p data-nodeid="2313">
-                      在介绍第 1 讲的时候，我就有介绍前端页面中，DOM
-                      节点是基于树状结构管理的。同时，前端应用即便通过模块化和组件化一层层地进行了封装，最终依然会呈现为树状。
-                    </p>
-                    <p data-nodeid="2314">
-                      因此，我们可以根据组件的树状作用域，结合共享对象的管理，来注入树状的数据结构。比如在
-                      Angular
-                      中，就是使用依赖注入的方式，配合树状的组件管理，来实现数据的共享或是隔离。
-                    </p>
-                    <p data-nodeid="2315">
-                      现在，我们知道应用中需要共享的数据可以通过怎样的方式进行管理，那么当数据发生变化的时候，又该怎样通知到依赖方吗？
-                    </p>
-                    <h3 data-nodeid="2316">数据变更</h3>
-                    <p data-nodeid="2317">
-                      前面的第 15
-                      讲中，我介绍了如何将应用和界面抽象成数据管理，其实被抽象的数据也就是我们常说的状态。
-                    </p>
-                    <p data-nodeid="2318">
-                      前端项目中的数据并不只是简单地存在于应用中，相互之间会进行交互和影响。数据间的相互作用，便是我们常说的数据通信或是状态管理，包括但不限于以下的一些方式：
-                    </p>
-                    <ul data-nodeid="2319">
-                      <li data-nodeid="2320">
-                        <p data-nodeid="2321">事件监听与触发；</p>
-                      </li>
-                      <li data-nodeid="2322">
-                        <p data-nodeid="2323">单向数据流；</p>
-                      </li>
-                      <li data-nodeid="2324">
-                        <p data-nodeid="2325">响应式数据流。</p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="2326">我们来分别看一下。</p>
-                    <h4 data-nodeid="2327">事件监听与触发</h4>
-                    <p data-nodeid="2496" class="te-preview-highlight">
-                      事件监听与触发的设计，一般来说会基于发布-订阅模式。想必你也比较熟悉，我们对浏览器点击、输入框的输入操作事件的绑定，就是典型的事件机制。
                     </p>
 
-                    <p data-nodeid="2329">
-                      我们也可以通过事件管理的方式，来进行数据的交互，比如
-                      Websocket 机制。
+                    <p data-nodeid="19">
+                      我们直观地根据视觉来划分模块，可以分为三大块。
                     </p>
-                    <p data-nodeid="2330">
-                      事件监听和触发的原理其实很简单。<strong data-nodeid="2426"
-                        >监听者在进行事件监听后，会被添加到该事件的监听者队列中。事件被触发后，则可以根据该事件的监听者队列，来通知相应的监听者。</strong
-                      >
-                    </p>
-                    <p data-nodeid="2331">
-                      在第 1
-                      讲中，我们介绍了事件委托机制，在很多前端框架中，事件委托会挂载在页面的组件根实例上。除了挂载在组件根实例这样的方式来绑定作为事件中心，我们也可以自行创建一个事件中心来进行管理。
-                    </p>
-                    <p data-nodeid="2332">
-                      事件通知机制很方便，可以随意控制触发的时机，也可以任意的地方监听或是触发。但前面也说过，事件机制的弊端也是很明显，就是每一个事件的触发对应一个或者多个监听，关系是一对多。
-                    </p>
-                    <p data-nodeid="2333">
-                      设计不合理的地方，甚至可能出现一个事件会被多处触发的问题，常常是事件散落在各个地方、数据流也难以跟踪。需要定位的时候，只能通过全局搜索的方式来跟踪数据的去向，导致维护难度大大上升。
-                    </p>
-                    <p data-nodeid="2334">以简单的博客系统来为例：</p>
-                    <p data-nodeid="2335">
-                      <img
-                        src="https://s0.lgstatic.com/i/image6/M01/41/CE/Cgp9HWCuGYuAJFuHAAG-ICgc0NA601.png"
-                        alt="Drawing 1.png"
-                        data-nodeid="2433"
-                      />
-                    </p>
-                    <p data-nodeid="2336">
-                      这里只有事件 1 和事件 2
-                      的触发和监听，存在跨组件甚至跨页面的事件通知。
-                    </p>
-                    <p data-nodeid="2337">
-                      如果在一个规模较大的应用中，可能会导致满屏的事件，同时事件之间并没有什么规律可循。这样我们每次改动事件相关的代码，例如多传一个参数、改变某个参数，都可能会导致未知的错误，需要全局搜索出相关的事件，并一一进行回归测试才可以。
-                    </p>
-                    <p data-nodeid="2338">
-                      除此之外，绑定的事件如果不能及时销毁甚至会导致内存泄漏等问题。那么，是不是在大型复杂的前端应用中，就不适合使用事件机制呢？并不是。
-                    </p>
-                    <p data-nodeid="2339">
-                      在大型前端项目 VS Code
-                      中就使用了事件机制，并配合依赖注入的框架设计了一套事件的管理模式，包括：
-                    </p>
-                    <ul data-nodeid="2340">
-                      <li data-nodeid="2341">
-                        <p data-nodeid="2342">
-                          提供标准化的<code
-                            data-backticks="1"
-                            data-nodeid="2439"
-                            >Event</code
-                          >和<code data-backticks="1" data-nodeid="2441"
-                            >Emitter</code
-                          >能力；
-                        </p>
+                    <ul data-nodeid="20">
+                      <li data-nodeid="21">
+                        <p data-nodeid="22">头部：快速导航栏</p>
                       </li>
-                      <li data-nodeid="2343">
-                        <p data-nodeid="2344">
-                          通过注册<code data-backticks="1" data-nodeid="2444"
-                            >Emitter</code
-                          >，并对外提供类似生命周期的方法<code
-                            data-backticks="1"
-                            data-nodeid="2446"
-                            >onXxxxx</code
-                          >的方式，来进行事件的订阅和监听；
-                        </p>
+                      <li data-nodeid="23">
+                        <p data-nodeid="24">左侧：内容板块</p>
                       </li>
-                      <li data-nodeid="2345">
-                        <p data-nodeid="2346">
-                          通过提供通用类<code
-                            data-backticks="1"
-                            data-nodeid="2449"
-                            >Disposable</code
-                          >，统一管理相关资源的注册和销毁；
-                        </p>
-                      </li>
-                      <li data-nodeid="2347">
-                        <p data-nodeid="2348">
-                          通过使用同样的方式<code
-                            data-backticks="1"
-                            data-nodeid="2452"
-                            >this._register()</code
-                          >注册事件和订阅事件，将事件相关资源的处理统一挂载到<code
-                            data-backticks="1"
-                            data-nodeid="2454"
-                            >dispose()</code
-                          >方法中。
-                        </p>
+                      <li data-nodeid="25">
+                        <p data-nodeid="26">右侧：推广导航板块</p>
                       </li>
                     </ul>
-                    <p data-nodeid="2349">
-                      由于 VS Code
-                      中使用了依赖注入，对于模块的实例创建、销毁等都会统一交给框架来进行，从而很方便地解决了事件机制的弊端。
+                    <p data-nodeid="27">
+                      上一讲我们说过，组件可理解为带有界面渲染的特殊模块，因此上述这些模块也可以视作为组件。论坛类、博客类的页面结构大多如此，除此之外还有视频类、电商类等各种角色的网站，大都可以划分为内容模块（详情页/列表页）、导航模块（TAB/导航栏/工具栏）、功能组件（回到顶部/翻页组件）等。
                     </p>
-                    <p data-nodeid="2350">
-                      很多时候，我们不只是选择某个技术方案这么简单，对于方案如何在项目中落地、是否需要进行适当的调整，都是需要进行思考的。
+                    <p data-nodeid="28">
+                      对应用进行模块划分之后，我们可以将划分后的模块抽象成数据的方式来表达。
                     </p>
-                    <p data-nodeid="2351">
-                      下面我们继续看一下，在前端领域中更加普遍的状态管理方式：单向数据流。
+                    <h4 data-nodeid="2797" class="">将模块/组件抽象成数据</h4>
+
+                    <p data-nodeid="30">
+                      通常来说，我们可以抽离出应用中存在变化的内容和动态获取的数据，再通过将这些数据与页面内容绑定的方式（比如使用前端框架进行绑定），来控制具体功能的展示。
                     </p>
-                    <h4 data-nodeid="2352">单向数据流</h4>
-                    <p data-nodeid="2353">
-                      如今很多前端框架都会搭配使用状态管理工具，来处理应用中的数据变更。
+                    <p data-nodeid="31">
+                      我们可以通过数据的来源，将其分成内部数据（状态数据）和外部数据（动态数据）两种。
                     </p>
-                    <p data-nodeid="2354">
-                      其中，Vuex/Redux/Flux
-                      这些热门的状态管理工具库设计思想都基于单向数据流，它们采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。
+                    <h5 data-nodeid="5346" class="">1. 内部数据（状态数据）</h5>
+
+                    <p data-nodeid="35">
+                      在一个应用的设计里，我们可能会有多个组件，每个组件又各自维护着自己的某些状态。其中，部分组件的状态会相互影响，所有状态的结合体便是应用最终的整体状态。这些状态维护在应用内部，可以通过数据的方式来表示，我们简单称之为内部数据（状态数据）。
                     </p>
-                    <p data-nodeid="2355">
-                      以 Redux 为例，为了保证数据是单向流动的：
+                    <p data-nodeid="36">
+                      怎么定义内部数据呢？最浅显、最直观的办法就是，这些数据来自应用本身，同时影响应用的呈现状态。如对话框的出现和隐藏、标签的激活和失效、进度条的状态等，都可以作为状态数据。
                     </p>
-                    <p data-nodeid="2356">
-                      <img
-                        src="https://s0.lgstatic.com/i/image6/M01/41/CE/Cgp9HWCuGZSAfO6rAACNdy-ztRY672.png"
-                        alt="Drawing 2.png"
-                        data-nodeid="2465"
-                      />
-                    </p>
-                    <ul data-nodeid="2357">
-                      <li data-nodeid="2358">
-                        <p data-nodeid="2359">
-                          使用单一的数据源：所有的状态数据都存储在<code
-                            data-backticks="1"
-                            data-nodeid="2467"
-                            >store</code
-                          >中；
-                        </p>
-                      </li>
-                      <li data-nodeid="2360">
-                        <p data-nodeid="2361">
-                          状态数据只读：只能通过<code
-                            data-backticks="1"
-                            data-nodeid="2470"
-                            >action</code
-                          >来触发数据变更；
-                        </p>
-                      </li>
-                      <li data-nodeid="2362">
-                        <p data-nodeid="2363">
-                          修改无副作用：修改现有数据的副本，并通过传递副本来更新数据。
-                        </p>
-                      </li>
-                    </ul>
-                    <p data-nodeid="2364">
-                      在全局数据的使用变频繁之后，我们在定位问题的时候还会遇到不知道这个数据为何改变的情况，因为所有引用到这个全局数据的地方都可能对它进行改变。
-                    </p>
-                    <p data-nodeid="2365">
-                      这种情况下，给数据的流动一个方向，则可以方便地跟踪数据的来源和去处。
-                    </p>
-                    <p data-nodeid="2366">同样以博客系统为例：</p>
-                    <p data-nodeid="2367">
-                      <img
-                        src="https://s0.lgstatic.com/i/image6/M01/41/D6/CioPOWCuGZqANSKyAAFUDJTyMXk508.png"
-                        alt="Drawing 3.png"
-                        data-nodeid="2478"
-                      />
-                    </p>
-                    <p data-nodeid="2368">
-                      可以看到，使用了单向数据流的状态管理方案之后，数据的变更来源、更新方向都相比事件触发要清晰。因此，也被更多开发者所推崇。
-                    </p>
-                    <p data-nodeid="2369">
-                      除了单向数据流的方案以外，前端项目中比较热门的还有响应式的数据管理方式。
-                    </p>
-                    <h4 data-nodeid="2370">响应式数据流</h4>
-                    <p data-nodeid="2371">
-                      响应式数据流的设计基于响应式编程方式，响应式编程同样基于观察者模式，它是一种面向数据流和变化传播的声明式编程方式。在前端领域，常见的异步编程场景包括事件处理、用户输入、HTTP
-                      响应等。
-                    </p>
-                    <p data-nodeid="2372">
-                      对于这样的异步数据流，可以使用响应式编程的方式来进行设计，通过订阅某个数据流，可以对数据进行一系列流式处理，例如过滤、计算、转换、合流等，配合函数式编程可以实现很多优秀的场景。
-                    </p>
-                    <p data-nodeid="2373">
-                      以 Rxjs
-                      为例，对用户的一些交互，也可以通过订阅的方式来获取需要的信息：
+                    <p data-nodeid="37">
+                      比如，用户在网页中的一些操作，点击某个按钮之后，会出现弹窗，这个弹窗的展示内容以及是否展示的状态可以用对象来描述。
                     </p>
                     <div class="course-code-area">
                       <div class="copy-btn">
                         <div class="copy-icon"></div>
                         复制代码
                       </div>
-                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> observable = Rx.Observable.fromEvent(input, <span class="hljs-string">"input"</span>) <span class="hljs-comment">// 监听 input 元素的 input 事件</span>
-</div></li><li><div class="code-word">  .map((e) =&gt; e.target.value) <span class="hljs-comment">// 一旦发生，把事件对象 e 映射成 input 元素的值</span>
-</div></li><li><div class="code-word">  .filter((value) =&gt; value.length &gt;= <span class="hljs-number">1</span>) <span class="hljs-comment">// 接着过滤掉值长度小于 1 的</span>
-</div></li><li><div class="code-word">  .distinctUntilChanged() <span class="hljs-comment">// 如果该值和过去最新的值相等，则忽略</span>
-</div></li><li><div class="code-word">  .subscribe(
-</div></li><li><div class="code-word">    <span class="hljs-comment">// subscribe 拿到数据</span>
-</div></li><li><div class="code-word">    (x) =&gt; console.log(x),
-</div></li><li><div class="code-word">    (err) =&gt; console.error(err)
-</div></li><li><div class="code-word">  );
-</div></li><li><div class="code-word"><span class="hljs-comment">// 订阅</span>
-</div></li><li><div class="code-word">observable.subscribe((x) =&gt; console.log(x));
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> dialog = {
+</div></li><li><div class="code-word">  isShow: <span class="hljs-keyword">true</span>,
+</div></li><li><div class="code-word">  title: <span class="hljs-string">"弹窗标题"</span>,
+</div></li><li><div class="code-word">  content: <span class="hljs-string">"弹窗内容"</span>
+</div></li><li><div class="code-word">};
 </div></li></ol></code></pre>
                     </div>
-                    <p data-nodeid="2375">
-                      Angular 框架本身推荐使用的状态管理工具便是 Rxjs，在
-                      Angular
-                      中结合依赖注入的方式，来进行数据流的订阅和触发，也可以很方便地对数据源和流向进行管理。
+                    <h5 data-nodeid="7845" class="">2. 外部数据（动态数据）</h5>
+
+                    <p data-nodeid="42">
+                      除了应用本身的状态数据，还有很多不属于应用状态的数据，比如文章内容、个人信息等，都是需要从其他地方（服务端、缓存、文件等）获取的。这些需要从外部获取，用于页面展示或是影响展示的一些数据，我们将它称作外部数据（动态数据）。
                     </p>
-                    <p data-nodeid="2376">
-                      除了 Rxjs，基于响应式数据流设计的状态管理库包括还有
-                      Mobx。其中，Rxjs
-                      提供了基于可观察对象（Observable）的响应式服务，Mobx
-                      提供了基于状态管理的响应式服务。基于响应式数据流的设计，我们可以通过各种合流的方式、订阅分流的方式，来将应用中的数据流动从头到尾串在一起。这样，我们可以很清晰地知道当前节点上的数据来自哪里，是用户的操作还是来自网络请求。
+                    <p data-nodeid="43">
+                      外部数据不同于内部数据，它并不会跟随着应用的生命周期而改变，也不会随着应用的关闭而消失。这些数据独立存在于外部，通过动态获取和注入的方式进入应用，从而影响应用的展示内容和功能逻辑。
                     </p>
-                    <p data-nodeid="2377">
-                      对于很多复杂程度较低的前端应用来说，响应式数据流的入门成本比较高。但在一些复杂应用的场景，合理地使用响应式编程，可以有效地降低各个模块间的依赖，更加容易地进行整体数据流动管理和维护。
+                    <p data-nodeid="44">
+                      举个例子，上面博客中的内容板块为列表页，这样的列表页可以用一个数组来表示：
                     </p>
-                    <p data-nodeid="2378">
-                      除了天然异步的前端、客户端等 GUI
-                      开发以外，响应式编程在大数据处理中也同样拥有高并发、分布式、依赖解耦等优势，在这种同步阻塞转异步的并发场景下会有较大的性能提升，淘宝业务架构就是使用响应式的架构。
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> articleList = [
+</div></li><li><div class="code-word">  { id: <span class="hljs-number">333</span>, title: <span class="hljs-string">"文章标题"</span>, brief: <span class="hljs-string">"文章简介"</span>, date: <span class="hljs-string">"日期"</span> }
+</div></li><li><div class="code-word">  <span class="hljs-comment">// ...</span>
+</div></li><li><div class="code-word">];
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="46">
+                      这些数据需要从本地数据库中读取，或者通过 HTTP
+                      请求从服务端获取，再根据获取结果渲染出每个列表的内容。
                     </p>
-                    <h3 data-nodeid="2379">小结</h3>
-                    <p data-nodeid="2380">
-                      我们的项目里，常常会面临应用中某些状态和数据相互影响、相互依赖的问题。
+                    <p data-nodeid="47">
+                      我们在设计模块和组件的时候，需要将这些内部数据和外部数据抽离出来，其中内部数据在组件和模块内部进行维护。当应用启动的时候，再通过注入外部数据的方式，使其可以正常运行。
                     </p>
-                    <p data-nodeid="2381">
-                      今天我介绍了一些常见的状态管理的解决方案，包括事件监听、单向数据流、响应式数据流等。那么，它们之间有明显的优劣吗？
+                    <h4 data-nodeid="8335" class="">将数据与应用抽离</h4>
+
+                    <p data-nodeid="49">
+                      要怎么理解将数据与应用抽离呢？如果将应用比作是一个公司，公司里所有的桌椅、电脑等设备都是静态的，每个工位可理解为一个组件，同时办公室也可以认为是大一点的组件或是模块。
                     </p>
-                    <p data-nodeid="2382">
-                      其实最终还是取决于项目本身的架构、业务场景，对于简单的项目来说，使用事件监听就可以方便地解决父子组件通信的问题；当项目规模增加之后，则可能面临全局事件乱飞的问题，此时使用单向数据流或是响应式数据流的方式都可以解决该问题。
+                    <p data-nodeid="50">那么在我们这个公司里：</p>
+                    <ul data-nodeid="51">
+                      <li data-nodeid="52">
+                        <p data-nodeid="53">
+                          内部数据是椅子的位置、消耗的电量、办公室的照明和空调状态等；
+                        </p>
+                      </li>
+                      <li data-nodeid="54">
+                        <p data-nodeid="55">
+                          外部数据是行政人员、技术人员、设计人员等各种人员流动。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="56">
+                      每天上班的时候，一个个的工作人员来到公司里，开始干活，此时公司也开始运作。
                     </p>
-                    <p data-nodeid="2383">
-                      实际上，复杂的前端项目中常常会同时存在多种状态管理方式，同时也会结合业务本身进行适当的调整。除了选择合适的状态管理方案以外，我们还可以通过设计合理的状态来简化一些复杂的问题场景，比如来解决前端常见的防抖和节流问题，同样可以设计状态机的方式来解决。
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"># 将公司和人分开（下班后）
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li><li><div class="code-word">                         公司
+</div></li><li><div class="code-word">---------------------------  ---------------------------
+</div></li><li><div class="code-word">|                                                      |  人           人
+</div></li><li><div class="code-word">|                                                      |      人          人
+</div></li><li><div class="code-word">|                         办公楼                        |           人
+</div></li><li><div class="code-word">|                                                      |   人     人     人  人
+</div></li><li><div class="code-word">|                                                      |   人      人   人
+</div></li><li><div class="code-word">---------------------------  ---------------------------
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word"># 在公司正常运作的时候
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li><li><div class="code-word">                         公司
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li><li><div class="code-word">|   人     人             人   人       人     人 人    |
+</div></li><li><div class="code-word">|           人            人   人     人          人    |
+</div></li><li><div class="code-word">|        人    人    办公楼   人   人          人       |
+</div></li><li><div class="code-word">|     人    人                人  人     人     人  人  |
+</div></li><li><div class="code-word">|     人     人         人      人     人      人   人  |
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="8825">
+                      当然，大家不只是站在工位里这么简单，我们会与各种物件进行交互和反馈（挪动桌椅、开灯开空调等），人与人之间也会相互交流和影响（对需求、方案评审等）。
                     </p>
-                    <p data-nodeid="2384">
-                      我们在思考如何解决问题的同时，还可以找到问题的根源，并尝试分析和解决。只有这样，我们才可以脱离被层出不穷的问题缠身的状况，更加专注地进行项目优化。
+                    <p data-nodeid="8826">
+                      如果我们每个人的工位都是随机的，在工作过程中会很不方便，所以大家会被有规律有组织地分别隔离到每个办公室、隔间里面。
                     </p>
-                    <p data-nodeid="2385" class="">
-                      除了本文介绍的，你还了解到哪些状态管理的方式呢？欢迎在留言区进行讨论～
+
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"># 按照组织进行分隔
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li><li><div class="code-word">                         公司
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li><li><div class="code-word">|   人   |  人   人  |         | 人    人    |  人 人    |
+</div></li><li><div class="code-word">|   人   |     人    |         |    人  人   |   人  人  |
+</div></li><li><div class="code-word">|--------    人  人  |  办公楼  |  人    人    --------- |
+</div></li><li><div class="code-word">|     人 |  人       |         |  人     人  |   人  人  |
+</div></li><li><div class="code-word">|     人 |   人   人 |         | 人     人   |  人   人  |
+</div></li><li><div class="code-word">--------------------------------------------------------
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="60">
+                      同样的，我们在设计应用的时候，除了需要考虑如何划分模块、对应用数据进行抽象，还需要将其有规律地管理。当我们将模块和组件的状态和内容抽象成数据之后，就可以将这些数据独立出来进行管理，也可以更好地解决模块/组件间耦合、依赖、通信等问题。
+                    </p>
+                    <p data-nodeid="61">
+                      我们还能观察到，桌椅和其他办公设备其实也可以通过外部获取，也就是说，内部数据同样可以转换为外部数据，通过动态获取的方式来恢复应用之前的状态。比如某个表单在二次编辑的时候，需要恢复为提交时的状态，包括勾选框是否选中、输入框填写的内容等。
+                    </p>
+                    <p data-nodeid="62">
+                      那么，我们将这些数据和应用抽离之后，可以用来做些什么呢？我们可以通过变更数据的方式来更新应用的状态，在第
+                      9 讲中我们也有介绍数据驱动的编程方式。
+                    </p>
+                    <p data-nodeid="63">
+                      我们还可以通过设计合适的状态机，来解决像 Web
+                      页面这种天然异步系统中事件被多次触发问题，比如用户连续点击某个按钮，通过状态判断是否需要进行相应的逻辑处理等。
+                    </p>
+                    <p data-nodeid="64">
+                      除此之外，当我们对数据进行抽象和分离之后，还可以很方便地实现应用的配置化。
+                    </p>
+                    <h3 data-nodeid="9317" class="">实现应用的配置化</h3>
+
+                    <p data-nodeid="66">
+                      配置化的思想不仅仅存在于前端或者是某个领域，大多数的系统和功能设计，都可以用领域抽象、数据抽离、配置化等方式，减少需求开发和维护的成本。
+                    </p>
+                    <p data-nodeid="67">
+                      将应用中的数据抽离之后，我们可以对这些数据进行配置。
+                    </p>
+                    <h4 data-nodeid="9807" class="">可配置的数据</h4>
+
+                    <p data-nodeid="69">
+                      前面我们介绍了影响应用状态的数据，其中包括了与界面有关和与界面无关的数据。
+                    </p>
+                    <p data-nodeid="70">
+                      当我们希望对某个产品进行配置化调整的时候，一般会使用运营管理平台来进行运营和管理。通过搭起一整套的运营管理平台，我们可以通过平台进行配置，管理应用的状态和数据，包括：
+                    </p>
+                    <ul data-nodeid="71">
+                      <li data-nodeid="72">
+                        <p data-nodeid="73">
+                          界面展示内容，如活动文案、广告内容、推荐位等；
+                        </p>
+                      </li>
+                      <li data-nodeid="74">
+                        <p data-nodeid="75">
+                          功能逻辑，比如有效时间的计算、活动上线和下线、是否需要用户输入信息等。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="76">
+                      如果应用功能逻辑通用性较好、复杂程度较低，我们甚至可以通过配置的方式快速搭建出前端页面，比如活动类配置系统、表单类配置系统等。
+                    </p>
+                    <p data-nodeid="77">
+                      对于一些功能简单的页面，页面结构、功能比较相似，区别在于文案不一致、模块位置的调整、颜色的改变等。相比于通过复制粘贴然后调整逻辑，通过抽象和配置化的方式，我们节省重复性的工作，同时还避免了项目过多、重复代码难以维护等问题。
+                    </p>
+                    <p data-nodeid="78">
+                      以上这种简单页面的配置，基本上有两种实现方式：
+                    </p>
+                    <ol data-nodeid="79">
+                      <li data-nodeid="80">
+                        <p data-nodeid="81">
+                          根据配置生成静态页面的代码，直接加载生成的页面代码；
+                        </p>
+                      </li>
+                      <li data-nodeid="82">
+                        <p data-nodeid="83">
+                          实现通用的功能逻辑，在加载页面的时候动态加载配置数据，从而生成展示的页面。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="84">
+                      配置化的核心大概是场景分析和功能拆解，所以抛开使用场景来做一个所谓“通用”的配置化是不现实的。为了做出合适的配置化功能，我们需要把问题范围局限在解决特定的场景，比如用于电商活动的页面、表单提交类的页面等。
+                    </p>
+                    <p data-nodeid="85">
+                      以一个组件开发为例，我们来看看怎么实现组件的配置化。
+                    </p>
+                    <h4 data-nodeid="10297" class="">组件配置化</h4>
+
+                    <p data-nodeid="87">以下图中的卡片组件来作为例子：</p>
+                    <p data-nodeid="10787" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/40/8B/Cgp9HWCl09CAIEkdAACPdnXlKiI285.png"
+                        alt="image (1).png"
+                        data-nodeid="10794"
+                      />
+                    </p>
+
+                    <blockquote data-nodeid="89">
+                      <p data-nodeid="90">
+                        为了方便地表达数据绑定，后面的代码会基于 Vue 框架实现。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="91">
+                      我们可以实现以下的配置化能力：状态和展示内容可配置、样式可配置、功能逻辑可配置。
+                    </p>
+                    <h5 data-nodeid="13302" class="">
+                      1. 状态和展示内容可配置
+                    </h5>
+
+                    <p data-nodeid="95">
+                      例如，我们需要一个对话框，其头部、正文文字、底部按钮等功能都可支持配置，我们可以用代码这样表示。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;div class="my-dialog" :class="{'show': isShown}"&gt;
+</div></li><li><div class="code-word">  &lt;header v-if="cardInfo.hasTitle"&gt;{{cardInfo.title}}&lt;/header&gt;
+</div></li><li><div class="code-word">  &lt;section v-if="cardInfo.hasContent"&gt;{{cardInfo.content}}&lt;/section&gt;
+</div></li><li><div class="code-word">  &lt;footer&gt;
+</div></li><li><div class="code-word">    &lt;button v-for="button in cardInfo.buttons"&gt;{{button.text}}&lt;/button&gt;
+</div></li><li><div class="code-word">  &lt;/footer&gt;
+</div></li><li><div class="code-word">&lt;/div&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="97">通过这样的方式，我们可以：</p>
+                    <ul data-nodeid="98">
+                      <li data-nodeid="99">
+                        <p data-nodeid="100">
+                          通过<code data-backticks="1" data-nodeid="215"
+                            >cardInfo.hasTitle</code
+                          >来控制是否展示头部；
+                        </p>
+                      </li>
+                      <li data-nodeid="101">
+                        <p data-nodeid="102">
+                          通过<code data-backticks="1" data-nodeid="218"
+                            >cardInfo.buttons</code
+                          >来控制底部按钮的数量和文字。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="103">
+                      通过这种配置方式，我们可以控制组件中具体某些功能的状态和展示内容。
+                    </p>
+                    <h5 data-nodeid="15761" class="">2. 样式可配置</h5>
+
+                    <p data-nodeid="107">
+                      样式的配置，通常是通过<code
+                        data-backticks="1"
+                        data-nodeid="226"
+                        >class</code
+                      >来实现的，比如可以使用条件语句进行判断，并绑定不同的<code
+                        data-backticks="1"
+                        data-nodeid="228"
+                        >class</code
+                      >：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">&lt;!-- 自己拼接完整 class --&gt;
+</div></li><li><div class="code-word">&lt;button :class="'my-dialog__btn--' + (isA ctived ? 'actived' : 'inactived')"&gt;Submit&lt;/button&gt;
+</div></li><li><div class="code-word">&lt;!-- 也可以将 class 拆分 --&gt;
+</div></li><li><div class="code-word">&lt;button class="my-dialog__btn" :class="isActived ? 'actived' : 'inactived'"&gt;Submit&lt;/button&gt;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="109">
+                      通过这样的方式，我们可以控制界面的展示样式。如今很多框架会通过在<code
+                        data-backticks="1"
+                        data-nodeid="231"
+                        >class</code
+                      >里添加随机 MD5 这样的方式，来保持局部作用域的<code
+                        data-backticks="1"
+                        data-nodeid="233"
+                        >class</code
+                      >样式不受其他地方影响。
+                    </p>
+                    <p data-nodeid="110">
+                      除了<code data-backticks="1" data-nodeid="236">class</code
+                      >之外，我们当然也可以直接将条件语句和<code
+                        data-backticks="1"
+                        data-nodeid="238"
+                        >style</code
+                      >进行绑定，来控制具体的某个样式。
+                    </p>
+                    <h5 data-nodeid="18170" class="">3. 功能逻辑可配置</h5>
+
+                    <p data-nodeid="114">
+                      举个例子，我们的这个卡片可以是视频、图片、文字三者其中之一的卡片。
+                    </p>
+                    <ul data-nodeid="115">
+                      <li data-nodeid="116">
+                        <p data-nodeid="117">视频：点击播放。</p>
+                      </li>
+                      <li data-nodeid="118">
+                        <p data-nodeid="119">图片：点击新窗口查看。</p>
+                      </li>
+                      <li data-nodeid="120">
+                        <p data-nodeid="121">文字：点击无效果。</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="122">
+                      这种时候，我们可以使用这两种方式来实现功能逻辑的配置化。
+                    </p>
+                    <ul data-nodeid="123">
+                      <li data-nodeid="124">
+                        <p data-nodeid="125">
+                          通过控制 UI
+                          展示来控制点击事件的处理：每个模块（视频、图片、文字）绑定自己的点击事件，同时通过配置控制哪个模块的展示，从而控制事件的处理逻辑。
+                        </p>
+                      </li>
+                      <li data-nodeid="126">
+                        <p data-nodeid="127">
+                          通过逻辑判断来控制点击事件的处理：绑定的点击事件里，根据配置来进行不同的事件处理，展示不同的效果。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="128">
+                      可以看到，一个组件中可以通过配置的方式来控制它的状态、展示内容、样式，甚至是功能逻辑。而我们的应用常常是通过不同的组件和模块组成的，同样可以通过配置的方式来控制应用的各个状态、内容以及功能。
+                    </p>
+                    <h3 data-nodeid="18642" class="te-preview-highlight">
+                      小结
+                    </h3>
+
+                    <p data-nodeid="130">
+                      今天我主要介绍了应用中常见的数据抽象，通过对应用进行合适的数据抽象，并将这些数据从应用中抽离从而实现应用的配置化，我们可以减少需要开发的代码量，提升系统的可维护性。
+                    </p>
+                    <p data-nodeid="131">
+                      配置化的思想可以用在各个地方，我们也常常将其称为“一切皆可配置化”。
+                    </p>
+                    <p data-nodeid="132">
+                      实际上，除了页面内容、应用状态的配置化，我们甚至可以实现接口的配置化，比如
+                      GraphQL 可用于自定义的接口 API 查询。
+                    </p>
+                    <p data-nodeid="133">
+                      除了这些，你觉得还有哪些问题可以通过配置化来解决的呢？欢迎在留言区进行讨论。
                     </p>
                   </div>
                 </div>
@@ -1618,7 +1702,7 @@
                         data-v-4bc80e00=""
                         class="message-list-title-left-name"
                       >
-                        **哈
+                        **航
                       </div>
                     </div>
                     <div data-v-4bc80e00="" class="message-list-title-right">
@@ -1632,21 +1716,64 @@
                       <div
                         data-v-4bc80e00=""
                         class="message-list-title-right-praise"
-                      >
-                        1
-                      </div>
+                      ></div>
                     </div>
                   </div>
                   <div data-v-4bc80e00="" class="message-list-container">
                     <div data-v-4bc80e00="" class="message-list-content">
-                      问几个问题：Vuex：1. 为什么mutation中只能是同步？2.
-                      为什么必须通过commit mutation的方式更改stateRedux：1.
-                      为什么reducer必须是纯函数？2.
-                      为什么reducer必须返回新的state，而不可以修改原有state？
+                      请教一个问题，比如有这样一种场景，在程序的入口调用了一个或多个接口，然后会根据这些接口的数据（有很多个字段）组合一起来做不同的判断走不同的路由，这样就要写很多个ifelse了，目前有没有一些好的优化方案呢
                     </div>
                     <!---->
                   </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    一般来说，可以将这些判断逻辑按照一定的规则进行拆分，拆分到多个函数中，这样每个函数的职责会更加清晰。但这样并不解决你的判断条件数量，个人认为可以梳理下依赖的判断数据是否合理，可以进行调整。另外，还可以尝试将依赖的数据用一定方式组合，直接根据组合后的数据来判断，比如
+                    a_b_c 这样，可以将三个判断放在一个里。
+                  </div>
                   <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **0231
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      微信小程序有什么方案可以配置化搭建页面吗？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    配置化的实现，很多时候其实都是针对自身的业务特点，划分出不同类型的组件将其组合，其实跟在哪个平台关系并不大。微信小程序可以结合自定义组件来做。
+                  </div>
                   <!---->
                   <!---->
                 </div>
