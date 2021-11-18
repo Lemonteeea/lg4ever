@@ -1,6 +1,6 @@
-import { Link, PageProps, navigate } from "gatsby"
+import { PageProps, navigate } from "gatsby"
 import axios from "axios"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Article from "../components/Article"
 import LinkButton from "../components/LinkButton"
 interface SectionData {
@@ -18,6 +18,9 @@ export default function Course(props: PageProps<object, object, CourseData>) {
   const [currSelect, setCurrSelect] = useState(0)
   const [showCategory, setShowCategory] = useState(false)
   const [list, setList] = useState([] as SectionData[])
+  const ref = useRef(null as null | HTMLDivElement)
+
+  // 界面第一次加载时读取数据
   useEffect(() => {
     if (!course?.list || course.list.length === 0) {
       navigate("/")
@@ -28,11 +31,15 @@ export default function Course(props: PageProps<object, object, CourseData>) {
       setCurrSelect(courseID)
     }
   }, [])
+
+  // 当前选中标记发生改变时保存到localstorage中
   useEffect(() => {
     if (!course?.id) return
     // 更新localstorage中存储的阅读的位置
     window.localStorage.setItem(course.id, "" + currSelect)
   }, [currSelect])
+
+  // 章节列表或当前选中标记发生改变时改变界面章节内容
   useEffect(() => {
     // 改变章节
     async function changeSection() {
@@ -46,6 +53,14 @@ export default function Course(props: PageProps<object, object, CourseData>) {
     }
     changeSection()
   }, [currSelect, list])
+  // 章节节点改变后重置滚动条
+  useEffect(() => {
+    if (!ref.current) return
+    ref.current.scrollTo({
+      top: 0,
+    })
+  }, [articleNode])
+
   // 点击章节目录
   const clickSection = (index: number) => {
     setCurrSelect(index)
@@ -59,12 +74,33 @@ export default function Course(props: PageProps<object, object, CourseData>) {
     navigate("/")
   }
 
+  const isNowFirstPage = () => currSelect === 0
+  const isNowLastPage = () => currSelect === list.length - 1
+
+  // 上一页
+  const toPrevious = () => {
+    if (isNowFirstPage()) return
+    setCurrSelect(currSelect - 1)
+  }
+
+  // 下一页
+  const toNext = () => {
+    if (isNowLastPage()) return
+    setCurrSelect(currSelect + 1)
+  }
+
   return (
     <div className="flex flex-col w-screen h-screen">
       <div className="w-full bg-white border-b-2 px-60">
         <LinkButton onClick={back}>返回</LinkButton>
         <LinkButton onClick={toggleCategory}>
           {showCategory ? "隐藏" : "显示"}目录
+        </LinkButton>
+        <LinkButton onClick={toPrevious} disable={isNowFirstPage()}>
+          上一页
+        </LinkButton>
+        <LinkButton onClick={toNext} disable={isNowLastPage()}>
+          下一页
         </LinkButton>
       </div>
       <div className="flex flex-1 w-full justify-center overflow-hidden">
@@ -93,7 +129,10 @@ export default function Course(props: PageProps<object, object, CourseData>) {
               </ul>
             </div>
           )}
-          <div className="flex-1 h-full lg:p-20 p-5 pt-10 overflow-y-auto context">
+          <div
+            ref={ref}
+            className="flex-1 h-full lg:p-20 p-5 pt-10 overflow-y-auto context"
+          >
             {articleNode}
           </div>
         </div>

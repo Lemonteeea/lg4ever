@@ -12,9 +12,7 @@ interface CourseData {
   list: SectionData[]
 }
 export default function Home() {
-  const [courseList, setCourseList] = useState(
-    undefined as undefined | CourseData[]
-  )
+  const [courseList, setCourseList] = useState([] as CourseData[])
   useEffect(() => {
     // 获取课程列表
     axios.get(`docs/list.json`).then(res => {
@@ -29,7 +27,7 @@ export default function Home() {
   return (
     <div className=" mt-24">
       <ul>
-        {courseList?.map(course => (
+        {courseList.map(course => (
           <li key={course.id}>
             <LinkButton size="lg" onClick={() => selectCourse(course)}>
               {course.title}
