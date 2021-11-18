@@ -3,7 +3,7 @@ import fs from "fs"
 const resList = [] as any[]
 // 写入文本到文件
 function writeDoc(filename: string, doc: string, cb?: any) {
-  const file = path.resolve(__dirname, `../static/docs/${filename}`)
+  const file = path.resolve(__dirname, `../../static/docs/${filename}`)
   const voidFunc = () => {}
   fs.writeFile(file, doc, cb || voidFunc)
 }
@@ -25,17 +25,31 @@ function getDocStr(htmlStr: string) {
   return htmlStr
 }
 
-// 生成专栏数据
-function createColumn(dirName: string) {
+function getCourseTitle(htmlStr: string) {
+  const courseTitleIndexStart = htmlStr.indexOf('<h1 style="display: none">')
+  const courseTitleIndexEnd = htmlStr.indexOf("</h1>")
+  return htmlStr
+    .slice(courseTitleIndexStart + 26, courseTitleIndexEnd)
+    .split("-")[0]
+    .trim()
+}
+
+// 生成课程数据
+function createCourse(dirName: string) {
   const id = dirName
-  const columnTitle = "前端进击笔记"
+  let courseTitle = ""
   const list = [] as any[]
   const fileList = fs.readdirSync(path.resolve(__dirname, `./rawHtml/${id}`))
+  if (fileList.length === 0) return
   fileList.sort((a, b) => parseInt(a) - parseInt(b))
   fileList.forEach(filename => {
     let htmlStr = readHtml(id, filename).trim()
-    const reg = /<h1.*class=\"main-title\">.*\n\s*(.*)\n.*<\/h1>/
-    const title = reg.exec(htmlStr)![1]
+    if (courseTitle === "") {
+      courseTitle = getCourseTitle(htmlStr)
+    }
+    const reg = /<h1.*class=\"main-title\">.*\n\s*([\s\S]*)\n.*<\/h1>/
+    // const title = reg.exec(htmlStr)![1].replace(/\n|\r|\s/g, "")
+    const title = reg.exec(htmlStr)![1].replace(/\n|\r/g, "")
     const docStr = getDocStr(htmlStr)
     const destStr = JSON.stringify({
       title,
@@ -48,16 +62,21 @@ function createColumn(dirName: string) {
   })
   resList.push({
     id,
-    title: columnTitle,
+    title: courseTitle,
     list: list,
   })
 }
 function start() {
   const dirList = fs.readdirSync(path.resolve(__dirname, "./rawHtml"))
   dirList.forEach(dirName => {
-    createColumn(dirName)
+    createCourse(dirName)
   })
   const listStr = JSON.stringify(resList)
   writeDoc("list.json", listStr)
 }
+
+// function test() {
+// }
+
+// test()
 start()

@@ -1,0 +1,2768 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">JavaScript 核心原理精讲 - 拉勾教育</h1>
+
+  <meta
+    content="前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React"
+    name="keywords"
+  />
+
+  <meta
+    content="对于前端工程师来说，精通 JavaScript 不仅可以助力眼前的面试，同时，对其的掌握程度也决定了你未来技术发展的上线，扎实的 JavaScript 基础可以帮助你从容应对新技术、新框架。"
+    name="description"
+  />
+
+  <title>JavaScript 核心原理精讲 - 前美团前端技术专家 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="JavaScript 核心原理精讲 - 前美团前端技术专家 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M01/60/E8/Cgp9HWGMxRSAWHDnAADwxLL_pbM113.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  JavaScript 核心原理精讲
+                </div>
+                <div data-v-5f686215="" class="name">
+                  若离
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  前美团前端技术专家
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 打好 JS 基石，走稳前端进阶之路
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 595px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：基石篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 代码基本功测试（上）：JS 的数据类型你了解多少？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 代码基本功测试（下）：如何实现一个深浅拷贝？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 继承实现：探究 JS 常见的 6 种继承方式
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 继承进阶：如何实现 new、apply、call、bind
+                          的底层逻辑？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 函数那些事：JS 闭包难点剖析
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 进阶练习：带你一起实现 JSON.Stringify 方法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 595px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：深入数组篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 数组原理（上）：帮你梳理眼花缭乱的数组 API
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 数组原理（中）：如何理解 JS 的类数组？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 数组原理（下）：实现数组扁平化的 6 种方式
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 数组排序（上）：如何用 JS 实现各种数组排序？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 数组排序（下）：sort 排序方法的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 进阶练习：带你手写 JS 数组多个方法的底层实现
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：异步编程篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 异步编程（上）：JS 异步编程都有哪些方案？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 异步编程（中）：如何深入理解异步编程的核心
+                          Promise？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 异步编程（下）：如何理解 Generator、Async/await
+                          等异步编程的语法糖？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 进阶练习（上）：怎样轻松实现一个 EventEmitter？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 进阶练习（下）：如何实现符合 Promise/A+ 规范的
+                          Promise？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：JS 引擎篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 垃圾回收：释放内存，提升浏览器页面性能
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 事件轮询：如何理解浏览器中的 EventLoop？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 原理解析：JS 代码是如何被浏览器引擎编译、执行的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | 引擎进阶（上）：探究宏任务 &amp; 微任务的运行机制
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | 引擎进阶（下）：如何理解 Process.nextTick
+                          的原理？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    彩蛋
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          彩蛋 1 | 如何应对大厂面试官的灵魂拷问？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          彩蛋 2 | 前端开发如何有针对性地学习算法？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 面向未来，我们该如何提升自己？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  07 | 数组原理（上）：帮你梳理眼花缭乱的数组 API
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/01/27
+                  <span data-v-1605a430="" class="auth">若离</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/15:01"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="901"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/15:01</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            39.16M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/15:01
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="2084" class="">
+                      欢迎来到第二个模块“深入数组篇”的学习。
+                    </p>
+                    <p data-nodeid="2085">
+                      JavaScript 数组的 API 经常会被 JS 开发者频繁使用，在整个
+                      JavaScript 的学习过程中尤为重要。
+                    </p>
+                    <p data-nodeid="2086">
+                      数组作为一个最基础的一维数据结构，在各种编程语言中都充当着至关重要的角色，你很难想象没有数组的编程语言会是什么模样。特别是
+                      JavaScript，它天生的灵活性，又进一步发挥了数组的特长，丰富了数组的使用场景。<strong
+                        data-nodeid="2221"
+                        >可以毫不夸张地说，不深入地了解数组，就不足以写好
+                        JavaScript。</strong
+                      >
+                    </p>
+                    <p data-nodeid="2087">
+                      随着前端框架的不断演进，React 和 Vue 等 MVVM
+                      框架的流行，数据更新的同时视图也会随之更新。在通过前端框架实现大量的业务代码中，开发者都会用数组来进行数据的存储和各种“增删改查”等操作，从而实现对应前端视图层的更新。可见熟练掌握数组各种方法，并深入了解数组是很有必要的。
+                    </p>
+                    <p data-nodeid="2088">
+                      因此，我希望这一模块，能让你对数组有更深一步的理解，更加得心应手地运用数组的各种
+                      API，并可以轻松实现面试中遇到的数组题目。
+                    </p>
+                    <p data-nodeid="2089">
+                      据不完全统计，在 LeetCode 题库的 1800
+                      多道题目中，和数组相关的题目是最多的，有 300
+                      多道，例如“合并两个有序数组”“两个数组的交集”等。其中有个别题目是大厂的面试题目，如果你有兴趣可以自己尝试去解答，我也会在课程中穿插讲解其中的一些数组类题目，帮助你更好地理解这部分知识。
+                    </p>
+                    <p data-nodeid="2090">
+                      那么，在课程开始前请你先思考几个问题。
+                    </p>
+                    <ol data-nodeid="2091">
+                      <li data-nodeid="2092">
+                        <p data-nodeid="2093">数组的构造器有哪几种？</p>
+                      </li>
+                      <li data-nodeid="2094">
+                        <p data-nodeid="2095">哪些是改变自身的方法？</p>
+                      </li>
+                      <li data-nodeid="2096">
+                        <p data-nodeid="2097">哪些是不改变自身的方法？</p>
+                      </li>
+                      <li data-nodeid="2098">
+                        <p data-nodeid="2099">遍历的方法有哪些？</p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="2100">
+                      不知道这几个问题你是否能够准确地回答出来？那么我们就带着以上几个思考，开始这一讲的学习。
+                    </p>
+                    <h3 data-nodeid="2101">数组概念的探究</h3>
+                    <p data-nodeid="2102">
+                      截至 ES7 规范，数组共包含 33 个标准的 API
+                      方法和一个非标准的 API
+                      方法，使用场景和使用方案纷繁复杂，其中还有不少坑。为了方便你可以循序渐进地学习这部分的内容，下面我将从数组的概念开始讲起。
+                    </p>
+                    <p data-nodeid="2103">
+                      由于数组的 API
+                      较多，很多相近的名字也容易导致混淆，所以在这里我按照“会改变自身值的”“不会改变自身值的”“遍历方法”这三种类型分开讲解，让你对这些
+                      API 形成更结构化的认识。
+                    </p>
+                    <h4 data-nodeid="2104">Array 的构造器</h4>
+                    <p data-nodeid="2105">
+                      Array
+                      构造器用于创建一个新的数组。通常，我们推荐使用对象字面量的方式创建一个数组，例如
+                      var a = []
+                      就是一个比较好的写法。但是，总有对象字面量表述乏力的时候，比如，我想创建一个长度为
+                      6
+                      的空数组，用对象字面量的方式是无法创建的，因此只能写成下述代码这样。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// 使用 Array 构造器，可以自定义长度</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> a = <span class="hljs-built_in">Array</span>(<span class="hljs-number">6</span>); <span class="hljs-comment">// [empty × 6]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// 使用对象字面量</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> b = [];
+</div></li><li><div class="code-word">b.length = <span class="hljs-number">6</span>; <span class="hljs-comment">// [undefined × 6]</span>
+</div></li></ol></code></pre>
+                    </div>
+
+                    <p data-nodeid="2107" class="te-preview-highlight">
+                      Array 构造器根据参数长度的不同，有如下两种不同的处理方式：
+                    </p>
+                    <ul data-nodeid="2108">
+                      <li data-nodeid="2109">
+                        <p data-nodeid="2110">
+                          <strong data-nodeid="2244"
+                            >new Array(arg1, arg2,…)</strong
+                          >，参数长度为 0 或长度大于等于 2
+                          时，传入的参数将按照顺序依次成为新数组的第 0 至第 N
+                          项（参数长度为 0 时，返回空数组）；
+                        </p>
+                      </li>
+                      <li data-nodeid="2111">
+                        <p data-nodeid="2112">
+                          <strong data-nodeid="2249">new Array(len)</strong>，当
+                          len 不是数值时，处理同上，返回一个只包含 len
+                          元素一项的数组；当 len 为数值时，len 最大不能超过 32
+                          位无符号整型，即需要小于 2 的 32 次方（len 最大为
+                          Math.pow(2,32)），否则将抛出 RangeError。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="2113">
+                      以上就是 Array 构造器的基本情况，我们来看下 ES6
+                      新增的几个构造方法。
+                    </p>
+                    <h4 data-nodeid="2114">
+                      ES6 新增的构造方法：Array.of 和 Array.from
+                    </h4>
+                    <p data-nodeid="2115">
+                      鉴于数组的常用性，ES6 专门扩展了数组构造器
+                      Array&nbsp;，新增了 2
+                      个方法：Array.of、Array.from。其中，Array.of
+                      整体用得比较少；而 Array.from
+                      具有灵活性，你在平常开发中应该会经常使用。那么关于两者的使用细节你真的了解吗？下面展开来聊下这两个方法。
+                    </p>
+                    <p data-nodeid="2116">
+                      <strong data-nodeid="2256">Array.of</strong>
+                    </p>
+                    <p data-nodeid="2117">
+                      Array.of
+                      用于将参数依次转化为数组中的一项，然后返回这个新数组，而不管这个参数是数字还是其他。它基本上与
+                      Array 构造器功能一致，唯一的区别就在单个数字参数的处理上。
+                    </p>
+                    <p data-nodeid="2118">
+                      比如，在下面的这几行代码中，你可以看到区别：当参数为两个时，返回的结果是一致的；当参数是一个时，Array.of
+                      会把参数变成数组里的一项，而构造器则会生成长度和第一个参数相同的空数组。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code><ol><li><div class="code-word">Array.of(8.0); // [8]
+</div></li><li><div class="code-word">Array(8.0); // [empty × 8]
+</div></li><li><div class="code-word">Array.of(8.0, 5); // [8, 5]
+</div></li><li><div class="code-word">Array(8.0, 5); // [8, 5]
+</div></li><li><div class="code-word">Array.of('8'); // ["8"]
+</div></li><li><div class="code-word">Array('8'); // ["8"]
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2120">
+                      <strong data-nodeid="2262">Array.from</strong>
+                    </p>
+                    <p data-nodeid="2121">
+                      Array.from
+                      的设计初衷是快速便捷地基于其他对象创建新数组，准确来说就是从一个类似数组的可迭代对象中创建一个新的数组实例。其实就是，只要一个对象有迭代器，Array.from
+                      就能把它变成一个数组（注意：是返回新的数组，不改变原对象）。
+                    </p>
+                    <p data-nodeid="2122">
+                      从语法上看，Array.from 拥有 3 个参数：
+                    </p>
+                    <ol data-nodeid="2123">
+                      <li data-nodeid="2124">
+                        <p data-nodeid="2125">类似数组的对象，必选；</p>
+                      </li>
+                      <li data-nodeid="2126">
+                        <p data-nodeid="2127">
+                          加工函数，新生成的数组会经过该函数的加工再返回；
+                        </p>
+                      </li>
+                      <li data-nodeid="2128">
+                        <p data-nodeid="2129">
+                          this 作用域，表示加工函数执行时 this 的值。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="2130">
+                      这三个参数里面第一个参数是必选的，后两个参数都是可选的。我们通过一段代码来看看它的用法。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">var</span> obj = {<span class="hljs-number">0</span>: <span class="hljs-string">'a'</span>, <span class="hljs-number">1</span>: <span class="hljs-string">'b'</span>, <span class="hljs-number">2</span>:<span class="hljs-string">'c'</span>, <span class="hljs-attr">length</span>: <span class="hljs-number">3</span>};
+</div></li><li><div class="code-word"><span class="hljs-built_in">Array</span>.from(obj, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, index</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-built_in">console</span>.log(value, index, <span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>.length);
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> value.repeat(<span class="hljs-number">3</span>);   <span class="hljs-comment">//必须指定返回值，否则返回 undefined</span>
+</div></li><li><div class="code-word">}, obj);
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2132">
+                      结果如下图所示。<br />
+                      <img
+                        src="https://s0.lgstatic.com/i/image2/M01/09/B2/CgpVE2APjSiAGLqXAAB5v09b2C4966.png"
+                        alt="WechatIMG13.png"
+                        data-nodeid="2273"
+                      />
+                    </p>
+                    <p data-nodeid="2133">
+                      结果中可以看出 console.log(value, index, this,
+                      arguments.length) 对应的四个值，并且看到 return 的 value
+                      重复了三遍，最后返回的数组为 ["aaa","bbb","ccc"]。
+                    </p>
+                    <p data-nodeid="2134">
+                      这表明了通过 Array.from
+                      这个方法可以自己定义加工函数的处理方式，从而返回想要得到的值；如果不确定返回值，则会返回
+                      undefined，最终生成的也是一个包含若干个 undefined
+                      元素的空数组。
+                    </p>
+                    <p data-nodeid="2135">
+                      实际上，如果这里不指定 this
+                      的话，加工函数完全可以是一个箭头函数。上述代码可以简写为如下形式。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-built_in">Array</span>.from(obj, (value) =&gt; value.repeat(<span class="hljs-number">3</span>));
+</div></li><li><div class="code-word"><span class="hljs-comment">// &nbsp;控制台返回 (3) ["aaa", "bbb", "ccc"]</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2137">
+                      除了上述 obj 对象以外，拥有迭代器的对象还包括
+                      String、Set、Map&nbsp;等，Array.from
+                      统统可以处理，请看下面的代码。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// String</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Array</span>.from(<span class="hljs-string">'abc'</span>);         <span class="hljs-comment">// ["a", "b", "c"]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// Set</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Array</span>.from(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>([<span class="hljs-string">'abc'</span>, <span class="hljs-string">'def'</span>])); <span class="hljs-comment">// ["abc", "def"]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// Map</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Array</span>.from(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>([[<span class="hljs-number">1</span>, <span class="hljs-string">'ab'</span>], [<span class="hljs-number">2</span>, <span class="hljs-string">'de'</span>]])); 
+</div></li><li><div class="code-word"><span class="hljs-comment">// [[1, 'ab'], [2, 'de']]</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2139">
+                      关于数组构造器
+                      Array&nbsp;新增的两个方法就讲解到这，下面接着介绍如何进行
+                      Array 的判断。
+                    </p>
+                    <h4 data-nodeid="2140">Array 的判断</h4>
+                    <p data-nodeid="2141">
+                      Array.isArray 用来判断一个变量是否为数组类型，我们在“<a
+                        href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=601#/detail/pc?id=6174"
+                        data-nodeid="2299"
+                        >01 | 代码基本功测试（上）：JS 的数据类型你了解多少</a
+                      >”中也讲过如何判断数据类型，不过那时只是针对 JS
+                      的所有数据类型做一个判断，数组的判断当时并未详细讲解，那么我们现在来学习一下。
+                    </p>
+                    <p data-nodeid="2142">
+                      在 ES5 提供该方法之前，我们至少有如下 5
+                      种方式去判断一个变量是否为数组。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">var</span> a = [];
+</div></li><li><div class="code-word"><span class="hljs-comment">// 1.基于instanceof</span>
+</div></li><li><div class="code-word">a <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Array</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 2.基于constructor</span>
+</div></li><li><div class="code-word">a.constructor === <span class="hljs-built_in">Array</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 3.基于Object.prototype.isPrototypeOf</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Array</span>.prototype.isPrototypeOf(a);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 4.基于getPrototypeOf</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Object</span>.getPrototypeOf(a) === <span class="hljs-built_in">Array</span>.prototype;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 5.基于Object.prototype.toString</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">Object</span>.prototype.toString.apply(a) === <span class="hljs-string">'[object Array]'</span>;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2144">
+                      上面这 5 个判断全部为
+                      True，这里应该没什么疑问。实际上，通过
+                      Object.prototype.toString 去判断一个值的类型，也是模块一的
+                      01 讲判断数据类型中我给你推荐的方法。
+                    </p>
+                    <p data-nodeid="2145">
+                      ES6 之后新增了一个 Array.isArray
+                      方法，能直接判断数据类型是否为数组，但是如果 isArray
+                      不存在，那么 Array.isArray 的 polyfill 通常可以这样写：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">if</span> (!<span class="hljs-built_in">Array</span>.isArray){
+</div></li><li><div class="code-word">  <span class="hljs-built_in">Array</span>.isArray = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">arg</span>)</span>{
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.prototype.toString.call(arg) === <span class="hljs-string">'[object Array]'</span>;
+</div></li><li><div class="code-word">  };
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2147">
+                      数组的基本概念到这里基本讲得差不多了，下面我们就来看看让人眼花缭乱的
+                      30 多个数组的基本方法。
+                    </p>
+                    <h3 data-nodeid="2148">改变自身的方法</h3>
+                    <p data-nodeid="2149">
+                      基于 ES6，会改变自身值的方法一共有 9 个，分别为
+                      pop、push、reverse、shift、sort、splice、unshift，以及两个
+                      ES6 新增的方法 copyWithin 和 fill。
+                    </p>
+                    <p data-nodeid="2150">
+                      接下来我们看一段代码，快速了解这些方法最基本的用法。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// pop方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"cat"</span>, <span class="hljs-string">"dog"</span>, <span class="hljs-string">"cow"</span>, <span class="hljs-string">"chicken"</span>, <span class="hljs-string">"mouse"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> item = array.pop();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// ["cat", "dog", "cow", "chicken"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(item); <span class="hljs-comment">// mouse</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// push方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"football"</span>, <span class="hljs-string">"basketball"</span>,  <span class="hljs-string">"badminton"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> i = array.push(<span class="hljs-string">"golfball"</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); 
+</div></li><li><div class="code-word"><span class="hljs-comment">// ["football", "basketball", "badminton", "golfball"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(i); <span class="hljs-comment">// 4</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// reverse方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.reverse();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// [5,4,3,2,1]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array2===array); <span class="hljs-comment">// true</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// shift方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> item = array.shift();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// [2,3,4,5]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(item); <span class="hljs-comment">// 1</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// unshift方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"red"</span>, <span class="hljs-string">"green"</span>, <span class="hljs-string">"blue"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> length = array.unshift(<span class="hljs-string">"yellow"</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// ["yellow", "red", "green", "blue"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(length); <span class="hljs-comment">// 4</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// sort方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"apple"</span>,<span class="hljs-string">"Boy"</span>,<span class="hljs-string">"Cat"</span>,<span class="hljs-string">"dog"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.sort();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// ["Boy", "Cat", "apple", "dog"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array2 == array); <span class="hljs-comment">// true</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// splice方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"apple"</span>,<span class="hljs-string">"boy"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> splices = array.splice(<span class="hljs-number">1</span>,<span class="hljs-number">1</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// ["apple"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(splices); <span class="hljs-comment">// ["boy"]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// copyWithin方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]; 
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.copyWithin(<span class="hljs-number">0</span>,<span class="hljs-number">3</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array===array2,array2);  <span class="hljs-comment">// true [4, 5, 3, 4, 5]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// fill方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.fill(<span class="hljs-number">10</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array===array2,array2); 
+</div></li><li><div class="code-word"><span class="hljs-comment">// true [10, 10, 10, 4, 5], 可见数组区间[0,3]的元素全部替换为10</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2152">
+                      我希望你能通过上面的代码，对这些方法形成一个直观的印象，并且能自己进行一定的实践来加深印象。不过上面的
+                      sort() 方法的内涵比较多，在第 11
+                      讲我会专门讲解，这里先不做过多的介绍了。
+                    </p>
+                    <p data-nodeid="2153">
+                      下面为了让你对这些 API 方法有更深刻的印象，我结合 Leetcode
+                      中的第 88 题
+                      《合并两个有序数组》，带你看下如何利用数组的多个改变自身的方法来解决这道题，题目是这样的：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">给你两个有序整数数组&nbsp;nums1&nbsp;和&nbsp;nums2，请你将&nbsp;nums2&nbsp;合并到&nbsp;nums1&nbsp;中，使&nbsp;nums1&nbsp;成为一个有序数组。
+</div></li><li><div class="code-word">输入:
+</div></li><li><div class="code-word">nums1 = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]； m = <span class="hljs-number">3</span>
+</div></li><li><div class="code-word">nums2 = [<span class="hljs-number">2</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]；&nbsp; &nbsp; &nbsp; &nbsp;n = <span class="hljs-number">3</span>
+</div></li><li><div class="code-word">输出: [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2155">你可以仔细看下题目要求：</p>
+                    <ul data-nodeid="2156">
+                      <li data-nodeid="2157">
+                        <p data-nodeid="2158">
+                          首先是将 nums2 合并到 nums1
+                          里面，不新开数组，否则将无法通过；
+                        </p>
+                      </li>
+                      <li data-nodeid="2159">
+                        <p data-nodeid="2160">
+                          其次是合并完了之后 nums1
+                          还是一个有序数组，这里也是需要注意的；
+                        </p>
+                      </li>
+                      <li data-nodeid="2161">
+                        <p data-nodeid="2162">
+                          另外样例里面 nums1 和 nums2
+                          都有“2”这个数，也都需要将重复的合并进去。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="2163">
+                      我们看上面这三点，可以思考下，既然要求不能新开数组，那么就需要利用数组改变自身的方法完成这个题目，应该怎么做呢？你可以试着先将想法写下来，之后再来看我提供的答案。
+                    </p>
+                    <p data-nodeid="2164">
+                      答案就是巧妙地利用数组的 API 中的 splice、push、sort
+                      这三个方法，在原数组上进行操作，最终完成如下代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">var</span>&nbsp;merge&nbsp;=&nbsp;<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">nums1,&nbsp;m,&nbsp;nums2,&nbsp;n</span>)&nbsp;</span>{
+</div></li><li><div class="code-word">&nbsp;&nbsp;&nbsp;&nbsp;nums1.splice(m);
+</div></li><li><div class="code-word">&nbsp;&nbsp;&nbsp;&nbsp;nums2.splice(n);
+</div></li><li><div class="code-word">&nbsp;&nbsp;&nbsp;&nbsp;nums1.push(...nums2);
+</div></li><li><div class="code-word">&nbsp;&nbsp;&nbsp;&nbsp;nums1.sort(<span class="hljs-function">(<span class="hljs-params">a,b</span>)&nbsp;=&gt;</span>&nbsp;a - b);  <span class="hljs-comment">// nums1从小到大排列，所以是a-b</span>
+</div></li><li><div class="code-word">};
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2166">
+                      我上面提供的这段代码是可以在 LeetCode 88 题提交 AC
+                      通过的，没写出来的话你可以试着再敲一遍，最后提交完成通过。
+                    </p>
+                    <p data-nodeid="2167">
+                      改变数组自身的 9
+                      个方法理解起来并不复杂，只要你对上面这些代码理解了，并且多加实践就够了，因此就讲解到这里。下面我们再来看看那些不改变自身的方法都是怎么使用的。
+                    </p>
+                    <h3 data-nodeid="2168">不改变自身的方法</h3>
+                    <p data-nodeid="2169">
+                      基于 ES7，不会改变自身的方法也有 9 个，分别为
+                      concat、join、slice、toString、toLocaleString、indexOf、lastIndexOf、未形成标准的
+                      toSource，以及 ES7 新增的方法 includes。
+                    </p>
+                    <p data-nodeid="2170">
+                      我们还是通过代码，快速了解这些方法的最基本用法。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// concat方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.concat(<span class="hljs-number">4</span>,[<span class="hljs-number">5</span>,<span class="hljs-number">6</span>],[<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>]);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array2); <span class="hljs-comment">// [1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// [1, 2, 3], 可见原数组并未被修改</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// join方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">'We'</span>, <span class="hljs-string">'are'</span>, <span class="hljs-string">'Chinese'</span>];
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.join()); <span class="hljs-comment">// "We,are,Chinese"</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.join(<span class="hljs-string">'+'</span>)); <span class="hljs-comment">// "We+are+Chinese"</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// slice方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"one"</span>, <span class="hljs-string">"two"</span>, <span class="hljs-string">"three"</span>,<span class="hljs-string">"four"</span>, <span class="hljs-string">"five"</span>];
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.slice()); <span class="hljs-comment">// ["one", "two", "three","four", "five"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.slice(<span class="hljs-number">2</span>,<span class="hljs-number">3</span>)); <span class="hljs-comment">// ["three"]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// toString方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">'Jan'</span>, <span class="hljs-string">'Feb'</span>, <span class="hljs-string">'Mar'</span>, <span class="hljs-string">'Apr'</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> str = array.toString();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(str); <span class="hljs-comment">// Jan,Feb,Mar,Apr</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// tolocalString方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array= [{<span class="hljs-attr">name</span>:<span class="hljs-string">'zz'</span>}, <span class="hljs-number">123</span>, <span class="hljs-string">"abc"</span>, <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> str = array.toLocaleString();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(str); <span class="hljs-comment">// [object Object],123,abc,2016/1/5 下午1:06:23</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// indexOf方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">'abc'</span>, <span class="hljs-string">'def'</span>, <span class="hljs-string">'ghi'</span>,<span class="hljs-string">'123'</span>];
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.indexOf(<span class="hljs-string">'def'</span>)); <span class="hljs-comment">// 1</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// includes方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">-0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>];
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.includes(+<span class="hljs-number">0</span>)); <span class="hljs-comment">// true</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.includes(<span class="hljs-number">1</span>)); <span class="hljs-comment">// true</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-literal">NaN</span>];
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.includes(<span class="hljs-literal">NaN</span>)); <span class="hljs-comment">// true</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2172">
+                      上面我把不会改变数组的几个方法大致做了一个回顾，其中
+                      includes 方法需要注意的是，如果元素中有
+                      0，那么在判断过程中不论是 +0 还是 -0 都会判断为
+                      True，这里的 includes 忽略了 +0 和 -0。
+                    </p>
+                    <p data-nodeid="2173">
+                      另外还有一个值得强调的是<strong data-nodeid="2344"
+                        >slice 不改变自身，而 splice 会改变自身</strong
+                      >，你还是需要注意不要记错了。其中，slice
+                      的语法是：arr.slice([start[, end]])，而 splice
+                      的语法是：arr.splice(start,deleteCount[, item1[, item2[,
+                      …]]])。我们可以看到从第二个参数开始，二者就已经有区别了，splice
+                      第二个参数是删除的个数，而 slice 的第二个参数是 end
+                      的坐标（可选）。
+                    </p>
+                    <p data-nodeid="2174">
+                      此外，lastIndexOf 和 indexOf 基本功能差不多，不过
+                      lastIndexOf 是从后面寻找元素的下标；而 toSource
+                      方法还未形成标准，因此在这里不做过多介绍了。
+                    </p>
+                    <p data-nodeid="2175">
+                      不改变数组自身的 9
+                      个方法到这里也基本回顾差不多了，下面我们接着看看数组遍历的方法都是怎么用的。
+                    </p>
+                    <h3 data-nodeid="2176">数组遍历的方法</h3>
+                    <p data-nodeid="2177">
+                      基于 ES6，不会改变自身的遍历方法一共有 12 个，分别为
+                      forEach、every、some、filter、map、reduce、reduceRight，以及
+                      ES6 新增的方法 entries、find、findIndex、keys、values。
+                    </p>
+                    <p data-nodeid="2178">
+                      我们还是先看一段代码，快速了解它们的基本用法。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// forEach方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> obj = {<span class="hljs-attr">name</span>:<span class="hljs-string">'cc'</span>};
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> sReturn = array.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, index, array</span>)</span>{
+</div></li><li><div class="code-word">  array[index] = value;
+</div></li><li><div class="code-word">  <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>.name); <span class="hljs-comment">// cc被打印了三次, this指向obj</span>
+</div></li><li><div class="code-word">},obj);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array); <span class="hljs-comment">// [1, 3, 5]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(sReturn); <span class="hljs-comment">// undefined, 可见返回值为undefined</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// every方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> o = {<span class="hljs-number">0</span>:<span class="hljs-number">10</span>, <span class="hljs-number">1</span>:<span class="hljs-number">8</span>, <span class="hljs-number">2</span>:<span class="hljs-number">25</span>, <span class="hljs-attr">length</span>:<span class="hljs-number">3</span>};
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> bool = <span class="hljs-built_in">Array</span>.prototype.every.call(o,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, index, obj</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> value &gt;= <span class="hljs-number">8</span>;
+</div></li><li><div class="code-word">},o);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(bool); <span class="hljs-comment">// true</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// some方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">18</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">35</span>, <span class="hljs-number">80</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> isExist = array.some(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, index, array</span>)</span>{
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-keyword">return</span> value &gt; <span class="hljs-number">20</span>;
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(isExist); <span class="hljs-comment">// true </span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// map 方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">18</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">35</span>, <span class="hljs-number">80</span>];
+</div></li><li><div class="code-word">array.map(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item + <span class="hljs-number">1</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array);  <span class="hljs-comment">// [19, 10, 11, 36, 81]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// filter 方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">18</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>, <span class="hljs-number">35</span>, <span class="hljs-number">80</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array2 = array.filter(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, index, array</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> value &gt; <span class="hljs-number">20</span>;
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array2); <span class="hljs-comment">// [35, 80]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// reduce方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> s = array.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">previousValue, value, index, array</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> previousValue * value;
+</div></li><li><div class="code-word">},<span class="hljs-number">1</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(s); <span class="hljs-comment">// 24</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// ES6写法更加简洁</span>
+</div></li><li><div class="code-word">array.reduce(<span class="hljs-function">(<span class="hljs-params">p, v</span>) =&gt;</span> p * v); <span class="hljs-comment">// 24</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// reduceRight方法 (和reduce的区别就是从后往前累计)</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>];
+</div></li><li><div class="code-word">array.reduceRight(<span class="hljs-function">(<span class="hljs-params">p, v</span>) =&gt;</span> p * v); <span class="hljs-comment">// 24</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// entries方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"a"</span>, <span class="hljs-string">"b"</span>, <span class="hljs-string">"c"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> iterator = array.entries();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value); <span class="hljs-comment">// [0, "a"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value); <span class="hljs-comment">// [1, "b"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value); <span class="hljs-comment">// [2, "c"]</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value); <span class="hljs-comment">// undefined, 迭代器处于数组末尾时, 再迭代就会返回undefined</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// find &amp; findIndex方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>];
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">f</span>(<span class="hljs-params">value, index, array</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> value%<span class="hljs-number">2</span>==<span class="hljs-number">0</span>;     <span class="hljs-comment">// 返回偶数</span>
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">f2</span>(<span class="hljs-params">value, index, array</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> value &gt; <span class="hljs-number">20</span>;     <span class="hljs-comment">// 返回大于20的数</span>
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.find(f)); <span class="hljs-comment">// 8</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.find(f2)); <span class="hljs-comment">// undefined</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.findIndex(f)); <span class="hljs-comment">// 4</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(array.findIndex(f2)); <span class="hljs-comment">// -1</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// keys方法</span>
+</div></li><li><div class="code-word">[...Array(<span class="hljs-number">10</span>).keys()];     <span class="hljs-comment">// [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+</div></li><li><div class="code-word">[...new <span class="hljs-built_in">Array</span>(<span class="hljs-number">10</span>).keys()]; <span class="hljs-comment">// [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// values方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> array = [<span class="hljs-string">"abc"</span>, <span class="hljs-string">"xyz"</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> iterator = array.values();
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value);<span class="hljs-comment">//abc</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">console</span>.log(iterator.next().value);<span class="hljs-comment">//xyz</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2180">
+                      其中，要注意有些遍历方法不会返回处理之后的数组，比如
+                      forEach；有些方法会返回处理之后的数组，比如
+                      filter。这个细节你需要牢记，这样才会在面试过程中正确作答。
+                    </p>
+                    <p data-nodeid="2181">
+                      reduce
+                      方法也需要重点关注，其参数复杂且多，通常一些复杂的逻辑处理，其实使用
+                      reduce 很容易就可以解决。我们重点看一下，reduce
+                      到底能解决什么问题呢？先看下 reduce 的两个参数。
+                    </p>
+                    <p data-nodeid="2182">
+                      首先是
+                      callback（一个在数组的每一项中调用的函数，接受四个参数）：
+                    </p>
+                    <ol data-nodeid="2183">
+                      <li data-nodeid="2184">
+                        <p data-nodeid="2185">
+                          previousValue（上一次调用回调函数时的返回值，或者初始值）
+                        </p>
+                      </li>
+                      <li data-nodeid="2186">
+                        <p data-nodeid="2187">
+                          currentValue（当前正在处理的数组元素）
+                        </p>
+                      </li>
+                      <li data-nodeid="2188">
+                        <p data-nodeid="2189">
+                          currentIndex（当前正在处理的数组元素下标）
+                        </p>
+                      </li>
+                      <li data-nodeid="2190">
+                        <p data-nodeid="2191">
+                          array（调用 reduce() 方法的数组）
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="2192">
+                      然后是
+                      initialValue（可选的初始值，作为第一次调用回调函数时传给
+                      previousValue 的值）。
+                    </p>
+                    <p data-nodeid="2193">
+                      光靠文字描述其实看着会比较懵，我们还是通过一个例子来说明
+                      reduce 的功能到底有多么强大。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">/* 题目：数组 arr = [1,2,3,4] 求数组的和：*/</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// 第一种方法：</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> sum = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">arr.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{sum += e;}); <span class="hljs-comment">// sum = 10</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">//&nbsp;第二种方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> sum = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">arr.map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">obj</span>)</span>{sum += obj});
+</div></li><li><div class="code-word"><span class="hljs-comment">//&nbsp;第三种方法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>];
+</div></li><li><div class="code-word">arr.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pre,cur</span>)</span>{<span class="hljs-keyword">return</span> pre + cur});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2195">
+                      从上面代码可以看出，我们分别用了 forEach 和 map
+                      都能实现数组的求和，其中需要另外新定义一个变量
+                      sum，再进行累加求和，最后再来看 sum 的值，而 reduce
+                      不仅可以少定义一个变量，而且也会直接返回最后累加的结果，是不是问题就可以轻松解决了？
+                    </p>
+                    <p data-nodeid="2196">
+                      那么我们结合一道题目来看看 reduce 怎么用。
+                    </p>
+                    <p data-nodeid="2197">
+                      <strong data-nodeid="2380">题目：</strong> var arr = [
+                      {name: 'brick1'}, {name: 'brick2'}, {name: 'brick3'} ]
+                    </p>
+                    <p data-nodeid="2198">
+                      希望最后返回到 arr 里面每个对象的 name 拼接数据为 'brick1,
+                      brick2 &amp; brick3' ，如果用 reduce 如何实现呢？
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">var</span> arr =  [ {<span class="hljs-attr">name</span>: <span class="hljs-string">'one'</span>}, {<span class="hljs-attr">name</span>: <span class="hljs-string">'two'</span>}, {<span class="hljs-attr">name</span>: <span class="hljs-string">'three'</span>} ];
+</div></li><li><div class="code-word">arr.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">prev, current, index, array</span>)</span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (index === <span class="hljs-number">0</span>){
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> current.name;
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index === array.length - <span class="hljs-number">1</span>){
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> prev + <span class="hljs-string">' &amp; '</span> + current.name;
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> prev + <span class="hljs-string">', '</span> + current.name;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}, <span class="hljs-string">''</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 返回结果 "one, two &amp; three"</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2200">
+                      从上面的答案也可以看出来，用 reduce
+                      就能很轻松地对数组进行遍历，然后进行一些复杂的累加处理操作即可。<br />
+                      到这里，数组遍历的方法也基本讲解差不多了，这一讲也将告一段落。
+                    </p>
+                    <h3 data-nodeid="2201">总结</h3>
+                    <p data-nodeid="2202">
+                      下面我将令人“眼花缭乱”的数组的基础 API
+                      简单做了个总结表格，方便你更清晰地回顾本课时所讲的内容。
+                    </p>
+                    <p data-nodeid="2203">
+                      <img
+                        src="https://s0.lgstatic.com/i/image2/M01/09/CC/Cip5yGAP1k2ACVqpAAE5zFVPD7o375.png"
+                        alt="Lark20210126-164334.png"
+                        data-nodeid="2395"
+                      />
+                    </p>
+                    <p data-nodeid="2204">
+                      以上，数组的各方法基本讲解完毕，这些方法之间存在很多共性，如下：
+                    </p>
+                    <ul data-nodeid="2205">
+                      <li data-nodeid="2206">
+                        <p data-nodeid="2207">
+                          所有插入元素的方法，比如 push、unshift
+                          一律返回数组新的长度；
+                        </p>
+                      </li>
+                      <li data-nodeid="2208">
+                        <p data-nodeid="2209">
+                          所有删除元素的方法，比如 pop、shift、splice
+                          一律返回删除的元素，或者返回删除的多个元素组成的数组；
+                        </p>
+                      </li>
+                      <li data-nodeid="2210">
+                        <p data-nodeid="2211">
+                          部分遍历方法，比如
+                          forEach、every、some、filter、map、find、findIndex，它们都包含
+                          function(value,index,array){}&nbsp;和&nbsp;thisArg&nbsp;这样两个形参。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="2212">
+                      在日常的前端开发工作中，开发者往往会忽视对数组 API
+                      方法的系统性学习，但其实因为数组的方法较多，每个方法的参数和细节也比较零散，很多开发者很难有一个系统的、整体的认识，在开发过程中还要频繁地查询
+                      MDN 文档，造成效率低下以及代码能力难以进一步提升等问题。
+                    </p>
+                    <p data-nodeid="2213">
+                      因此我希望通过这一讲的学习，你能很好地掌握数组的 API
+                      方法，以便在开发中规避我所说的这些问题。
+                    </p>
+                    <p data-nodeid="2214" class="">
+                      在后续的课程中，我将继续带领你尝试一些数组 API
+                      方法的手工实现。同时希望你多动手练习以熟练使用所学的知识点，也欢迎你在下方留言讨论自己在学习过程中遇到的困惑，以及学习感悟等，让我们共同进步。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >JavaScript 核心原理精讲</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div
+                  data-v-4bc80e00=""
+                  class="message-list"
+                  style="display: none"
+                >
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **远
+                      </div>
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-tag tag-type3"
+                      >
+                        我的留言
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-content">
+                    'Array.from
+                    的设计初衷是快速便捷地基于其他对象创建新数组，准确来说就是从一个类似数组的可迭代对象中创建一个新的数组实例。'这句话是不是不太对啊，可迭代对象要求部署了Symbol.iterator接口，下面例子中的obj对象不是具备这样的条件讲师回复：
+                    你可能还是没太理解iterator查了一些资料，这里似乎确实有问题：obj不是可迭代对象，而是一个伪数组对象。而对于Array.from，MDN上写的是：“Array.from()方法从一个类似数组或可迭代对象创建一个新的，浅拷贝的数组实例。”"arrayLike想要转换成数组的伪数组对象或可迭代对象。"因此这里的案例没有问题，但是解释稍微有些不细节了。
+                  </div>
+                  <!---->
+                  <div data-v-4bc80e00="" class="message-delete pointer">
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAD1BMVEWZmZn4+fqysrPu7/DS09OEJUPlAAAAf0lEQVQ4y+3VwQ2AIAwF0C9hAAUHgDgBToD7L2UiUMDiwQMXpQfS9B3ohQ+WVDtibTRCarRJKBzDGVQTQ59RMjSwoVEQDIF4lQYa2Oi6IR6qJ5Yr1Et9ExvnwIGv8A9vxdWmCzRFdMdIF4Se54wkVBwtYQ7/+hMIe643Fcc1PgEbl0u1B0v+VgAAAABJRU5ErkJggg=="
+                      alt="delete_icon"
+                      class="message-delete-icon"
+                    />
+                    删除
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-line"></div>
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *亚
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        10
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      // 使用 Array 构造器，可以自定义长度var a = Array(6); //
+                      [undefined × 6]这里应该是【empty ×
+                      6】,empty表示是空位，undefined也是一种数据类型
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **6184
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        4
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      // map 方法 var array = [18, 9, 10, 35, 80];
+                      array.map(item = item + 1); console.log(array); // [19,
+                      10, 11, 36,
+                      81]这里写错了吧？map是返回一个新数组不改变原数组的。应该是[18,
+                      9, 10, 35, 80]
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    上面有说遍历的时候不会改变数组的，但是直接map会返回一个每个都加一的数组，我后面的注释是想表达这个，让你们感觉又错误了
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **开发
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAkFBMVEUAAAD//wD/v0D/yUP/ykr/wkf/w0T4wUX5wkP7yUb8xkb6xkb8xkb8xUf7xkX7xUb8xUb8xUb8xkb8xUf8xUf8xkf7xEb8xkb7xUb8xkf7xUb7xEb8xkb6xUb6xUb7xUb8xUb8xkb8xUb7xUb7xkb7xUb8xkb7xUb7zWD703b824384aH94qL96br98M/+8NAg3mEzAAAAJ3RSTlMAAQQTGBkeJSpCUGJiZYGEmZ2dnqamrra+v8HR3+Hi6Ors7/n5+/7tp/SIAAAAbElEQVQYGXXBBQ7CQAAAwcXd3YqzSKH//x0SDpoQZvirNa+TVtVtnq/CSq3wkZ36UOKl0Rl0xz71Os0csDdlAujxZLAD9HIzmAEaJwZtQOPEoAZonBiUAT1ffdtkgINfQx760XoZvSxGRX7dAXj2FUdZ+bZ0AAAAAElFTkSuQmCC"
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise greenColor"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      'Array.from
+                      的设计初衷是快速便捷地基于其他对象创建新数组，准确来说就是从一个类似数组的可迭代对象中创建一个新的数组实例。'这句话是不是不太对啊，可迭代对象要求部署了Symbol.iterator接口，下面例子中的obj对象不是具备这样的条件
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    你可能还是没太理解iterator
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **北
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      改变自身的例题中，splice （m）传入一个参数是什么意思呀🤔
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    这个基本的api你可以自己查一下学习一下呢，比较基础
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *浩
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      老师总结的很到位，很全面。
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *峰
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      测试了下，Array.from({length: 3})
+                      也是可以获得新数组的。这么看的话入参不一定要有Symbol.iterator？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    是的
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **6605
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      mdn上copyWithin说不会改变原数组长度
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    var array = [1,2,3,4,5]; var array2 = array.copyWithin(0,3);
+                    console.log(array===array2,array2);
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **帆
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      楼上说的对，会产生一个 hole Arrary 没有位置都是 empty
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+  <script></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 601,
+      courseCId: "",
+      courseName: "JavaScript 核心原理精讲",
+      teachers: [
+        {
+          id: 605,
+          teacherName: "若离",
+          position: "前美团前端技术专家",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image2/M01/05/0D/CgpVE1_6umyAALyyAAAJ09cFwqY371.png",
+          description:
+            '<p line="TaGP" linespacing="150">曾负责和参与过<strong>美团</strong>多个业务（到家、团购及电影业务）的<strong>前端研发及团队搭建</strong>，致力于<strong>前端性能优化、质量保证、效率提升、跨端融合</strong>等方向的研究，并且都有一定的技术落地，得到了超出预期的结果。<br/></p><p line="1XSR" linespacing="150">现在某大厂负责前端、中台业务以及跨端平台的核心研发。目前，致力于带领团队探索跨端技术上以及向全栈方向发展。</p><p line="iOVU" linespacing="150"><strong>持续为公司进行前端岗位的社招、校招面试近 6 年多，面试候选人近千人，深谙大厂面试套路及定级之道。</strong></p>',
+        },
+      ],
+      totalCourseTime: 26,
+      totalDuration: 390,
+      sales: 12196,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image2/M01/05/0D/CgpVE1_6umyAALyyAAAJ09cFwqY371.png",
+      sellGoodsId: 645,
+      sellGoodsPriceId: 31875,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "对于前端工程师来说，精通 JavaScript 不仅可以助力眼前的面试，同时，对其的掌握程度也决定了你未来技术发展的上线，扎实的 JavaScript 基础可以帮助你从容应对新技术、新框架。",
+      seoKeywords:
+        "前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React",
+      seoTitle: "JavaScript 核心原理精讲 - 前美团前端技术专家 - 拉勾教育",
+      shareTitle: "这是我看过的把 JavaScript 核心原理讲得非常清楚的内容了",
+      shareDescription: "推荐你看看",
+      brief: "夯实 JavaScript 基本功，跨越前端进阶门槛",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M01/60/E8/Cgp9HWGMxRSAWHDnAADwxLL_pbM113.png",
+      courseType: 1,
+      previewFirstField: "共26讲",
+      previewSecondField: "每周一、三更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 531,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 531,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "7617890a8c164e2db71d1d9cdb515a82"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+</body>

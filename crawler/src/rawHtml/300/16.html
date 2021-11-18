@@ -1,0 +1,2593 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">深入浅出搞定 React - 拉勾教育</h1>
+
+  <meta
+    content="前端开发,React,React-Hooks,栈调,Fiber,setState,Redux,Facebook,源码分析,技术栈,JS,ES2015,React-Router,DOM,React Native,state,props,diff,umi,Suspense,React.js,batchUpdate,setState,	Web ,前端,UI,HTML,jsx,ShoppingList,Props"
+    name="keywords"
+  />
+
+  <meta
+    content="本专栏基于源码提炼出来原理，所涉及的原理，可以帮助你解决掉实际工作中的大多数疑难杂症，也可以 match 上大厂对资深前端工程师的技术深度的要求。在广度方面，专栏涵盖了对基本问题的较为深入和完善的讲解，涵盖了 React 周边生态及生产实践，足以帮助你构建起“表象——原理——应用”的完整学习链路。"
+    name="description"
+  />
+
+  <title>深入浅出搞定 React - 高级前端工程师 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="深入浅出搞定 React - 高级前端工程师 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image/M00/5D/09/Ciqc1F-D0-OAZTxlAABYS9gye8s357.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">深入浅出搞定 React</div>
+                <div data-v-5f686215="" class="name">
+                  修言
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  高级前端工程师
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 这一次，真正吃透 React 知识链路与底层逻辑
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：系统深入学习“基础知识”
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | JSX 代码是如何“摇身一变”成为 DOM 的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 为什么 React 16 要更改组件的生命周期？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 为什么 React 16 要更改组件的生命周期？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 数据是如何在 React 组件之间流动的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 数据是如何在 React 组件之间流动的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | React-Hooks 设计动机与工作模式（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | React-Hooks 设计动机与工作模式（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 923px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：刨根问底吃透“核心原理”
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 深入 React-Hooks 工作机制：“原则”的背后，是“原理”
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 真正理解虚拟 DOM：React 选它，真的是为了性能吗？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | React 中的“栈调和”（Stack
+                          Reconciler）过程是怎样的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | setState 到底是同步的，还是异步的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 如何理解 Fiber 架构的迭代动机与设计思想？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | ReactDOM.render 是如何串联渲染链路的？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | ReactDOM.render 是如何串联渲染链路的？（中）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | ReactDOM.render 是如何串联渲染链路的？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 剖析 Fiber 架构下 Concurrent 模式的实现原理
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 特别的事件系统：React 事件与 DOM 事件有何不同？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 431px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：“周边生态”帮你拓宽技术视野
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 揭秘 Redux 设计思想与工作原理（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 揭秘 Redux 设计思想与工作原理（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 从 Redux 中间件实现原理切入，理解“面向切面编程”
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | 从 React-Router 切入，系统学习前端路由解决方案
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：“生产实践”通用法则
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | 思路拓展：如何打造高性能的 React 应用？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 | 跟 React
+                          学设计模式：掌握编程“套路”，打造高质量应用
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 聊聊 React 17，谈谈学习前端框架的心法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 100px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  15 | ReactDOM.render 是如何串联渲染链路的？（下）
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2020/11/30
+                  <span data-v-1605a430="" class="auth">修言</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/18:21"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="1101"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/18:21</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            47.84M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/18:21
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="1653" class="">
+                      在上一讲我们从 beginWork 切入，摸索出了 Fiber
+                      节点的创建链路与 Fiber 树的构建链路。本讲我们将以
+                      completeWork 为线索，去寻觅 Fiber 树和 DOM
+                      树之间的关联，将整个 render 阶段讲透。在此基础上，结合
+                      commit 阶段工作流，你将会对 ReactDOM.render
+                      所触发的渲染链路有一个完整、通透的理解。
+                    </p>
+                    <p data-nodeid="1654">
+                      本讲的实验 Demo 与前两讲保持一致，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">import React from "react";
+</div></li><li><div class="code-word">import ReactDOM from "react-dom";
+</div></li><li><div class="code-word">function App() {
+</div></li><li><div class="code-word">  return (
+</div></li><li><div class="code-word">    &lt;div className="App"&gt;
+</div></li><li><div class="code-word">      &lt;div className="container"&gt;
+</div></li><li><div class="code-word">        &lt;h1&gt;我是标题&lt;/h1&gt;
+</div></li><li><div class="code-word">        &lt;p&gt;我是第一段话&lt;/p&gt;
+</div></li><li><div class="code-word">        &lt;p&gt;我是第二段话&lt;/p&gt;
+</div></li><li><div class="code-word">      &lt;/div&gt;
+</div></li><li><div class="code-word">    &lt;/div&gt;
+</div></li><li><div class="code-word">  );
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">const rootElement = document.getElementById("root");
+</div></li><li><div class="code-word">ReactDOM.render(&lt;App /&gt;, rootElement);
+</div></li></ol></code></pre>
+                    </div>
+                    <h3 data-nodeid="1656">
+                      completeWork——将 Fiber 节点映射为 DOM 节点
+                    </h3>
+                    <h4 data-nodeid="1657">completeWork 的调用时机</h4>
+                    <p data-nodeid="1658">
+                      首先，我们先在调用栈中定位一下 completeWork。Demo
+                      所对应的调用栈中，第一个 completeWork
+                      出现在下图红框选中的位置：
+                    </p>
+                    <p data-nodeid="1659">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/1B/CgqCHl_AsdSAQuGuAAC09U5X0K0556.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="1787"
+                      />
+                    </p>
+                    <p data-nodeid="1660">
+                      从图上我们需要把握住的一个信息是，从 performUnitOfWork 到
+                      completeWork，中间会经过一个这样的调用链路：
+                    </p>
+                    <p data-nodeid="1661">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/29/CgqCHl_A2PuADu50AABVUspw4O0014.png"
+                        alt="图片10.png"
+                        data-nodeid="1791"
+                      />
+                    </p>
+                    <p data-nodeid="1662">
+                      其中 completeUnitOfWork 的工作也非常关键，但眼下我们先拿
+                      completeWork 开刀，你可以暂时将 completeUnitOfWork
+                      简单理解为一个用于发起 completeWork
+                      调用的“工具人”。completeUnitOfWork 是在 performUnitOfWork
+                      中被调用的，那么 performUnitOfWork
+                      是如何把握其调用时机的呢？我们直接来看相关源码（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">performUnitOfWork</span><span class="hljs-params">(unitOfWork)</span> </span>{
+</div></li><li><div class="code-word">  ......
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 获取入参节点对应的 current 节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> current = unitOfWork.alternate;
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> next;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (xxx) {
+</div></li><li><div class="code-word">    ...
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 创建当前节点的子节点</span>
+</div></li><li><div class="code-word">    next = beginWork$<span class="hljs-number">1</span>(current, unitOfWork, subtreeRenderLanes);
+</div></li><li><div class="code-word">    ...
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 创建当前节点的子节点</span>
+</div></li><li><div class="code-word">    next = beginWork$<span class="hljs-number">1</span>(current, unitOfWork, subtreeRenderLanes);
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  ......
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (next === <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 调用 completeUnitOfWork</span>
+</div></li><li><div class="code-word">    completeUnitOfWork(unitOfWork);
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 将当前节点更新为新创建出的 Fiber 节点</span>
+</div></li><li><div class="code-word">    workInProgress = next;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  ......
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1664">
+                      这段源码中你需要提取出的信息是：performUnitOfWork
+                      每次会尝试调用 beginWork
+                      来创建当前节点的子节点，若创建出的子节点为空（也就意味着当前节点不存在子
+                      Fiber 节点），则说明当前节点是一个叶子节点。<strong
+                        data-nodeid="1798"
+                        >按照深度优先遍历的原则，当遍历到叶子节点时，“递”阶段就结束了，随之而来的是“归”的过程</strong
+                      >。因此这种情况下，就会调用
+                      completeUnitOfWork，执行当前节点对应的 completeWork 逻辑。
+                    </p>
+                    <p data-nodeid="1665">
+                      接下来我们在 Demo 代码的 completeWork
+                      处打上断点，看看第一个走到 completeWork
+                      的节点是哪个，结果如下图所示：
+                    </p>
+                    <p data-nodeid="1666">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/10/Ciqc1F_AseOADKNDAALdERWik0M525.png"
+                        alt="Drawing 1.png"
+                        data-nodeid="1802"
+                      />
+                    </p>
+                    <p data-nodeid="1667">
+                      显然，第一个进入 completeWork 的节点是
+                      h1，这也符合我们上一讲所构建出来的 Fiber
+                      树中的节点关系，如下图所示：
+                    </p>
+                    <p data-nodeid="1668">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/1B/CgqCHl_AsgSAJoM0AAEYVWI-PXg056.png"
+                        alt="Drawing 3.png"
+                        data-nodeid="1806"
+                      />
+                    </p>
+                    <p data-nodeid="1669">
+                      由图可知，按照深度优先遍历的原则，h1
+                      确实将是第一个被遍历到的叶子节点。接下来我们就以 h1
+                      为例，一起看看 completeWork 都围绕它做了哪些事情。
+                    </p>
+                    <h4 data-nodeid="1670">completeWork 的工作原理</h4>
+                    <p data-nodeid="1671">
+                      这里仍然为你提取一下 completeWork
+                      的源码结构和主体逻辑，代码如下（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">completeWork</span><span class="hljs-params">(current, workInProgress, renderLanes)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 取出 Fiber 节点的属性值，存储在 newProps 里</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> newProps = workInProgress.pendingProps;
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 根据 workInProgress 节点的 tag 属性的不同，决定要进入哪段逻辑</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">switch</span> (workInProgress.tag) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> ......:
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> ClassComponent:
+</div></li><li><div class="code-word">      {
+</div></li><li><div class="code-word">        .....
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> HostRoot:
+</div></li><li><div class="code-word">      {
+</div></li><li><div class="code-word">        ......
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    <span class="hljs-comment">// h1 节点的类型属于 HostComponent，因此这里为你讲解的是这段逻辑</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> HostComponent:
+</div></li><li><div class="code-word">      {
+</div></li><li><div class="code-word">        popHostContext(workInProgress);
+</div></li><li><div class="code-word">        <span class="hljs-keyword">var</span> rootContainerInstance = getRootHostContainer();
+</div></li><li><div class="code-word">        <span class="hljs-keyword">var</span> type = workInProgress.type;
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 判断 current 节点是否存在，因为目前是挂载阶段，因此 current 节点是不存在的</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (current !== <span class="hljs-keyword">null</span> &amp;&amp; workInProgress.stateNode != <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">          updateHostComponent$<span class="hljs-number">1</span>(current, workInProgress, type, newProps, rootContainerInstance);
+</div></li><li><div class="code-word">          <span class="hljs-keyword">if</span> (current.ref !== workInProgress.ref) {
+</div></li><li><div class="code-word">            markRef$<span class="hljs-number">1</span>(workInProgress);
+</div></li><li><div class="code-word">          }
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">          <span class="hljs-comment">// 这里首先是针对异常情况进行 return 处理</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">if</span> (!newProps) {
+</div></li><li><div class="code-word">            <span class="hljs-keyword">if</span> (!(workInProgress.stateNode !== <span class="hljs-keyword">null</span>)) {
+</div></li><li><div class="code-word">              {
+</div></li><li><div class="code-word">                <span class="hljs-keyword">throw</span> Error(<span class="hljs-string">"We must have new props for new mounts. This error is likely caused by a bug in React. Please file an issue."</span>);
+</div></li><li><div class="code-word">              }
+</div></li><li><div class="code-word">            } 
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+</div></li><li><div class="code-word">          }
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">          <span class="hljs-comment">// 接下来就为 DOM 节点的创建做准备了</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">var</span> currentHostContext = getHostContext();
+</div></li><li><div class="code-word">          <span class="hljs-comment">// _wasHydrated 是一个与服务端渲染有关的值，这里不用关注</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">var</span> _wasHydrated = popHydrationState(workInProgress);
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">          <span class="hljs-comment">// 判断是否是服务端渲染</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">if</span> (_wasHydrated) {
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 这里不用关注，请你关注 else 里面的逻辑</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">if</span> (prepareToHydrateHostInstance(workInProgress, rootContainerInstance, currentHostContext)) {
+</div></li><li><div class="code-word">              markUpdate(workInProgress);
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">          } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 这一步很关键， createInstance 的作用是创建 DOM 节点</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">var</span> instance = createInstance(type, newProps, rootContainerInstance, currentHostContext, workInProgress);
+</div></li><li><div class="code-word">            <span class="hljs-comment">// appendAllChildren 会尝试把上一步创建好的 DOM 节点挂载到 DOM 树上去</span>
+</div></li><li><div class="code-word">            appendAllChildren(instance, workInProgress, <span class="hljs-keyword">false</span>, <span class="hljs-keyword">false</span>);
+</div></li><li><div class="code-word">            <span class="hljs-comment">// stateNode 用于存储当前 Fiber 节点对应的 DOM 节点</span>
+</div></li><li><div class="code-word">            workInProgress.stateNode = instance; 
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">            <span class="hljs-comment">// finalizeInitialChildren 用来为 DOM 节点设置属性</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">if</span> (finalizeInitialChildren(instance, type, newProps, rootContainerInstance)) {
+</div></li><li><div class="code-word">              markUpdate(workInProgress);
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">          }
+</div></li><li><div class="code-word">          ......
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> HostText:
+</div></li><li><div class="code-word">      {
+</div></li><li><div class="code-word">        ......
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> SuspenseComponent:
+</div></li><li><div class="code-word">      {
+</div></li><li><div class="code-word">        ......
+</div></li><li><div class="code-word">      }
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> HostPortal:
+</div></li><li><div class="code-word">      ......
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+</div></li><li><div class="code-word">    <span class="hljs-keyword">case</span> ContextProvider:
+</div></li><li><div class="code-word">      ......
+</div></li><li><div class="code-word">      <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+</div></li><li><div class="code-word">    ......
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  {
+</div></li><li><div class="code-word">    {
+</div></li><li><div class="code-word">      <span class="hljs-keyword">throw</span> Error(<span class="hljs-string">"Unknown unit of work tag ("</span> + workInProgress.tag + <span class="hljs-string">"). This error is likely caused by a bug in React. Please file an issue."</span>);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1673">
+                      试图捋顺这段 completeWork 逻辑，你需要掌握以下几个要点。
+                    </p>
+                    <ol data-nodeid="1674">
+                      <li data-nodeid="1675">
+                        <p data-nodeid="1676">
+                          completeWork 的核心逻辑是一段体量巨大的 switch
+                          语句，在这段 switch 语句中，<strong data-nodeid="1816"
+                            >completeWork 将根据 workInProgress 节点的 tag
+                            属性的不同，进入不同的 DOM
+                            节点的创建、处理逻辑</strong
+                          >。
+                        </p>
+                      </li>
+                      <li data-nodeid="1677">
+                        <p data-nodeid="1678">
+                          在 Demo 示例中，h1 节点的 tag 属性对应的类型应该是
+                          HostComponent，也就是“原生 DOM 元素类型”。
+                        </p>
+                      </li>
+                      <li data-nodeid="1679">
+                        <p data-nodeid="1680">
+                          completeWork 中的 current、 workInProgress
+                          分别对应的是下图中左右两棵 Fiber 树上的节点：
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1681">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/29/CgqCHl_A2R-AWalhAAD-42SivEU001.png"
+                        alt="图片12.png"
+                        data-nodeid="1821"
+                      />
+                    </p>
+                    <p data-nodeid="1682">
+                      其中 workInProgress 树代表的是“当前正在 render 中的树”，而
+                      current 树则代表“已经存在的树”。
+                    </p>
+                    <p data-nodeid="1683">
+                      workInProgress 节点和 current 节点之间用 alternate
+                      属性相互连接。在组件的挂载阶段，current 树只有一个
+                      rootFiber 节点，并没有其他内容。因此 h1 这个
+                      workInProgress 节点对应的 current 节点是 null。
+                    </p>
+                    <p data-nodeid="1684">
+                      带着上面这些前提，再去结合注释读一遍上面提炼出来的源码，思路是不是就清晰多了？
+                    </p>
+                    <p data-nodeid="1685">
+                      捋顺思路后，我们直接来提取知识点。关于
+                      completeWork，你需要明白以下几件事。
+                    </p>
+                    <p data-nodeid="1686">
+                      （1）用一句话来总结 completeWork 的工作内容：<strong
+                        data-nodeid="1831"
+                        >负责处理 Fiber 节点到 DOM 节点的映射逻辑</strong
+                      >。
+                    </p>
+                    <p data-nodeid="1687">
+                      （2）completeWork 内部有 3 个关键动作：
+                    </p>
+                    <ul data-nodeid="1688">
+                      <li data-nodeid="1689">
+                        <p data-nodeid="1690">
+                          <strong data-nodeid="1837">创建</strong>DOM
+                          节点（CreateInstance）
+                        </p>
+                      </li>
+                      <li data-nodeid="1691">
+                        <p data-nodeid="1692">
+                          将 DOM 节点<strong data-nodeid="1843">插入</strong>到
+                          DOM 树中（AppendAllChildren）
+                        </p>
+                      </li>
+                      <li data-nodeid="1693">
+                        <p data-nodeid="1694">
+                          为 DOM 节点<strong data-nodeid="1849">设置属性</strong
+                          >（FinalizeInitialChildren）
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="1695">
+                      （3）<strong data-nodeid="1855"
+                        >创建好的 DOM 节点会被赋值给 workInProgress 节点的
+                        stateNode 属性</strong
+                      >。也就是说当我们想要定位一个 Fiber 对应的 DOM
+                      节点时，访问它的 stateNode
+                      属性就可以了。这里我们可以尝试访问运行时的 h1 节点的
+                      stateNode 属性，结果如下图所示：
+                    </p>
+                    <p data-nodeid="1696">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/10/Ciqc1F_Ash-AW32XAABIXg8drFo176.png"
+                        alt="Drawing 5.png"
+                        data-nodeid="1858"
+                      />
+                    </p>
+                    <p data-nodeid="1697">
+                      （4）将 DOM 节点插入到 DOM 树的操作是通过
+                      appendAllChildren 函数来完成的。
+                    </p>
+                    <p data-nodeid="1698">
+                      说是将 DOM 节点插入到 DOM 树里去，实际上是将<strong
+                        data-nodeid="1869"
+                        >子 Fiber 节点所对应的 DOM 节点</strong
+                      >挂载到其<strong data-nodeid="1870"
+                        >父 Fiber 节点所对应的 DOM 节点里去</strong
+                      >。比如说在本讲 Demo 所构建出的 Fiber 树中，h1
+                      节点的父结点是 div，那么 h1 对应的 DOM 节点就理应被挂载到
+                      div 对应的 DOM 节点里去。
+                    </p>
+                    <p data-nodeid="1699">
+                      那么如果执行 appendAllChildren 时，父级的 DOM
+                      节点还不存在怎么办？
+                    </p>
+                    <p data-nodeid="1700">
+                      比如 h1 节点作为第一个进入 completeWork 的节点，它的父节点
+                      div 对应的 DOM 就尚不存在。其实不存在也没关系，反正 h1 DOM
+                      节点被创建后，会作为 h1 Fiber 节点的 stateNode
+                      属性存在，丢不掉的。当父节点 div 进入 appendAllChildren
+                      逻辑后，会逐个向下查找并添加自己的后代节点，这时候，h1
+                      就会被它的父级 DOM 节点“收入囊中”啦~
+                    </p>
+                    <h3 data-nodeid="1701">
+                      completeUnitOfWork —— 开启收集 EffectList 的“大循环”
+                    </h3>
+                    <p data-nodeid="1702">
+                      completeUnitOfWork
+                      的作用是开启一个大循环，在这个大循环中，将会重复地做下面三件事：
+                    </p>
+                    <ol data-nodeid="1703">
+                      <li data-nodeid="1704">
+                        <p data-nodeid="1705">
+                          <strong data-nodeid="1880"
+                            >针对传入的当前节点，调用 completeWork</strong
+                          >，completeWork
+                          的工作内容前面已经讲过，这一步应该是没有异议的；
+                        </p>
+                      </li>
+                      <li data-nodeid="1706">
+                        <p data-nodeid="1707">
+                          将<strong data-nodeid="1890"
+                            >当前节点的副作用链</strong
+                          >（EffectList）插入到其<strong data-nodeid="1891"
+                            >父节点对应的副作用链</strong
+                          >（EffectList）中；
+                        </p>
+                      </li>
+                      <li data-nodeid="1708">
+                        <p data-nodeid="1709">
+                          以当前节点为起点，循环遍历其兄弟节点及其父节点。当遍历到兄弟节点时，将
+                          return 掉当前调用，触发兄弟节点对应的
+                          performUnitOfWork
+                          逻辑；而遍历到父节点时，则会直接进入下一轮循环，也就是重复
+                          1、2 的逻辑。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1710">
+                      步骤 1 无须多言，接下来我将为你解读步骤 2 和步骤 3
+                      的含义。
+                    </p>
+                    <h4 data-nodeid="1711">
+                      completeUnitOfWork 开启下一轮循环的原则
+                    </h4>
+                    <p data-nodeid="1712">
+                      在理解副作用链之前，首先要理解 completeUnitOfWork
+                      开启下一轮循环的原则，也就是步骤 3。步骤 3
+                      相关的源码如下所示（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">do</span> {
+</div></li><li><div class="code-word">  ......
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 这里省略步骤 1 和步骤 2 的逻辑 </span>
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 获取当前节点的兄弟节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">var</span> siblingFiber = completedWork.sibling;
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 若兄弟节点存在</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (siblingFiber !== <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 将 workInProgress 赋值为当前节点的兄弟节点</span>
+</div></li><li><div class="code-word">    workInProgress = siblingFiber;
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 将正在进行的 completeUnitOfWork 逻辑 return 掉</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span>;
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 若兄弟节点不存在，completeWork 会被赋值为 returnFiber，也就是当前节点的父节点</span>
+</div></li><li><div class="code-word">  completedWork = returnFiber; 
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 这一步与上一步是相辅相成的，上下文中要求 workInProgress 与 completedWork 保持一致</span>
+</div></li><li><div class="code-word">  workInProgress = completedWork;
+</div></li><li><div class="code-word">} <span class="hljs-keyword">while</span> (completedWork !== <span class="hljs-keyword">null</span>);
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1714">
+                      步骤 3
+                      是整个循环体的收尾工作，它会在当前节点相关的各种工作都做完之后执行。
+                    </p>
+                    <p data-nodeid="1715">
+                      当前节点处理完了，自然是去寻找下一个可以处理的节点。我们知道，当前的
+                      Fiber 节点之所以会进入
+                      completeWork，是因为“递无可递”了，才会进入“归”的逻辑，这就意味着当前
+                      Fiber 要么没有 child 节点、要么 child 节点的 completeWork
+                      早就执行过了。因此 child
+                      节点不会是下次循环需要考虑的对象，下次循环只需要考虑兄弟节点（siblingFiber）和父节点（returnFiber）。
+                    </p>
+                    <p data-nodeid="1716">
+                      那么为什么在源码中，遇到兄弟节点会
+                      return，遇到父节点才会进入下次循环呢？这里我以 h1
+                      节点的节点关系为例进行说明。请看下图：
+                    </p>
+                    <p data-nodeid="1717">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/29/CgqCHl_A2UCAeC8WAAByZUWVwpM770.png"
+                        alt="图片8.png"
+                        data-nodeid="1901"
+                      />
+                    </p>
+                    <p data-nodeid="1718">
+                      结合前面的分析和图示可知，<strong data-nodeid="1907"
+                        >h1
+                        节点是递归过程中所触及的第一个叶子节点，也是其兄弟节点中被遍历到的第一个节点</strong
+                      >；而剩下的两个 p 节点，此时都还没有被遍历到，也就是说连
+                      beginWork 都没有执行过。
+                    </p>
+                    <p data-nodeid="1719">
+                      <strong data-nodeid="1912"
+                        >因此对于 h1 节点的兄弟节点来说，当下的第一要务是回去从
+                        beginWork 开始走起，直到 beginWork
+                        “递无可递”时，才能够执行 completeWork 的逻辑</strong
+                      >。beginWork 的调用是在 performUnitOfWork 里发生的，因此
+                      completeUnitOfWork
+                      一旦识别到当前节点的兄弟节点不为空，就会终止后续的逻辑，退回到上一层的
+                      performUnitOfWork 里去。
+                    </p>
+                    <p data-nodeid="1720">
+                      接下来我们再来看 h1 的父节点 div：在向下递归到 h1
+                      的过程中，div 必定已经被遍历过了，也就是说 div
+                      的“递”阶段（ beginWork）
+                      已经执行完毕，只剩下“归”阶段的工作要处理了。因此，对于父节点，completeUnitOfWork
+                      会毫不犹豫地把它推到下一次循环里去，让它进入 completeWork
+                      的逻辑。
+                    </p>
+                    <p data-nodeid="1721">
+                      值得注意的是，completeUnitOfWork
+                      中处理兄弟节点和父节点的顺序是：先检查兄弟节点是否存在，若存在则优先处理兄弟节点；确认没有待处理的兄弟节点后，才转而处理父节点。这也就意味着，<strong
+                        data-nodeid="1919"
+                        >completeWork 的执行是严格自底向上的</strong
+                      >，子节点的 completeWork 总会先于父节点执行。
+                    </p>
+                    <h4 data-nodeid="1722">
+                      副作用链（effectList）的设计与实现
+                    </h4>
+                    <p data-nodeid="1723">
+                      无论是 beginWork 还是 completeWork，它们的应用对象都是
+                      workInProgress 树上的节点。我们说 render
+                      阶段是一个递归的过程，“递归”的对象，正是这棵
+                      workInProgress 树（见下图右侧高亮部分）：
+                    </p>
+                    <p data-nodeid="1724">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/29/CgqCHl_A2VCAHbHdAAEBwCIJFE4253.png"
+                        alt="图片13.png"
+                        data-nodeid="1924"
+                      />
+                    </p>
+                    <p data-nodeid="1725">
+                      那么我们递归的目的是什么呢？或者说，render
+                      阶段的工作目标是什么呢？
+                    </p>
+                    <p data-nodeid="1726">
+                      <strong data-nodeid="1930"
+                        >render 阶段的工作目标是找出界面中需要处理的更新</strong
+                      >。
+                    </p>
+                    <p data-nodeid="1727">
+                      在实际的操作中，并不是所有的节点上都会产生需要处理的更新。比如在挂载阶段，对图中的整棵
+                      workInProgress 递归完毕后，React 会发现实际只需要对 App
+                      节点执行一个挂载操作就可以了；而在更新阶段，这种现象更为明显。
+                    </p>
+                    <p data-nodeid="1728">
+                      更新阶段与挂载阶段的主要区别在于更新阶段的 current
+                      树不为空，比如说情况可以是下图这样子的：
+                    </p>
+                    <p data-nodeid="1729">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/29/CgqCHl_A2VyAUxeJAAIrypFDLh4388.png"
+                        alt="图片14.png"
+                        data-nodeid="1935"
+                      />
+                    </p>
+                    <p data-nodeid="1730">
+                      假如说我的某一次操作，仅仅对 p
+                      节点产生了影响，那么对于渲染器来说，它理应只关注 p
+                      节点这一处的更新。这时候问题就来了：<strong
+                        data-nodeid="1941"
+                        >怎样做才能让渲染器又快又好地定位到那些真正需要更新的节点呢</strong
+                      >？
+                    </p>
+                    <p data-nodeid="7897" class="">
+                      在 render 阶段，我们通过艰难的递归过程来明确“p
+                      节点这里有一处更新”这件事情。按照 React 的设计思路，render
+                      阶段结束后，“找不同”这件事情其实也就告一段落了。<strong
+                        data-nodeid="7911"
+                        >commit 只负责实现更新，而不负责寻找更新</strong
+                      >，这就意味着我们必须找到一个办法能让 commit
+                      阶段“坐享其成”，能直接拿到 render
+                      阶段的工作成果。而这，正是<strong data-nodeid="7912"
+                        >副作用链</strong
+                      >（<strong data-nodeid="7913">effectList</strong
+                      >）的价值所在。
+                    </p>
+
+                    <p data-nodeid="1732" class="te-preview-highlight">
+                      <strong data-nodeid="1958">副作用链（effectList）</strong>
+                      可以理解为 render 阶段“工作成果”的一个集合：每个 Fiber
+                      节点都维护着一个属于它自己的 effectList，effectList
+                      在数据结构上以链表的形式存在，链表内的每一个元素都是一个
+                      Fiber 节点。这些 Fiber 节点需要满足两个共性：
+                    </p>
+                    <ol data-nodeid="1733">
+                      <li data-nodeid="1734">
+                        <p data-nodeid="1735">都是当前 Fiber 节点的后代节点</p>
+                      </li>
+                      <li data-nodeid="1736">
+                        <p data-nodeid="1737">都有待处理的副作用</p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1738">
+                      没错，Fiber 节点的 effectList
+                      里记录的并非它自身的更新，而是其<strong data-nodeid="1966"
+                        >需要更新的后代节点</strong
+                      >。带着这个结论，我们再来品品小节开头 completeUnitOfWork
+                      中的“步骤 2”：
+                    </p>
+                    <blockquote data-nodeid="1739">
+                      <p data-nodeid="1740">
+                        将<strong data-nodeid="1976">当前节点的副作用链</strong
+                        >（effectList）插入到其<strong data-nodeid="1977"
+                          >父节点对应的副作用链</strong
+                        >（effectList）中。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="1741">
+                      咱们前面已经分析过，“<strong data-nodeid="1987"
+                        >completeWork 是自底向上执行的</strong
+                      >”，也就是说，子节点的 completeWork
+                      总是比父节点先执行。试想，若每次处理到一个节点，都将当前节点的
+                      effectList 插入到其父节点的 effectList
+                      中。那么当所有节点的 completeWork
+                      都执行完毕时，我是不是就可以从“终极父节点”，也就是
+                      rootFiber 上，拿到一个<strong data-nodeid="1988"
+                        >存储了当前 Fiber 树所有 effect Fiber</strong
+                      >的“终极版”的 effectList 了？
+                    </p>
+                    <p data-nodeid="1742">
+                      <strong data-nodeid="1993"
+                        >把所有需要更新的 Fiber
+                        节点单独串成一串链表，方便后续有针对性地对它们进行更新，这就是所谓的“收集副作用”的过程</strong
+                      >。
+                    </p>
+                    <p data-nodeid="1743">
+                      这里我以挂载过程为例，带你分析一下这个过程是如何实现的。
+                    </p>
+                    <p data-nodeid="1744">
+                      首先我们要知道的是，这个 effectList 链表在 Fiber
+                      节点中是通过 firstEffect 和 lastEffect
+                      来维护的，如下图所示：
+                    </p>
+                    <p data-nodeid="1745">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/1C/CgqCHl_AspmALRFDAADaKY8wTqc180.png"
+                        alt="Drawing 10.png"
+                        data-nodeid="1998"
+                      />
+                    </p>
+                    <p data-nodeid="1746">
+                      其中 firstEffect 表示 effectList 的第一个节点，而
+                      lastEffect 则记录最后一个节点。
+                    </p>
+                    <p data-nodeid="1747">
+                      对于挂载过程来说，我们唯一要做的就是把 App
+                      组件挂载到界面上去，因此 App 后代节点们的
+                      effectList&nbsp;其实都是不存在的。effectList 只有在 App
+                      的父节点（rootFiber）这才不为空。
+                    </p>
+                    <p data-nodeid="1748">
+                      那么 effectList
+                      的创建逻辑又是怎样的呢？其实非常简单，只需要为 firstEffect
+                      和 lastEffect 各赋值一个引用即可。以下是从
+                      completeUnitOfWork
+                      源码中提取出的相关逻辑（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// 若副作用类型的值大于“PerformedWork”，则说明这里存在一个需要记录的副作用</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (flags &gt; PerformedWork) {
+</div></li><li><div class="code-word">  <span class="hljs-comment">// returnFiber 是当前节点的父节点</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (returnFiber.lastEffect !== <span class="hljs-keyword">null</span>) {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 若父节点的 effectList 不为空，则将当前节点追加到 effectList 的末尾去</span>
+</div></li><li><div class="code-word">    returnFiber.lastEffect.nextEffect = completedWork;
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 若父节点的 effectList 为空，则当前节点就是 effectList 的 firstEffect</span>
+</div></li><li><div class="code-word">    returnFiber.firstEffect = completedWork;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 将 effectList 的 lastEffect 指针后移一位</span>
+</div></li><li><div class="code-word">  returnFiber.lastEffect = completedWork;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="1750">
+                      代码中的 flags
+                      咱们已经反复强调过了，它旧时的名字叫“effectTag”，是用来标识副作用类型的；而“completedWork”这个变量，在当前上下文中存储的就是“正在被执行
+                      completeWork
+                      相关逻辑”的节点；至于“PerformedWork”，它是一个值为 1
+                      的常量，React 规定若 flags（又名 effectTag）的值小于等于
+                      1，则不必提交到 commit 阶段。因此 completeUnitOfWork
+                      只会对 flags 大于 PerformedWork 的 effect fiber 进行收集。
+                    </p>
+                    <p data-nodeid="1751">
+                      结合这些信息，再去读一遍源码片段，相信你的理解过程就会很流畅了。这里我以
+                      App 节点为例，带你走一遍 effectList 的创建过程：
+                    </p>
+                    <ol data-nodeid="1752">
+                      <li data-nodeid="1753">
+                        <p data-nodeid="1754">
+                          App FiberNode 的 flags 属性为 3，大于
+                          PerformedWork，因此会进入 effectList 的创建逻辑；
+                        </p>
+                      </li>
+                      <li data-nodeid="1755">
+                        <p data-nodeid="1756">
+                          创建 effectList 时，并不是为当前 Fiber
+                          节点创建，而是为它的父节点创建，App 节点的父节点是
+                          rootFiber，rootFiber 的 effectList 此时为空；
+                        </p>
+                      </li>
+                      <li data-nodeid="1757">
+                        <p data-nodeid="1758">
+                          rootFiber 的 firstEffect 和 lastEffect 指针都会指向
+                          App 节点，App 节点由此成为 effectList 中的唯一一个
+                          FiberNode，如下图所示。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1759">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/1E/Ciqc1F_A2W-AVmmRAABDdji0MoI238.png"
+                        alt="图片15.png"
+                        data-nodeid="2009"
+                      />
+                    </p>
+                    <p data-nodeid="1760">
+                      OK，读到这里，相信你已经对 effectList
+                      的创建过程知根知底了。
+                    </p>
+                    <p data-nodeid="1761">
+                      现在，即便你对部分源码细节的消化可能没有那么快，也请你不要因为这些细节去中断自己串联整个渲染链路的思路。你只需要把握住“根节点（rootFiber）上的
+                      effectList 信息，是 commit
+                      阶段的更新线索”这个结论，就足以将 render 阶段和 commit
+                      阶段串联起来。
+                    </p>
+                    <h3 data-nodeid="1762">commit 阶段工作流简析</h3>
+                    <p data-nodeid="1763">
+                      在整个 ReactDOM.render 的渲染链路中，render 阶段是 Fiber
+                      架构的核心体现，也是我们讲解的重点。对于 render
+                      阶段，我对你的期望是“熟悉”，为了达成这个目标，我们对
+                      render 阶段的学习还会再持续一个课时；而对于 commit
+                      阶段，我只要求你做到“了解”。因此这里我会快速地带你过一遍
+                      commit 阶段的重点知识，不占用你太多时间。
+                    </p>
+                    <p data-nodeid="1764">
+                      commit 会在 performSyncWorkOnRoot 中被调用，如下图所示：
+                    </p>
+                    <p data-nodeid="1765">
+                      <img
+                        src="https://s0.lgstatic.com/i/image/M00/72/10/Ciqc1F_AsqiAENXWAAF6r2_37Lc521.png"
+                        alt="Drawing 12.png"
+                        data-nodeid="2017"
+                      />
+                    </p>
+                    <p data-nodeid="1766">
+                      这里的入参 root 并不是 rootFiber，而是
+                      fiberRoot（FiberRootNode）实例。fiberRoot 的 current
+                      节点指向 rootFiber，因此拿到 effectList 对后续的 commit
+                      流程来说不是什么难事。
+                    </p>
+                    <p data-nodeid="1767">
+                      从流程上来说，commit 共分为 3 个阶段：<strong
+                        data-nodeid="2023"
+                        >before mutation、mutation、layout。</strong
+                      >
+                    </p>
+                    <ul data-nodeid="1768">
+                      <li data-nodeid="1769">
+                        <p data-nodeid="1770">
+                          before mutation 阶段，<strong data-nodeid="2029"
+                            >这个阶段 DOM 节点还没有被渲染到界面上去</strong
+                          >，过程中会触发 getSnapshotBeforeUpdate，也会处理
+                          useEffect 钩子相关的调度逻辑。
+                        </p>
+                      </li>
+                      <li data-nodeid="1771">
+                        <p data-nodeid="1772">
+                          mutation，<strong data-nodeid="2035"
+                            >这个阶段负责 DOM 节点的渲染</strong
+                          >。在渲染过程中，会遍历 effectList，根据
+                          flags（effectTag）的不同，执行不同的 DOM 操作。
+                        </p>
+                      </li>
+                      <li data-nodeid="1773">
+                        <p data-nodeid="1774">
+                          layout，<strong data-nodeid="2045"
+                            >这个阶段处理 DOM 渲染完毕之后的收尾逻辑</strong
+                          >。比如调用 componentDidMount/componentDidUpdate，调用
+                          useLayoutEffect
+                          钩子函数的回调等。除了这些之外，它还会<strong
+                            data-nodeid="2046"
+                            >把 fiberRoot 的 current 指针指向 workInProgress
+                            Fiber 树</strong
+                          >。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="1775">
+                      关于 commit 阶段的实现细节，感兴趣的同学课下可以参阅
+                      <a
+                        href="https://github.com/facebook/react/blob/a81c02ac150233bdb5f31380d4135397fb8f4660/packages/react-reconciler/src/ReactFiberWorkLoop.new.js"
+                        data-nodeid="2050"
+                        >commit 相关源码</a
+                      >，这里不再展开讨论。对于
+                      commit，如果你只能记住一个知识点，我希望你记住<strong
+                        data-nodeid="2056"
+                        >它是一个绝对同步的过程</strong
+                      >。render 阶段可以同步也可以异步，但 commit 一定是同步的。
+                    </p>
+                    <h3 data-nodeid="1776" class="">总结</h3>
+                    <p data-nodeid="1777">
+                      这一讲我们完成了对 ReactDOM.render
+                      调用栈的分析。表面上剖析的是首次渲染的渲染链路，实际上将包括同步模式下的挂载、更新链路（与挂载链路的调用栈非常相似）都串联了一遍。
+                    </p>
+                    <p data-nodeid="1778">
+                      虽然还没有正式介入更新链路、包括异步更新模式的讲解，但你此时其实已经具备了理解这些知识的基础：Concurrent
+                      模式（异步渲染）与 Legacy
+                      模式（同步渲染）在数据结构设计、核心 API
+                      调用等方面都是一致的。<strong data-nodeid="2064"
+                        >这也就意味着我们这三讲所讲解的知识，都是可以在后续的学习中复用的</strong
+                      >。
+                    </p>
+                    <p data-nodeid="1779" class="">
+                      接下来，我们就将进入更新过程的学习，揭开 Concurrent 模式及
+                      Scheduler
+                      的神秘面纱。同时，针对上一讲遗留下来的“为什么需要两棵树”的问题，我也会在下一讲中为你解答。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >深入浅出搞定 React</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **宇
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        4
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div
+                      data-v-4bc80e00=""
+                      class="message-list-content ellipsis"
+                    >
+                      看了两三遍，终于有点明白了。第一次看云里雾里，迷失在漫长的调用链路里，后面几次看慢慢明白老师讲的还是很形象的，尤其是模拟递归那块。还有就是看到commit阶段后还有一点业务上的疑惑是：其实useEffect被调用时还在before
+                      mutation阶段，dom是还没被渲染的？所以意味着其实不能在里面获取元素，而要在useLayoutEffect里？
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-expand">
+                      全部
+                    </div>
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **东
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      APP FiberNode 的flags是3 是怎么得到的
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    调和 FiberNode 的过程中，会根据副作用操作的类型去设定 Flags
+                    的值。这一点在14节中有介绍。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        console_man
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      老师，你好。在关于‘completeUnitOfWork
+                      开启下一轮循环的原则’中。既然 h1 的兄弟节点 p 还未执行
+                      beginWork 方法，那不就表示 h1 节点对应的 Fiber 节点的
+                      sibling 为 null 了吗？
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    h1 节点的直接兄弟节点是 p 节点，p 节点在 h1 的completeWork
+                    结束后，其对应的 Fiber
+                    节点还没有被创建出来。接下来会做的事情就是退回去执行
+                    beginWork，创建出 p 节点对应的 Fiber 节点。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        Sola
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div
+                      data-v-4bc80e00=""
+                      class="message-list-content ellipsis"
+                    >
+                      Fiber 的 diff 阶段在哪里？ effectList
+                      里面都是diff出来有差别的节点么？
+                      这个依赖收集和vue3的那种模版精确定位依赖变动是类似的东西么？
+                      挺多地方没太看懂，就是一个朦胧的感觉 fiber
+                      在好像就是不想遍历树，或者是说就只遍历一次树，过程中把线索父子，兄弟用链表纪录了下来，同时在自底线上的过程中顺带聚合了一些信息给后面用？
+                      所以后面是分治那样的可以并行计算来节省时间么？
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-expand">
+                      全部
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    fiber 的 diff 逻辑在 reconcileChildren 里。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 510,
+      courseCId: "",
+      courseName: "深入浅出搞定 React",
+      teachers: [
+        {
+          id: 512,
+          teacherName: "修言",
+          position: "高级前端工程师",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image/M00/5C/83/CgqCHl-BnE6Adj2iAAAI-hEnRgU445.png",
+          description:
+            '<p><span data-shimo-docs="[[20,&quot;他是 React 重度用户，对 React 源码、底层原理及周边生态有着较为深入的探究和理解。早期专注于性能优化和前端工程化，曾将线上大型应用性能提升率做到 40%，并基于 React 打造过团队新基建。现在在一线电商集团专攻前端框架与底层链路设计，同时，作为多年一线前端面试官，积累了丰富的面试经验。&quot;,&quot;0:\\&quot;%23494949\\&quot;&quot;]]"></span></p><p line="ydpB" linespacing="115"><span style="font-size: 14px; font-family: 微软雅黑, &quot;Microsoft YaHei&quot;;">他是 React 重度用户，对 React 源码、底层原理及周边生态有着较为深入的探究和理解。早期专注于性能优化和前端工程化，曾将线上大型应用性能提升率做到 40%，并基于 React 打造过团队新基建。现在在某一线互联网大厂专攻前端框架与底层链路设计，同时，作为多年一线前端面试官，积累了丰富的面试经验。</span></p><p><br/></p><p><br/></p>',
+        },
+      ],
+      totalCourseTime: 20,
+      totalDuration: 1,
+      sales: 13477,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image/M00/5C/83/CgqCHl-BnE6Adj2iAAAI-hEnRgU445.png",
+      sellGoodsId: 556,
+      sellGoodsPriceId: 47335,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "本专栏基于源码提炼出来原理，所涉及的原理，可以帮助你解决掉实际工作中的大多数疑难杂症，也可以 match 上大厂对资深前端工程师的技术深度的要求。在广度方面，专栏涵盖了对基本问题的较为深入和完善的讲解，涵盖了 React 周边生态及生产实践，足以帮助你构建起“表象——原理——应用”的完整学习链路。",
+      seoKeywords:
+        "前端开发,React,React-Hooks,栈调,Fiber,setState,Redux,Facebook,源码分析,技术栈,JS,ES2015,React-Router,DOM,React Native,state,props,diff,umi,Suspense,React.js,batchUpdate,setState,\tWeb ,前端,UI,HTML,jsx,ShoppingList,Props",
+      seoTitle: "深入浅出搞定 React - 高级前端工程师 - 拉勾教育",
+      shareTitle: "戳此，带你吃透 React 知识链路和底层逻辑",
+      shareDescription: "帮你构建起“表象、原理、应用”的完整学习链路。",
+      brief: "掌握 React 知识链路和底层逻辑",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image/M00/5D/09/Ciqc1F-D0-OAZTxlAABYS9gye8s357.png",
+      courseType: 1,
+      previewFirstField: "共22讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 275,
+      successShowType: "COURSE_COMMUNITY",
+      weixinQrUrl:
+        "https://s0.lgstatic.com/i/image/M00/59/46/Ciqc1F9xW1eAEPp6AAS4A4rXd4I423.png",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 275,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "6b62455562524a2abd56ef262bd463b1"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>

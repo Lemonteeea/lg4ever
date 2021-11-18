@@ -1,0 +1,666 @@
+<body style="font-size: 15px; height: 100%; width: 100%; background-color: rgb(237, 237, 237);"><h1 style="display: none">深入浅出搞定 React - 拉勾教育</h1>
+    
+  <meta content="前端开发,React,React-Hooks,栈调,Fiber,setState,Redux,Facebook,源码分析,技术栈,JS,ES2015,React-Router,DOM,React Native,state,props,diff,umi,Suspense,React.js,batchUpdate,setState,	Web ,前端,UI,HTML,jsx,ShoppingList,Props" name="keywords">
+
+  <meta content="本专栏基于源码提炼出来原理，所涉及的原理，可以帮助你解决掉实际工作中的大多数疑难杂症，也可以 match 上大厂对资深前端工程师的技术深度的要求。在广度方面，专栏涵盖了对基本问题的较为深入和完善的讲解，涵盖了 React 周边生态及生产实践，足以帮助你构建起“表象——原理——应用”的完整学习链路。" name="description">
+
+  <title>深入浅出搞定 React - 高级前端工程师 - 拉勾教育</title>
+<meta name="apple-mobile-web-app-title" content="深入浅出搞定 React - 高级前端工程师 - 拉勾教育">
+
+  <script>
+// 全局token变量，防CSRF，防重复提交
+window.X_Anti_Forge_Code = '';
+window.X_Anti_Forge_Token = '';
+var mds = {
+  userInfo: {
+      shortName: "",
+  }
+}
+window.mds = mds;
+</script>
+<script type="text/javascript" src="//g.alicdn.com/AWSC/AWSC/awsc.js"></script>
+<script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+<script>
+  window.userInfo = {
+      userId: '20015885',
+  };
+  //风控系统
+  (function() {
+      console.log(window);
+      window._smReadyFuncs = [];
+      window.SMSdk = {
+          ready: function(fn) {
+              fn && _smReadyFuncs.push(fn);
+          }
+      };
+  // 1. 通用配置项
+      window._smConf = {
+          organization: 'uTuOLHj2zLGJgglbtLOC',            //必填，组织标识，邮件中organization项
+          staticHost: 'static.fengkongcloud.com'  //必填, 设置JS-SDK文件域名
+
+      //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+      //
+      // 2.1 业务机房在国内
+      //     1) 用户分布：国内（默认设置）
+      // apiHost:'fp-it.fengkongcloud.com'
+  //      2) 用户分布：全球
+  //  apiHost:'fp-it-acc.fengkongcloud.com'
+  //
+  // 2.2 业务机房在欧美
+  //    1) 用户分布：欧美
+  // apiHost: 'fp-na-it.fengkongcloud.com'
+  //    2) 用户分布：全球
+  // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+  //
+  //2.3 业务机房在东南亚
+  //   1) 用户分布：东南亚
+  // apiHost:'fp-sa-it.fengkongcloud.com'
+  //   2) 用户分布：全球
+  // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+  // 2.4 私有化特殊配置
+  // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+  // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+
+      };
+
+      var url = (function () {
+          var originHost = 'static2.fengkongcloud.com';
+          var isHttps = document.location.protocol === 'https:';
+          var protocol = isHttps ? 'https://' : 'http://';
+          var fpJsPath = '/fpv2.js';
+          var url =  protocol + _smConf.staticHost + fpJsPath;
+          var ua = navigator.userAgent.toLowerCase();
+          var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua);
+          var isLowIE = /msie\s[678]\.0/.test(ua);
+
+          if (isHttps && isWinXP && isLowIE) {
+              url = protocol + originHost + fpJsPath;
+          }
+
+          return url;
+      })();
+      var sm = document.createElement('script');
+      var s = document.getElementsByTagName('script')[0];
+      sm.src = url;
+      s.parentNode.insertBefore(sm, s);
+  })();
+  //阿里云风控系统
+  var uabModule;
+  var webUmidToken;
+  //人机识别模块，只需初始化一次
+  AWSC.use("uab", function (state, uab) {
+      if(state === "loaded") {
+          uabModule = uab;
+      }
+  });
+  //设备指纹模块，得到设备token，只需初始化一次
+  AWSC.use("um", function (state, um) {
+      if(state === "loaded") {
+          um.init({
+              //appName请直接使用'saf-aliyun-com'
+              appName: 'saf-aliyun-com',
+          }, function (initState, result) {
+              if(initState === 'success') {
+                  webUmidToken = result.tn;
+              }
+          });
+      }
+  });
+/////
+  function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200;
+      var smDeviceId = '';
+      var smDeviceIdReady = false;
+      var smTimer = setTimeout(function() {
+          smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId;
+          if (!smDeviceIdReady && smDeviceId) {
+              smDeviceIdReady = true;
+              //执行业务逻辑
+              cb && cb(smDeviceId);
+          }
+      }, smTimeoutTime);
+
+      SMSdk.ready(function() {
+          smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId;
+          clearTimeout(smTimer);
+
+          if (!smDeviceIdReady && smDeviceId) {
+              smDeviceIdReady = true;
+              //执行业务逻辑
+              cb && cb(smDeviceId);
+          }
+      });
+  };
+  function getCookie(name){
+      var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+      if(arr=document.cookie.match(reg)){
+          return unescape(arr[2]);
+      }else{
+          return null;
+      }
+  }
+  function getHost(){
+      let host = window.location.host.split('.');
+      if(host[1] && host[1] == 'lagou'){
+         return true;
+      }
+      return false;
+  }
+  const getdeviceld = function (deviceId){
+      if(deviceId){
+          let data = [];
+          data.push({channel: 1,thirdDeviceId:deviceId});
+          data.push({channel: 2,thirdDeviceId: uabModule && uabModule.getUA() + ',' + webUmidToken});
+          var expats=new Date();
+          expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000);
+          if(getHost()){
+              document.cookie = 'thirdDeviceIdInfo=' + escape(JSON.stringify(data)) + ';expires=' +expats.toGMTString()+';path=/;domain=.lagou.com;';
+          }else{
+              document.cookie = 'thirdDeviceIdInfo=' + escape(JSON.stringify(data)) + ';expires=' +expats.toGMTString()+';path=/;';
+          }
+      }else{
+          dealSmDeviceId(getdeviceld)
+      }
+  }
+  if(!getCookie('thirdDeviceIdInfo')){
+      dealSmDeviceId(getdeviceld)
+  }
+  // Note: onepass h5无感本机认证
+  // https://docs.geetest.com/onelogin/deploy/h5
+  (function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(window.navigator.userAgent)
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType(){
+          var common_cell = ['cellular', '2g', '3g', '4g', '5g','3G/2G'];
+          var user_agent = navigator.userAgent.toLowerCase();
+          var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection ||{type: 'unknown'};
+          var type;
+          // 判断是否是微信内置浏览器
+          var isWeixin = /micromessenger/.test(user_agent);
+          if(isWeixin) {
+              if(user_agent.indexOf('nettype') !== -1){
+                  type = user_agent.match(/nettype\/\w+/) ? user_agent.match(/nettype\/\w+/)[0] : 'nettype/unknow';
+                  type = type.replace('nettype/', '')
+              }else {
+                  var weixinType = {"network_type:wifi":"wifi","network_type:edge":"3G/2G","network_type:fail":"fail","network_type:wwan":"3G/2G"}
+                  document.addEventListener("WeixinJSBridgeReady",function onBridgeReady(){
+                      WeixinJSBridge.invoke('getNetworkType',{},function(e){
+                          type = weixinType[e.err_msg];
+                      });
+                  });
+              }
+          }else {
+              type = (connection && connection.type) || 'unknown';
+          }
+          // 对type 做统一处理
+          if(type && common_cell.indexOf(type) !== -1){
+              return 'cellular'
+          }else if ( type === 'wifi'){
+              return 'wifi'
+          }
+          return 'unknown'
+      }
+      var metaEle = document.createElement('meta')
+      metaEle.content = 'always'
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement('script')
+      scriptEle.src = "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+          console.log(GOP, 'GOP 加载成功')
+          if (typeof GOP !== 'function') return
+          var nettype = getNetworkType();
+          // Note: onepass api h5场景只支持数据网络的场景
+          var ispre = nettype === 'wifi'? false: true;
+          window.OP_INSTANCE = new GOP({
+              app_id: '000760cd4c8bb48a3860e5070ded2717', // 在极验后台获取，生成app_id后等待极验审核成功后生效
+              timeout: 30000, // 超时时长，默认30000
+              pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+          })
+      }
+  })()
+</script>
+<link href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css" rel="stylesheet"><link href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css" rel="stylesheet">
+
+
+
+<div id="app" class=""><div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap"><div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header"><div data-v-5d185b94="" class="wrap-content"><div data-v-5d185b94="" class="wrap-left"><a data-v-5d185b94="" href="https://edu.lagou.com"><img data-v-5d185b94="" src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80" alt="" class="logo"></a> <h1 data-v-5d185b94="" class="title">
+          拉勾教育
+      </h1> <h1 data-v-5d185b94="" class="desc">
+          互联网职业教育平台
+      </h1></div> <div data-v-5d185b94="" class="wrap-right"><div data-v-5d185b94="" class="tab-list"><h2 data-v-5d185b94="" class="tab-item">
+              选课
+          </h2><h2 data-v-5d185b94="" class="tab-item">
+              学习
+          </h2><h2 data-v-5d185b94="" class="tab-item">
+              企业培训
+          </h2></div> <div data-v-5d185b94="" class="login-wrap"><div data-v-5d185b94="" class="wrap-login"><span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user"><a data-v-5d185b94="" href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3" target="_blank" class="tool-tip-item">
+                          帮助与反馈
+                      </a><a data-v-5d185b94="" href="https://kaiwu.lagou.com/certificate/index" target="_certificate" class="tool-tip-item">
+                          学业证书
+                      </a><a data-v-5d185b94="" href="https://kaiwu.lagou.com/setting" target="_self" class="tool-tip-item">
+                          账号设置
+                      </a><a data-v-5d185b94="" href="https://kaiwu.lagou.com/frontLogout.do" target="_self" class="tool-tip-item">
+                          退出登录
+                      </a></div></span> <img data-v-5d185b94="" src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png" alt="" class="avatar"></div></div></div></div> <!----></div> <div data-v-daa3f53a="" class="container"><div data-v-130a0286="" data-v-daa3f53a="" class="pub-header"><div data-v-130a0286="" class="pub-header-container-wrap"><div data-v-130a0286="" class="item-wrap inline-block catalog"><div data-v-130a0286="" class="img-wrap inline-block"></div> <div data-v-130a0286="" class="text-wrap inline-block">
+          收起目录
+      </div></div> <div data-v-130a0286="" class="splice-line inline-block"></div> <div data-v-130a0286="" class="item-wrap inline-block pre"><div data-v-130a0286="" class="img-wrap inline-block"></div> <div data-v-130a0286="" class="text-wrap inline-block">
+          上一讲
+      </div></div> <div data-v-130a0286="" class="splice-line inline-block"></div> <div data-v-130a0286="" class="item-wrap inline-block next disable-button"><div data-v-130a0286="" class="img-wrap inline-block"></div> <div data-v-130a0286="" class="text-wrap inline-block">
+          下一讲
+      </div></div> <div data-v-130a0286="" class="splice-line inline-block"></div> <div data-v-130a0286="" class="item-wrap inline-block detail"><div data-v-130a0286="" class="img-wrap inline-block"></div> <div data-v-130a0286="" class="text-wrap inline-block">
+          课程详情
+      </div></div> <div data-v-130a0286="" class="splice-line inline-block"></div> <div data-v-130a0286="" class="item-wrap inline-block all"><div data-v-130a0286="" class="img-wrap inline-block"></div> <div data-v-130a0286="" class="text-wrap inline-block">
+          全部课程
+      </div></div></div></div> <div data-v-daa3f53a="" class="content-wrap"><div data-v-daa3f53a="" class="left-content-wrap"><div data-v-5f686215="" data-v-daa3f53a="" class="menu-top-tips inline-block"><img data-v-5f686215="" src="https://s0.lgstatic.com/i/image/M00/5D/09/Ciqc1F-D0-OAZTxlAABYS9gye8s357.png" class="image-wrap"> <div data-v-5f686215="" class="menu-top-tips-wrap inline-block"><div data-v-5f686215="" class="title">
+      深入浅出搞定 React
+  </div> <div data-v-5f686215="" class="name">
+      修言
+      <div data-v-5f686215="" class="incise inline-block"></div>
+      高级前端工程师
+  </div> <!----> <div data-v-5f686215="" class="button btn btn-pc-css">
+      专属班主任
+  </div></div></div> <div data-v-daa3f53a="" class="menu-content calc"><div data-v-68b0779c="" data-v-daa3f53a="" class="class-menu-contaniner more-sections more-sections-detail"><!----> <div data-v-68b0779c="" class="class-menu-box" style="max-height: 185px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      开篇词
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  开篇词 | 这一次，真正吃透 React 知识链路与底层逻辑
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div><div data-v-68b0779c="" class="class-menu-box" style="max-height: 677px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      模块一：系统深入学习“基础知识”
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  01 | JSX 代码是如何“摇身一变”成为 DOM 的？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  02 | 为什么 React 16 要更改组件的生命周期？（上）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  03 | 为什么 React 16 要更改组件的生命周期？（下）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  04 | 数据是如何在 React 组件之间流动的？（上）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  05 | 数据是如何在 React 组件之间流动的？（下）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  06 | React-Hooks 设计动机与工作模式（上）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  07 | React-Hooks 设计动机与工作模式（下）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div><div data-v-68b0779c="" class="class-menu-box" style="max-height: 923px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      模块二：刨根问底吃透“核心原理”
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  08 | 深入 React-Hooks 工作机制：“原则”的背后，是“原理”
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  09 | 真正理解虚拟 DOM：React 选它，真的是为了性能吗？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  10 | React 中的“栈调和”（Stack Reconciler）过程是怎样的？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  11 | setState 到底是同步的，还是异步的？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  12 | 如何理解 Fiber 架构的迭代动机与设计思想？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  13 | ReactDOM.render 是如何串联渲染链路的？（上）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  14 | ReactDOM.render 是如何串联渲染链路的？（中）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  15 | ReactDOM.render 是如何串联渲染链路的？（下）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  16 | 剖析 Fiber 架构下 Concurrent 模式的实现原理
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  17 | 特别的事件系统：React 事件与 DOM 事件有何不同？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div><div data-v-68b0779c="" class="class-menu-box" style="max-height: 431px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      模块三：“周边生态”帮你拓宽技术视野
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  18 | 揭秘 Redux 设计思想与工作原理（上）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  19 | 揭秘 Redux 设计思想与工作原理（下）
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  20 | 从 Redux 中间件实现原理切入，理解“面向切面编程”
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  21 | 从 React-Router 切入，系统学习前端路由解决方案
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div><div data-v-68b0779c="" class="class-menu-box" style="max-height: 267px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      模块四：“生产实践”通用法则
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  22 | 思路拓展：如何打造高性能的 React 应用？
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div><div data-v-68b0779c="" class="class-level-one over-ellipsis    class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  23 | 跟 React 学设计模式：掌握编程“套路”，打造高质量应用
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div><div data-v-68b0779c="" class="class-menu-box" style="max-height: 185px;"><div data-v-68b0779c="" class="kw-icon-arrow show show-detail show-active"></div> <div data-v-68b0779c="" class="section-name single-line section-name-detail">
+      结束语
+  </div> <div data-v-68b0779c="" class="class-menu-block"><div data-v-68b0779c="" class="class-level-one over-ellipsis   isclick  class-level-one-detail"><div data-v-68b0779c="" class="text-wrap"><div data-v-68b0779c="" class="content">
+                  结束语 | 聊聊 React 17，谈谈学习前端框架的心法
+              </div> <div data-v-68b0779c="" class="item-status-wrap"><!----></div></div></div></div></div></div></div></div> <div data-v-daa3f53a="" class="right-content-wrap" style="height: 100px;"><div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap"><div data-v-1605a430=""><h1 data-v-1605a430="" class="main-title">
+      结束语 | 聊聊 React 17，谈谈学习前端框架的心法
+  </h1> <div data-v-1605a430="" class="main-tips">
+      2020/12/30
+      <span data-v-1605a430="" class="auth">修言</span></div> <div data-v-1605a430="" class="media-player-wrap"><div data-v-6ecd2302="" data-v-1605a430=""><div data-v-6ecd2302="" class="media-container"><div data-v-6ecd2302="" class="button-wrap inline-block"><div data-v-6ecd2302="" class="button-icon inline-block"></div></div> <div data-v-6ecd2302="" class="data-wrap inline-block"><div data-v-6ecd2302="" class="progress-bar"><div class="vue-slider vue-slider-ltr" style="padding: 7px 0px; width: auto; height: 4px;"><div class="vue-slider-rail" style="height: 2px; background: rgb(213, 218, 223); border-radius: 1.5px;"><div class="vue-slider-process" style="height: 100%; top: 0px; left: 0%; width: 0%; transition-property: width, left; transition-duration: 0.5s; background: rgb(252, 215, 102);"></div><div aria-valuetext="00:00/17:18" class="vue-slider-dot vue-slider-dot-hover" role="slider" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1038" aria-orientation="horizontal" tabindex="0" style="width: 14px; height: 14px; transform: translate(-50%, -50%); top: 50%; left: 0%; transition: left 0.5s ease 0s;"><div class="vue-slider-dot-handle" style="width: 16px; height: 16px; background: rgb(252, 215, 102); box-shadow: none; margin-top: -1px; z-index: 1;"></div><div class="vue-slider-dot-tooltip vue-slider-dot-tooltip-top"><div class="vue-slider-dot-tooltip-inner vue-slider-dot-tooltip-inner-top" style="padding: 2px 12px; border-radius: 14px; font-size: 14px; color: rgb(0, 0, 0); background: rgb(252, 215, 102); min-width: 20px; border-color: rgb(252, 215, 102);"><span class="vue-slider-dot-tooltip-text">00:00/17:18</span></div></div></div></div></div></div> <div data-v-6ecd2302="" class="detail-wrap "><div data-v-6ecd2302="" class="detail-one">
+              45.11M
+          </div> <div data-v-6ecd2302="" class="detail-two">
+              00:00/17:18
+          </div></div></div> <div data-v-6ecd2302="" class="division-line inline-block"></div> <div data-v-6ecd2302="" class="viedo-wrap inline-block"><div data-v-6ecd2302="" class="viedo-icon"></div> <div data-v-6ecd2302="" class="text">
+          看视频
+      </div></div></div> <!----></div></div> <div data-v-1605a430="" class="main-container"><div data-v-1605a430="" class="rich-text-wrap"><p data-nodeid="3071" class="">经过 23 个课时的学习，从基础到原理再到生产实践，相信此时此刻的你已经对 React 建立起了一个系统且深入的认知。前不久，React 17 版本正式面世，但 React 17 到底意味着什么，或许有不少同学还是一头雾水。因此，在专栏的最后一讲，我们先一起聊聊面向未来的 React——React 17 版本带来的改变。</p>
+<p data-nodeid="3072">聊完面向未来的 React，还要和你聊聊面向未来的学习——授人以鱼不如授人以渔，面对前端框架的更迭，技术的日新月异，我们应该如何确保自己能够保持住对新事物的敏锐度和理解能力呢？在本文的最后，我将对前端框架的学习方法论做一个提取，希望能帮助你建立良好的学习习惯。</p>
+<h3 data-nodeid="3073">React 17 带来了哪些改变</h3>
+<p data-nodeid="3074">我们先来看看 React 官方是如何介绍 React 17 的：</p>
+<blockquote data-nodeid="3075">
+<p data-nodeid="3076">React v17 的发布非比寻常，因为它没有增加任何面向开发者的新特性。但是，<strong data-nodeid="3173">这个版本会使得 React 自身的升级变得更加容易</strong>。<br>
+值得特别说明的是，React v17 作为后续版本的“基石”，它让不同版本的 React 相互嵌套变得更加容易。<br>
+—— React 官方</p>
+</blockquote>
+<p data-nodeid="3077">React 17 中没有新特性，这是由它的定位决定的。React 17 的定位是<strong data-nodeid="3183">后续 18、19 等更新版本的“基石”</strong>，它是一个“承上启下”的版本，用官方的说法来说，“<strong data-nodeid="3184">React v17 开启了 React 渐进式升级的新篇章”</strong>。</p>
+<p data-nodeid="3078">所谓“渐进式升级”，是相对于“一次性升级”来说的。日后我们需要将项目从 React 17 迁移至 18、19 等更新版本时，不需要一口气把整个应用升级到新版本，而是可以部分升级，比如说我们完全可以在 React 18 中安全地引入 React 17 版本的某个组件。而在 React 17 之前，这样做将会伴随着不可用的风险，彼时我们但凡要升级 React 版本，就必须一次性将整个应用迁移至目标版本。</p>
+<p data-nodeid="3079">“渐进式升级”意味着更大的选择余地，它将在未来为大量的 React 老版本项目留出喘息的空间，确保开发者们不必为了兼容多版本而徒增烦恼。</p>
+<p data-nodeid="3080">没有新特性，不代表没有变化，更不代表没有东西可以学了。事实上，React 17 中仍然有不少值得我们关注的用户侧改变，个人认为最重要的是以下三点：</p>
+<ul data-nodeid="3081">
+<li data-nodeid="3082">
+<p data-nodeid="3083">新的 JSX 转换逻辑</p>
+</li>
+<li data-nodeid="3084">
+<p data-nodeid="3085">事件系统重构</p>
+</li>
+<li data-nodeid="3086">
+<p data-nodeid="3087">Lane 模型的引入</p>
+</li>
+</ul>
+<p data-nodeid="3088">除此之外，React 17 中还有一些细节层面的变化，比如调整了 useEffect 钩子中清理副作用的时机，强化了组件返回 undefined 的错误校验等，这些也很有趣，大家课下可以多摸索摸索。</p>
+<h4 data-nodeid="3089">重构 JSX 转换逻辑</h4>
+<p data-nodeid="3090">在过去，如果我们在 React 项目中写入下面这样的代码：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word">function MyComponent() {
+</div></li><li><div class="code-word">  return &lt;p&gt;这是我的组件&lt;/p&gt;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3092">React 是会报错的，原因是 React 中对 JSX 代码的转换依赖的是 React.createElement 这个函数。因此但凡我们在代码中包含了 JSX，那么就必须在文件中引入 React，像下面这样：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word">import React from 'react';
+</div></li><li><div class="code-word">function MyComponent() {
+</div></li><li><div class="code-word">  return &lt;p&gt;这是我的组件&lt;/p&gt;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3094"><strong data-nodeid="3199">而 React 17 则允许我们在不引入 React 的情况下直接使用 JSX</strong>。这是因为在 React 17 中，编译器会自动帮我们引入 JSX 的解析器，也就是说像下面这样一段逻辑：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word">function MyComponent() {
+</div></li><li><div class="code-word">  return &lt;p&gt;这是我的组件&lt;/p&gt;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3096">会被编译器转换成这个样子：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">import</span> {jsx as _jsx} from <span class="hljs-string">'react/jsx-runtime'</span>;
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">MyComponent</span><span class="hljs-params">()</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> _jsx(<span class="hljs-string">'p'</span>, { children: <span class="hljs-string">'这是我的组件'</span> });
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3098">react/jsx-runtime 中的 JSX 解析器将取代 React.createElement 完成 JSX 的编译工作，这个过程对开发者而言是自动化、无感知的。因此，新的 JSX 转换逻辑带来的最显著的改变就是<strong data-nodeid="3206">降低了开发者的学习成本</strong>。</p>
+<p data-nodeid="3099">为什么说降低了学习成本呢？仔细回忆一下，当你入门 React 时，是不是很容易因为漏掉对 React 的引入从而引发 JSX 相关的问题？当这些问题发生的时候，作为新手难免会懵逼。直到你有一天成了进阶选手，理解了 JSX 和 React.createElement 之间的关系，你才恍然大悟，从此便永远地记住了“有 JSX 就必须有 React 引入”这条真理，于是你每次用 JSX 的时候都要手动 import 一下 React，虽极为不便，但也没有什么办法。</p>
+<p data-nodeid="3100">但如果你学习的是 React 17，那么从一开始你就不会感知到 React 需要和 JSX 一同引入这件事情，后续更不必去纠结背后的许多个为什么，因为 React 17 已经为你打点好了一切。</p>
+<p data-nodeid="3101">新的 JSX 转换逻辑告诉了我们一个道理——框架，并不是越复杂越难学才越牛。好的框架，甚至说好的“轮子”，追求的一定都是简单和稳定。</p>
+<p data-nodeid="3102">react/jsx-runtime 中的 JSX 解析器看上去似乎在调用姿势上和 React.createElement 区别不大，那么它是否只是 React.createElement 换了个马甲呢？当然不是，它在内部实现了 React.createElement 无法做到的<a href="https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md#motivation" data-nodeid="3213">性能优化和简化</a>。在一定情况下，它可能会略微改善编译输出内容的大小。</p>
+<h4 data-nodeid="3103">事件系统重构</h4>
+<p data-nodeid="3104">事件系统在 React 17 中的重构要从以下两个方面来看：</p>
+<ul data-nodeid="3105">
+<li data-nodeid="3106">
+<p data-nodeid="3107"><strong data-nodeid="3220">卸掉历史包袱</strong></p>
+</li>
+<li data-nodeid="3108">
+<p data-nodeid="3109"><strong data-nodeid="3224">拥抱新的潮流</strong></p>
+</li>
+</ul>
+<p data-nodeid="3110"><strong data-nodeid="3230">1. 卸掉历史包袱：放弃利用 document 来做事件的中心化管控</strong></p>
+<p data-nodeid="3111">在本专栏的第 17 讲，相信你已经对 React 16.13.x 版本中的事件系统实现原理有了深入的了解。当时我们反复强调过，React 会<strong data-nodeid="3236">通过将所有事件冒泡到 document 来实现对事件的中心化管控</strong>。</p>
+<p data-nodeid="3112">这样的做法虽然看上去已经足够巧妙，但仍然有它不聪明的地方——document 是整个文档树的根节点，操作 document 带来的影响范围实在是太大了，这将会使事情变得更加不可控。相关的 Bug 中最出名的莫过于下图这个 GitHub issue 了：</p>
+<p data-nodeid="3113"><img src="https://s0.lgstatic.com/i/image/M00/8C/49/Ciqc1F_qxmOACrCCAAQ4SHpdu30570.png" alt="Drawing 0.png" data-nodeid="3240"></p>
+<p data-nodeid="3114">提问者说他试图在 input 这个元素的 React 事件函数中阻止冒泡，但事实并没有如他所愿——每次点击 input 的时候，事件还是会被冒泡到 document 上去。对此，他得到的回复是这样的：</p>
+<p data-nodeid="3115"><img src="https://s0.lgstatic.com/i/image/M00/8C/49/Ciqc1F_qxmmAbX_mAAJbigHC7d0803.png" alt="Drawing 1.png" data-nodeid="3244"></p>
+<p data-nodeid="3116">原因和大家想的一样：由于 React 依赖将 DOM 事件冒泡到 document 上来实现对所有事件的中心化管控。图中源代码中，作者在 handleClick 这个 React 事件函数中阻止了冒泡，这只能够保证该事件对应的合成事件在 React 事件体系下的冒泡被阻止了（也就是说 React 不会为这个合成事件模拟冒泡效果，关于“模拟冒泡”这个概念，第 17 讲中有源码级的原理分析，趁机拐回去复习一下吧^_^），并不能够阻止原生 DOM 事件的冒泡。因此我们安装在 document 上的事件监听器一定会被触发。</p>
+<p data-nodeid="3117">且不说 document 中心化管控这个设定给开发者带来了多大的限制，单看设计理念，就多少能够预感到其中的风险：document 是一个全局的概念，而组件只是全局的一个部分。由 React 组件引入的 React 事件系统，理论上看和组件绑在一起是最合适的，不应该将影响范围扩大到全局。</p>
+<p data-nodeid="3118">在 React 17 中，React 团队终于正面解决了这个问题：事件的中心化管控不会再全部依赖 document，管控相关的逻辑被转移到了每个 React 组件自己的容器 DOM 节点中。比如说我们在 ID 为 root 的 DOM 节点下挂载了一个 React 组件，像下面代码这样：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> rootElement = document.getElementById(<span class="hljs-string">"root"</span>);
+</div></li><li><div class="code-word">ReactDOM.render(&lt;App /&gt;, rootElement);
+</div></li></ol></code></pre></div>
+<p data-nodeid="3120">那么事件管控相关的逻辑就会被安装到 root 节点上去。这样一来， React 组件就能够自己玩自己的，再也无法对全局的事件流构成威胁了。</p>
+<p data-nodeid="3121"><strong data-nodeid="3256">2. 拥抱新的潮流：放弃事件池</strong></p>
+<p data-nodeid="3122">在 React 17 之前，合成事件对象会被放进一个叫作“事件池”的地方统一管理。这样做的目的是能够实现事件对象的复用，进而提高性能：每当事件处理函数执行完毕后，其对应的合成事件对象内部的所有属性都会被置空，意在为下一次被复用做准备。这也就意味着事件逻辑一旦执行完毕，我们就拿不到事件对象了，React 官方给出的这个例子就很能说明问题，请看下面这个代码：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">handleChange</span><span class="hljs-params">(e)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-comment">// This won't work because the event object gets reused.</span>
+</div></li><li><div class="code-word">  setTimeout(() =&gt; {
+</div></li><li><div class="code-word">    console.log(e.target.value); <span class="hljs-comment">// Too late!</span>
+</div></li><li><div class="code-word">  }, <span class="hljs-number">100</span>);
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3124">异步执行的 setTimeout 回调会在 handleChange 这个事件处理函数执行完毕后执行，因此它拿不到想要的那个事件对象 e。</p>
+<p data-nodeid="3125">屏幕前面因为拿不到心仪的事件对象而写出过 Bug 的同学，请在心里默默地扣个 1——我相信如果文章有弹幕，此时一定能看到满屏的 1。事件池的这个设计，虽然利好了性能，却整懵了用户。很多人只有在写过无数 Bug 之后，才会后知后觉地发现，要想拿到目标事件对象，必须显式地告诉 React——我永远需要它，也就是调用 e.persist() 函数，像下面这样：</p>
+<div class="course-code-area"><div class="copy-btn"><div class="copy-icon"></div>复制代码</div><pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">handleChange</span><span class="hljs-params">(e)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-comment">// Prevents React from resetting its properties:</span>
+</div></li><li><div class="code-word">  e.persist();
+</div></li><li><div class="code-word">  setTimeout(() =&gt; {
+</div></li><li><div class="code-word">    console.log(e.target.value); <span class="hljs-comment">// Works</span>
+</div></li><li><div class="code-word">  }, <span class="hljs-number">100</span>);
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre></div>
+<p data-nodeid="3127">在旧版本中，React 这样做在很大程度上是希望能能够对部分性能一般的老浏览器进行向下兼容。</p>
+<p data-nodeid="3128">但随着时代的发展，如今市面上的浏览器虽不能说是性能绝佳，但基本上也不会因为事件池里的对象多几个少几个就给你表演内存泄漏。因此，React 17 拥抱了新时代的潮流，重新在研发体验和向下兼容性能之间做了选择，这一次，它选择了前者——<strong data-nodeid="3266">放弃事件池，为每一个合成事件创建新的对象</strong>。</p>
+<p data-nodeid="3129">因此在 React 17 中，我们不需要 e.persist()，也可以随时随地访问我们想要的事件对象。</p>
+<h4 data-nodeid="3130">Lane 模型的引入</h4>
+<p data-nodeid="3131">如果你曾经尝试持续较长一段时间地关注并阅读 React 源码，会发现 React 16 中几乎每一个小版本的更新，都要动一动 Fiber Reconciler 相关的逻辑。这一点曾经让我感到很头痛，一度陷入“学不完了”的惆怅中。虽然变更仅仅发生在编码层面，并不至于影响核心思想，但这仍然会对源码学习者造成不小的压力。</p>
+<p data-nodeid="3132">为了避免你陷入类似的困境，本专栏涉及 Fiber 源码的几讲（第 13 ~ 16 讲），其中源码全部引用自 React 17——直接学最新的，是当下最保险的方式，这意味着我们捕获到的是 React 团队截至目前的“最佳思路”。</p>
+<p data-nodeid="3133">而在第 13 ~ 16 讲的分析中，我们其实就已经在源码的各个角落见过“Lane”这个概念，也分析过一些和 Lane 相关的一些函数。初学 React 源码的同学由此可能会很自然地认为：优先级就应该是用 Lane 来处理的。但事实上，React 16 中处理优先级采用的是 expirationTime 模型。</p>
+<p data-nodeid="3134">expirationTime 模型使用 expirationTime（一个时间长度） 来描述任务的优先级；而 Lane 模型则使用二进制数来表示任务的优先级：</p>
+<blockquote data-nodeid="3135">
+<p data-nodeid="3136">lane 模型通过将不同优先级赋值给一个位，通过 31 位的位运算来操作优先级。</p>
+</blockquote>
+<p data-nodeid="3137">Lane 模型提供了一个新的优先级排序的思路，相对于 expirationTime 来说，它对优先级的处理会更细腻，能够覆盖更多的边界条件。</p>
+<h3 data-nodeid="3138">如何深入了解一个前端框架</h3>
+<p data-nodeid="3139">作为团队自研前端框架方向的负责人，我在实际工作中需要调研和深扒的框架类型可能会比大家想象的多得多。那么面对一个陌生的前端框架，我们应该怎样做才能够高效且平稳地完成从“小工”到“专家”的蜕变呢？</p>
+<p data-nodeid="3140">这个问题其实是没有标准答案的，它和每个人的学习习惯、学习效率甚至元认知能力都有关系。但我想总有一些具体到行为上的规律是可以复用的。今天我想和你分享的，就是一部分我在团队的新人包括实习生同学身上验证过的、可执行度较高的学习经验，希望能够对你日后的生涯道路有所帮助。</p>
+<h4 data-nodeid="3141">不要小看官方文档</h4>
+<p data-nodeid="3142">在实际的读者调研中，我发现很多同学对 React 官方文档不够重视。大家习惯于在入门阶段借助文档完成“快速上手”，却忽视了文档所能够提供给我们的一些更有价值的信息——比如框架的设计思想、源码分层及一些对特殊功能点的介绍。</p>
+<p data-nodeid="3143">在专栏的更新过程中，我会在引用官方文档的地方标注出处，这促使了一部分同学去阅读一部分的文档内容，这是一件好事情。React 文档在前端框架文档中属于相当优秀的范本，如果你懂得利用文档，会发现它不只是一个 API 手册或是入门教程，而是一套成体系的官方教学。</p>
+<p data-nodeid="3144">如果专栏中的一些文档的摘要引用使你受用，不妨尝试去阅读一下完整的原文。在日常的源码阅读包括生产实践中，如果遇到了 React 相关的问题，请不要急于去阅读参差不齐的社区文章——先问问 React 文档试试看吧，或许你能收获的会比你想象中要多。</p>
+<h4 data-nodeid="3145">调用栈就是你的学习地图</h4>
+<p data-nodeid="3146">若你的学习层次已经超越了阅读官方文档这个阶段，接下来可能会想要了解框架到底是如何运行的。此时你已经掌握了框架的设计理念和基本特性，也有了一些简单项目的实践经验，但或许还并不具备从头挑战源码的知识储备和心理准备。这时，在阅读源码之前，框架的函数调用栈将会给你指明许多方向性的问题。</p>
+<p data-nodeid="3147">比如当你想要了解 Hooks，那么就可以尝试去观察不同 Hooks 调用所触发的函数调用栈，从中找出出镜率最高的那些函数，它们大概率暗示着 Hooks 源码的主流程。事件系统、render 过程之类的也是同理。观察调用栈，寻找共性，然后点对点去阅读关键函数的源码，这将大大降低我们阅读源码的难度。</p>
+<h4 data-nodeid="3148">如何阅读源码</h4>
+<p data-nodeid="3149">当你理解了一部分核心功能的源码逻辑之后，难免会对整个框架的运行机制产生好奇。这时候直接从入口文件出发去阅读所有的源码，仍然是一个不太明智的选择。</p>
+<p data-nodeid="3150">在整体阅读源码之前，我们最好去复习一下框架官方对框架架构设计、源码分层相关的介绍——这些信息未必会全部暴露在文档里，但借助搜索引擎，我们总能找到一些线索——比如框架作者/官方团队的博文，其内容的权威度基本和文档持平。</p>
+<p data-nodeid="3151">在理解了整个框架项目的架构分层之后，我们阅读源码的姿势就可以多样化一些了：可以尝试分层阅读，一次搞清楚一个大问题，最后再把整个思路按照架构分层的逻辑组合起来；也可以继续借助调用栈，通过观察一个完整的执行流程（比如 React 的首屏渲染过程）中所涉及的函数，自行将每个层次的逻辑对号入座，然后再向下拆分，我个人采用的就是这种办法。</p>
+<h3 data-nodeid="3152">总结</h3>
+<p data-nodeid="3153">行文至此，我们对 React 世界的探索就要告一段落了。</p>
+<p data-nodeid="3154">通过对本专栏的学习，希望大家最终收获不仅仅是对 React 框架的通透理解，更有一套健康的、可持续的前端学习的方法论。</p>
+<p data-nodeid="3155">经过几年的角逐和沉淀，主流前端框架的稳定性逐渐在强化，三大框架都向着 Web Components 的标准演化，一切并非倾向于无序，而是变得越来越确定、越来越可预测。因此大家大可不必迷信舆论中对“学不完了”这种焦虑的渲染，更不必去盲目追逐新的花样。在当下的这种趋势下，很多时候若你能深入地吃透一个优秀的框架，就能够迅速地积累许多可以复用的理解经验，这将为你学习其他的新知识创造极大的加速度。</p>
+<p data-nodeid="3156">所以说，不要急，慢慢来，或许会比较快。</p>
+<p data-nodeid="3157">主流框架趋于稳定，而前端世界却仍在野蛮生长。近年来，Serverless、低代码、智能化、跨平台等新的概念层出不穷，每一个都足以将前端推入一个崭新的时代。面对层出不穷的技术热点，我们除了要保持冷静的头脑，还需要保持飞快的脚步，这一切的一切，都需要你主动去构建并持续地迭代属于自己的、行之有效的学习习惯。如果本专栏在这个方面能够帮到你，将是我最大的幸事。</p>
+<p data-nodeid="3158">最后，我邀请你为本专栏课程进行结课评价，因为你的每一个观点都是我和拉勾教育最关注的点。<a href="https://wj.qq.com/s2/7788862/db64/" data-nodeid="3302">点击链接，既可参与课程评价</a>。编辑会随机抽 5 位同学送精美礼品喔。</p>
+<p data-nodeid="3159" class="te-preview-highlight"><img src="https://s0.lgstatic.com/i/image2/M01/04/37/Cip5yF_rHZ-AXqYdAAQ04psP83A706.png" alt="图片1.png" data-nodeid="3306"></p></div></div></div> <div data-v-1605a430="" class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="dialog" class="el-dialog el-dialog--center show-img-wrap" style="margin-top: 15vh; width: 60%;"><div class="el-dialog__header"><span class="el-dialog__title"></span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div></div> <div data-v-daa3f53a="" class="fix-box-wrap"><div data-v-daa3f53a="" class="mini-player-wrap"><div data-v-2ee8fa4a="" data-v-daa3f53a="" class="player-container-wrap"><div data-v-2ee8fa4a="" class="player"><div data-v-2ee8fa4a="" class="close-btn"></div> <div data-v-2ee8fa4a="" class="content"><div data-v-2ee8fa4a="" class="theme single-line narrow-theme">
+          
+      </div> <div data-v-2ee8fa4a="" class="time-course"><div data-v-2ee8fa4a="" class="time">
+              00:00<span data-v-2ee8fa4a="" class="line"></span></div> <span data-v-2ee8fa4a="" class="course-name single-line">深入浅出搞定 React</span></div></div> <div data-v-2ee8fa4a="" class="player-container"><div data-v-2ee8fa4a="" class="play-btn"><div data-v-2ee8fa4a="" class="play-status playing"></div></div> <div data-v-2ee8fa4a="" class="play-next next-unable"></div></div></div></div></div> <!----></div> <div data-v-daa3f53a="" class="right-content-space"></div> <div data-v-daa3f53a="" class="right-content-message"><div data-v-4bc80e00="" data-v-daa3f53a="" class="message pc-message"><div data-v-4bc80e00="" class="message-topic"><div data-v-4bc80e00="" class="message-topic-title">
+      精选留言
+      </div> <div data-v-4bc80e00="" class="message-topic-write pointer btn-pc-css"><img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII=" class="message-topic-write-icon">
+      写留言
+  </div></div> <!----> <!---->  <div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **彪
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              28
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">最精华最精彩的部分居然是最后一讲，大佬厉害了</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **森
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              17
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">修言大佬辛苦，为数不多的react精品课程，我还得反复看几遍，👍👍👍</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *欢
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              7
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">醍醐灌顶，感谢修言</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **飞
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              4
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">第一遍学完，打卡！</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              console_man
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              4
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">秀妍出品！必属精品！</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **飞
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              4
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">🙏🙏</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **8768
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              2
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">修大文笔通俗易懂，读起来丝毫不觉得乏味，每读完一遍都有不同的收获，很棒棒</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **龙
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              2
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">Thanks</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **宇
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">大佬真的厉害，没想到跟着大佬我也能读懂源码。</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *童
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">通俗易懂，收获良多，感恩修言大佬</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **8621
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">fiber架构还是最难的，需要多复习几遍才可以……</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *灿
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">看完这个课程，醍醐灌顶，感谢修言！</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *盼
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">谢谢修言大佬的系统专栏，感谢，辛苦了</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **霖
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              1
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">谢谢</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **6614
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">nice,第二遍看。 还是很有感触。 加油(ง •_•)ง</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *斌
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">感谢</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **林
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">修言老师讲的内容一点都不拖沓，也不会太抠细节，每个点讲的都非常到位。在“核心原理”阶段非常专业非常深入，帮助我理解了整个执行链路。非常棒，感谢老师。</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *杰
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">顶礼膜拜，本专栏值得反复阅读</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              **翊
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">感谢修言大佬，每一节课都收获颇丰。</div> <!----></div> <!----> <!----> <!----></div><div data-v-4bc80e00="" class="message-list"><div data-v-4bc80e00="" class="message-list-title"><div data-v-4bc80e00="" class="message-list-title-left"><!----> <div data-v-4bc80e00="" class="message-list-title-left-name">
+              *磊
+          </div></div> <div data-v-4bc80e00="" class="message-list-title-right"><!----> <img data-v-4bc80e00="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII=" alt="right-icon" class="message-list-title-right-icon"> <div data-v-4bc80e00="" class="message-list-title-right-praise">
+              
+          </div></div></div> <div data-v-4bc80e00="" class="message-list-container"><div data-v-4bc80e00="" class="message-list-content">感谢大佬，fiber架构那块需要再研究</div> <!----></div> <!----> <!----> <!----></div> <!----></div> <div data-v-7580e7ec="" data-v-daa3f53a="" class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="dialog" class="el-dialog el-dialog--center" style="margin-top: 25vh; width: 400px;"><div class="el-dialog__header"><span class="el-dialog__title"></span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div> <div data-v-e31d0af2="" data-v-daa3f53a="" class="el-dialog__wrapper" style="display: none;"><div role="dialog" aria-modal="true" aria-label="dialog" class="el-dialog el-dialog--center" style="margin-top: 10vh; width: 500px;"><div class="el-dialog__header"><span class="el-dialog__title"></span><!----></div><!----><!----></div></div></div></div></div></div></div> <video data-v-537ed502="" id="video" controls="controls" x-webkit-airplay="true" x5-video-player-fullscreen="true" preload="auto" playsinline="true" webkit-playsinline="" x5-video-player-type="h5" class="video vjs-default-skin"><source data-v-537ed502="" type="application/x-mpegURL" src=""></video> <!----> <div><!----> <!----> <!----> <div data-v-51f7ab0d="" class="vux-alert purchase-alert-container" current-environment="PC"><div class="vux-x-dialog"><div class="weui-mask" style="display: none;"></div> <div class="weui-dialog" style="display: none;"><div class="weui-dialog__hd"><strong class="weui-dialog__title">购买成功</strong></div> <div class="weui-dialog__bd"><div data-v-51f7ab0d="" class="purchase-alert-content"><img data-v-51f7ab0d="" src="data:image/png;base64,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" alt="购买成功" class="purchase-success-img"></div></div> <div class="weui-dialog__ft"><a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">我知道了</a></div></div></div></div> <!----> <!----> <!----> <!----> <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap"><div data-v-467635e0="" data-v-0b91fc6d="" class="el-dialog__wrapper sale-pc-all-dirlog" style="display: none;"><div role="dialog" aria-modal="true" aria-label="dialog" class="el-dialog el-dialog--center" style="margin-top: 25vh; width: 500px;"><div class="el-dialog__header"><span class="el-dialog__title"></span><button type="button" aria-label="Close" class="el-dialog__headerbtn"><i class="el-dialog__close el-icon el-icon-close"></i></button></div><!----><!----></div></div></div></div></div>
+<!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+<!--[if lt IE 9]>
+<script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+<![endif]-->
+
+<script id="_lgpassport_" data-css-site="0" data-css-popup="0" type="text/javascript" src="https://passport.lagou.com/static/js/passport.js"></script>
+
+<script type="text/javascript">
+//后端变量赋值
+  window.courseInfo = {"id":510,"courseCId":"","courseName":"深入浅出搞定 React","teachers":[{"id":512,"teacherName":"修言","position":"高级前端工程师","teacherHeadPicUrl":"https://s0.lgstatic.com/i/image/M00/5C/83/CgqCHl-BnE6Adj2iAAAI-hEnRgU445.png","description":"<p><span data-shimo-docs=\"[[20,&quot;他是 React 重度用户，对 React 源码、底层原理及周边生态有着较为深入的探究和理解。早期专注于性能优化和前端工程化，曾将线上大型应用性能提升率做到 40%，并基于 React 打造过团队新基建。现在在一线电商集团专攻前端框架与底层链路设计，同时，作为多年一线前端面试官，积累了丰富的面试经验。&quot;,&quot;0:\\&quot;%23494949\\&quot;&quot;]]\"></span></p><p line=\"ydpB\" linespacing=\"115\"><span style=\"font-size: 14px; font-family: 微软雅黑, &quot;Microsoft YaHei&quot;;\">他是 React 重度用户，对 React 源码、底层原理及周边生态有着较为深入的探究和理解。早期专注于性能优化和前端工程化，曾将线上大型应用性能提升率做到 40%，并基于 React 打造过团队新基建。现在在某一线互联网大厂专攻前端框架与底层链路设计，同时，作为多年一线前端面试官，积累了丰富的面试经验。</span></p><p><br/></p><p><br/></p>"}],"totalCourseTime":20,"totalDuration":1,"sales":13477,"price":"98","priceTag":"立即购买","discounts":"98","discountsTag":"立即购买","courseImgUrl":"https://s0.lgstatic.com/i/image/M00/5C/83/CgqCHl-BnE6Adj2iAAAI-hEnRgU445.png","sellGoodsId":556,"sellGoodsPriceId":47335,"lgCoinPrice":98,"isBuy":false,"isFavorite":false,"isNewDes":"","seoDescription":"本专栏基于源码提炼出来原理，所涉及的原理，可以帮助你解决掉实际工作中的大多数疑难杂症，也可以 match 上大厂对资深前端工程师的技术深度的要求。在广度方面，专栏涵盖了对基本问题的较为深入和完善的讲解，涵盖了 React 周边生态及生产实践，足以帮助你构建起“表象——原理——应用”的完整学习链路。","seoKeywords":"前端开发,React,React-Hooks,栈调,Fiber,setState,Redux,Facebook,源码分析,技术栈,JS,ES2015,React-Router,DOM,React Native,state,props,diff,umi,Suspense,React.js,batchUpdate,setState,\tWeb ,前端,UI,HTML,jsx,ShoppingList,Props","seoTitle":"深入浅出搞定 React - 高级前端工程师 - 拉勾教育","shareTitle":"戳此，带你吃透 React 知识链路和底层逻辑","shareDescription":"帮你构建起“表象、原理、应用”的完整学习链路。","brief":"掌握 React 知识链路和底层逻辑","courseListImg":"https://s0.lgstatic.com/i/image/M00/5D/09/Ciqc1F-D0-OAZTxlAABYS9gye8s357.png","courseType":1,"previewFirstField":"共22讲","previewSecondField":"已全部更新","joinMember":false,"freeForVip":true,"decorateId":275,"successShowType":"COURSE_COMMUNITY","weixinQrUrl":"https://s0.lgstatic.com/i/image/M00/59/46/Ciqc1F9xW1eAEPp6AAS4A4rXd4I423.png","appDecorateId":0,"recruitAppDecorateId":0,"joinSeckill":false,"seckillRemainSeconds":"0","hasActivityTask":false,"enterpriseDecorateId":275,"hasCoupon":false,"hasActivityGroup":false,"synEnterprise":true,"classCourseType":0};
+      window.isLogin = true;
+      window.sellGoodsPriceId = -1;
+      window.orderToken = '6b62455562524a2abd56ef262bd463b1';
+      window.userInfo = {"id":20015885,"nickName":"张熙远","isActive":0,"portrait":"https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"};
+      window.enterNewPage = false;
+          window.activityButtonInfo = null;
+  
+</script>
+<script type="text/javascript" src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js" crossorigin=""></script>
+
+<!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+<!---->
+<!---->
+
+
+
+
+
+<script type="text/javascript" src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js" crossorigin="anonymous"></script>
+<script src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js" crossorigin="anonymous"></script><script src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js" crossorigin="anonymous"></script><script src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js" crossorigin="anonymous"></script><script src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js" crossorigin="anonymous"></script><div class="lg-pay lg-recharge-pay-container">
+<div class="lg-pay-container recharge-pay-container">
+  <div class="lg-pay-close"></div>
+  <div class="modal-payment-title">
+      <i class="icon-hd"></i>
+      <span class="title-text">已开启安全支付</span>
+  </div>
+  <div class="amount-coupon"></div>
+  <div class="recharge-pay-title">请选择支付方式</div>
+  <div class="pay-methods">
+              <div class="pay-method-list">
+                  <div class="lg-pay-select lg-pay-select-ali pay-method-item pay-ali active">
+                      <i class="pay-icon-ali"></i>
+                      <span class="pay-method-name">支付宝支付</span>
+                  </div>
+                  <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx ">
+                      <i class="pay-icon-wx"></i>
+                      <span class="pay-method-name">微信支付</span>
+                  </div>
+              </div>
+          </div>
+          <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+              <canvas id="wxQrcode"></canvas>
+          </div>
+          <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display:block">
+              <canvas id="aliQrcode"></canvas>
+          </div>
+         
+          <div class="pay-qrcode-status">
+              <span>
+                  <span class="left-text">未支付成功，请重新扫码支付</span>
+                  <div class="pay-tips">
+                    <span>使用支付宝扫码支付</span>
+                    <a class="link">
+                      我已支付
+                    </a>
+                  </div>
+              </span>
+          </div>
+          <div class="pay-notes">
+              <span>付费即表示同意<a href="https://activity.lagou.com/app/business/service-agreement.html" }="" target="_blank">《拉勾网在线增值服务协议》</a></span>
+          </div>
+</div>
+</div><div class="lg-pay-recharge" style="display: none;">
+<div class="lg-pay-container lg-pay-recharge-confirm">
+  <div class="lg-pay-close"></div>
+  <div class="recharge-title">勾豆充值</div>
+  <div>
+      <div class="recharge-label">填写充值勾豆数量</div>
+      <div class="recharge-amount">
+          <input type="text" class="amount input" min="0" max="9999" value="100">
+      </div>
+  </div>
+  <div class="recharge-tips">
+      需支付：<span class="count-show">100元</span><span class="recharge-description">（1元=1勾豆）</span>
+  </div>
+  <div class="recharge-btn">立即充值</div>
+</div>
+</div><div class="lg-pay-recharge" style="display: none;">
+<div class="lg-pay-container lg-pay-recharge-confirm">
+  <div class="lg-pay-close"></div>
+  <div class="recharge-title">勾豆充值</div>
+  <div>
+      <div class="recharge-label">填写充值勾豆数量</div>
+      <div class="recharge-amount">
+          <input type="text" class="amount input" min="0" max="9999" value="100">
+      </div>
+  </div>
+  <div class="recharge-tips">
+      需支付：<span class="count-show">100元</span><span class="recharge-description">（1元=1勾豆）</span>
+  </div>
+  <div class="recharge-btn">立即充值</div>
+</div>
+</div><script type="text/javascript" crossorigin="anonymous" src="https://kaiwu.lagou.com/upload/oss.js?v=1010"></script>
+
+<div class="xl-chrome-ext-bar" id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}" style="display: none;">
+<div class="xl-chrome-ext-bar__logo"></div>
+
+<a id="xl_chrome_ext_download" href="javascript:;" class="xl-chrome-ext-bar__option">下载视频</a>
+<a id="xl_chrome_ext_close" href="javascript:;" class="xl-chrome-ext-bar__close"></a>
+</div><script></script><div id="cboxOverlay" style="display: none;"></div><div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none;"><div id="cboxWrapper"><div><div id="cboxTopLeft" style="float: left;"></div><div id="cboxTopCenter" style="float: left;"></div><div id="cboxTopRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxMiddleLeft" style="float: left;"></div><div id="cboxContent" style="float: left;"><div id="cboxTitle" style="float: left;"></div><div id="cboxCurrent" style="float: left;"></div><button type="button" id="cboxPrevious"></button><button type="button" id="cboxNext"></button><button id="cboxSlideshow"></button><div id="cboxLoadingOverlay" style="float: left;"></div><div id="cboxLoadingGraphic" style="float: left;"></div></div><div id="cboxMiddleRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxBottomLeft" style="float: left;"></div><div id="cboxBottomCenter" style="float: left;"></div><div id="cboxBottomRight" style="float: left;"></div></div></div><div style="position: absolute; width: 9999px; visibility: hidden; display: none;"></div></div></body>
