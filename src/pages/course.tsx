@@ -3,6 +3,8 @@ import axios from "axios"
 import React, { useEffect, useRef, useState } from "react"
 import Article from "../components/Article"
 import LinkButton from "../components/LinkButton"
+import { Transition } from "@headlessui/react"
+import Loading from "../components/Loading"
 interface SectionData {
   title: string // 章节标题名
   filename: string // 章节文件名
@@ -45,6 +47,7 @@ export default function Course(props: PageProps<object, object, CourseData>) {
     async function changeSection() {
       const sectionData = list[currSelect]
       if (!sectionData) return
+      setArticleNode(<Loading></Loading>)
       const res = await axios.get(`docs/${sectionData.filename}`)
       const section = res.data as { title: string; context: string }
       setArticleNode(
@@ -91,7 +94,7 @@ export default function Course(props: PageProps<object, object, CourseData>) {
 
   return (
     <div className="flex flex-col w-screen h-screen">
-      <div className="w-full bg-white border-b-2 px-60">
+      <div className="w-full bg-white border-b-2 lg:px-60 px-2">
         <LinkButton onClick={back}>返回</LinkButton>
         <LinkButton onClick={toggleCategory}>
           {showCategory ? "隐藏" : "显示"}目录
@@ -104,8 +107,16 @@ export default function Course(props: PageProps<object, object, CourseData>) {
         </LinkButton>
       </div>
       <div className="flex flex-1 w-full justify-center overflow-hidden">
-        <div className="flex 2xl:w-1280 xl:w-1024 lg:w-950 w-full h-full shadow-lg">
-          {showCategory && (
+        <div className="flex 2xl:w-1280 xl:w-1024 lg:w-950 w-full h-full shadow-lg overflow-x-hidden">
+          <Transition
+            show={showCategory}
+            enter="transform transition ease-in-out duration-500"
+            enterFrom="-translate-x-full"
+            enterTo="translate-x-0"
+            leave="transform transition ease-in-out duration-500"
+            leaveFrom="translate-x-0"
+            leaveTo="-translate-x-full"
+          >
             <div className="lg:w-40 xl:w-60 2xl:w-80 w-0 h-full shadow-lg overflow-y-auto">
               <header className="container font-semibold text-base p-6 mt-16 sticky top-0 bg-white">
                 章节目录
@@ -128,7 +139,7 @@ export default function Course(props: PageProps<object, object, CourseData>) {
                 })}
               </ul>
             </div>
-          )}
+          </Transition>
           <div
             ref={ref}
             className="flex-1 h-full lg:p-20 p-5 pt-10 overflow-y-auto context"
