@@ -1,0 +1,2152 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">TypeScript 入门实战笔记 - 拉勾教育</h1>
+
+  <meta
+    content="TypeScript,JavaScript,开源语言,Babel,ECMAScript,装饰器,前端,开发,jQuery,MongoDB，	Node.js和D3.js,静态类型,动态类型,JScript .NET,Visual Studio,	CodePlex,IntelliSense,TS,编程,流行库,	类型批注,类,接口,模块,Microsoft,number, bool,string,any"
+    name="keywords"
+  />
+
+  <meta
+    content="TypeScript 很好地弥补了 JavaScript 在静态类型检查方面的缺陷，在不严重破坏代码的情况下，开发人员可以更轻松地避免错误并进行代码重构。TypeScript 在国内成了一个主流的技术方向，国内各大互联网公司和中小型团队都在使用 TS 开发项目。"
+    name="description"
+  />
+
+  <title>
+    Type script 入门实战笔记 - 快手资深前端技术专家，快手轻雀协作前端负责人 -
+    拉勾教育
+  </title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Type script 入门实战笔记 - 快手资深前端技术专家，快手轻雀协作前端负责人 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/3B/75/CioPOWCFE-qAI1j-AAEVxeXd9lc749.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  TypeScript 入门实战笔记
+                </div>
+                <div data-v-5f686215="" class="name">
+                  乾元
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  快手资深前端技术专家，快手轻雀协作前端负责人
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 你为什么要选择 TypeScript？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 923px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：TypeScript 入门
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 如何快速搭建 TypeScript 学习开发环境？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 简单基础类型：TypeScript 与 JavaScript 有何不同？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 复杂基础类型：TypeScript 与 JavaScript 有何不同？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 什么是字面量类型、类型推断、类型拓宽和类型缩小？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 函数类型：返回值类型和参数类型到底如何定义？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 类类型：如何高效使用类型化的面向对象编程利器？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 |
+                          接口类型与类型别名：这两者的用法与区别分别是什么？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 高级类型：如何快速读懂联合类型和交叉类型的含义？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 枚举类型：详解常见枚举类型的 7 种用法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 泛型：如何正确使用泛型约束类型变量？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：TypeScript 进阶
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 类型守卫：如何有效地保障类型的安全性？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 |
+                          类型兼容：如何判断一个类型是否可以赋值给其他类型？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 必备增强类型系统的方式大盘点，让你的开发如虎添翼
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 掌握 TypeScript
+                          这些官方工具类型，让你的开发事半功倍
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 类型编程：如何打造属于自己的工具类型？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：实战指南
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | tsconfig.json 配置：如何定制 TypeScript 的行为？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 来自 100 +项目经历的常见 TypeScript 错误汇总分析
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 手把手教你使用 TypeScript 开发 Node.js 应用
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 使用 TypeScript 开发 Web 应用的最佳实践
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 如何将 JavaScript 应用切换至 TypeScript？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | TypeScript 的这些实用技能，你不得不知
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 160px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  17 | 来自 100 +项目经历的常见 TypeScript 错误汇总分析
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/06/29
+                  <span data-v-1605a430="" class="auth">乾元</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/11:59"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="719"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/11:59</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            31.25M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/11:59
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="2306">
+                      经过前面课程的学习，你已经掌握了 TypeScript
+                      的基本知识，并了解了如何利用 TypeScript
+                      的基本知识实现一些高级类型和特性。这一讲我将介绍一些平时在开发过程中常见但在官方文档甚少提及的
+                      TypeScript 类型错误，并教你如何给 TypeScript
+                      代码编写单元测试。
+                    </p>
+                    <h3 data-nodeid="2307">常见错误</h3>
+                    <p data-nodeid="2308">
+                      TypeScript
+                      错误信息由错误码和详细信息组成。其中，错误码是以“TS”开头 +
+                      数字（一般是 4
+                      位数字）结尾这样的格式组成的字符串，用来作为特定类型错误的专属代号。如果你想查看所有的错误信息和错误码，可以点击<a
+                        href="https://github.com/Microsoft/TypeScript/blob/master/src/compiler/diagnosticMessages.json"
+                        data-nodeid="2391"
+                        >TypeScript 源码仓库</a
+                      >。当然，随着 TypeScript
+                      版本的更新，也会逐渐增加更多新的类型错误。
+                    </p>
+                    <p data-nodeid="2309">
+                      下面我们看一下那些常见但在官方文档甚少提及的类型错误。
+                    </p>
+                    <h4 data-nodeid="2310">TS2456</h4>
+                    <p data-nodeid="2311">
+                      首先是由于类型别名循环引用了自身造成的 TS2456
+                      类型错误，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-comment">// TS2456: Type alias 'T' circularly references itself.</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">type</span> T = Readonly&lt;T&gt;;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="3766" class="">
+                      在上述示例中，对于 T 这个类型别名，如果 TypeScript
+                      编译器想知道 T 类型是什么，就需要展开类型别名赋值的
+                      Readonly<code data-backticks="1" data-nodeid="3768"
+                        >&lt;T&gt;</code
+                      >。而为了确定 Readonly<code
+                        data-backticks="1"
+                        data-nodeid="3770"
+                        >&lt;T&gt;</code
+                      >
+                      的类型，TypeScript 编译器需要继续判断类型入参 T
+                      的类型，这就形成了一个循环引用。类似函数循环调用自己，如果没有正确的终止条件，就会一直处于无限循环的状态。
+                    </p>
+
+                    <p data-nodeid="2314">
+                      当然，如果在类型别名的定义中设定了正确的终止条件，我们就可以使用循环引用的特殊数据结构，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">type JSON = string | number | <span class="hljs-keyword">boolean</span> | <span class="hljs-keyword">null</span> | JSON[] | { [key: string]: JSON };
+</div></li><li><div class="code-word">​
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> json1: JSON = <span class="hljs-string">'json'</span>;
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> json2: JSON = [<span class="hljs-string">'str'</span>, <span class="hljs-number">1</span>, <span class="hljs-keyword">true</span>, <span class="hljs-keyword">null</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> json3: JSON = { key: <span class="hljs-string">'value'</span> };
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2316">
+                      在上面的例子中，我们定义了 JSON 数据结构的 TypeScript
+                      类型。其中，就有对类型别名 JSON
+                      自身的循环引用，即示例中出现的 JSON[] | { [key: string]:
+                      JSON }。与第 1
+                      个例子不同的是，这里的引用最终可以具体展开为 string |
+                      number | boolean | null 类型，所以不会出现无限循环的情况。
+                    </p>
+                    <blockquote data-nodeid="2317">
+                      <p data-nodeid="2318">
+                        <strong data-nodeid="2413"
+                          >注意：第 2 个例子只能在 TypeScript 3.7
+                          以上的版本使用，如果版本小于 3.7 仍会提示 TS2456
+                          错误。</strong
+                        >
+                      </p>
+                    </blockquote>
+                    <h4 data-nodeid="2319">TS2554</h4>
+                    <p data-nodeid="2320">
+                      另外，我们需要介绍的是比较常见的一个 TS2554
+                      错误，它是由于形参和实参个数不匹配造成的，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">toString</span><span class="hljs-params">(x: number | undefined)</span>: string </span>{
+</div></li><li><div class="code-word"> &nbsp;<span class="hljs-keyword">if</span> (x === undefined) {
+</div></li><li><div class="code-word"> &nbsp; &nbsp;<span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word"> &nbsp;<span class="hljs-keyword">return</span> x.toString();
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">​
+</div></li><li><div class="code-word">toString(); <span class="hljs-comment">// TS2554: Expected 1 arguments, but got 0.</span>
+</div></li><li><div class="code-word">toString(undefined);
+</div></li><li><div class="code-word">toString(<span class="hljs-number">1</span>);
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2322">
+                      上面例子报错的原因是，在 TypeScript 中，undefined
+                      是一个特殊的类型。由于类型为
+                      undefined，并不代表可缺省，因此示例中的第 8 行提示了
+                      TS2554 错误。
+                    </p>
+                    <p data-nodeid="2323">
+                      而可选参数是一种特殊的类型，虽然在代码执行层面上，最终参数类型是
+                      undefined 和参数可选的函数，接收到的入参的值都可以是
+                      undefined，但是在 TypeScript 的代码检查中，undefined
+                      类型的参数和可选参数都会被当作不同的类型来对待，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">toString</span><span class="hljs-params">(x?: number)</span>: string </span>{
+</div></li><li><div class="code-word"> &nbsp;<span class="hljs-keyword">if</span> (x === undefined) {
+</div></li><li><div class="code-word"> &nbsp; &nbsp;<span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word"> &nbsp;<span class="hljs-keyword">return</span> x.toString();
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">​
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">toString</span><span class="hljs-params">(x = <span class="hljs-string">''</span>)</span>: string </span>{
+</div></li><li><div class="code-word"> &nbsp;<span class="hljs-keyword">return</span> x.toString();
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2325">
+                      因此，如果在编程的过程中函数的参数是可选的，我们最好使用可选参数的语法，这样就可以避免手动传入
+                      undefined 的值，并顺利通过 TypeScript 的检查。
+                    </p>
+                    <p data-nodeid="4186" class="te-preview-highlight">
+                      值得一提的是，在 TypeScript 4.1 大版本的更新中，Promise
+                      构造的 resolve 参数不再是默认可选的了，所以如以下示例第 2
+                      行所示，在未指定入参的情况下，调用 resolve 会提示类型错误
+                      <strong data-nodeid="4192"
+                        >（注意：为了以示区分，官方使用了 TS2794
+                        错误码指代这个错误）</strong
+                      >。
+                    </p>
+
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">new</span> Promise((resolve) =&gt; {
+</div></li><li><div class="code-word"> &nbsp;resolve(); <span class="hljs-comment">// TS2794: Expected 1 arguments, but got 0. Did you forget to include 'void' in your type argument to 'Promise'? </span>
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2328">
+                      如果我们不需要参数，只需要给 Promise 的泛型参数传入 void
+                      即可，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">new</span> Promise&lt;<span class="hljs-keyword">void</span>&gt;((resolve) =&gt; {
+</div></li><li><div class="code-word"> &nbsp;resolve();
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2330">
+                      在上述示例中，因为我们在第 1 行给泛型类 Promise 指定了
+                      void 类型入参（注意是 void 而不是 undefined），所以在第 3
+                      行调用 resolve 时无须指定入参。
+                    </p>
+                    <h4 data-nodeid="2331">TS1169</h4>
+                    <p data-nodeid="2332">
+                      接下来是 TS1169
+                      类型错误，它是在接口类型定义中由于使用了非字面量或者非唯一
+                      symbol 类型作为属性名造成的，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Obj</span> </span>{
+</div></li><li><div class="code-word">  [key in <span class="hljs-string">'id'</span> | <span class="hljs-string">'name'</span>]: any; <span class="hljs-comment">// TS1169: A computed property name in an interface must refer to an expression whose type is a literal type or a 'unique symbol' type.</span>
+</div></li><li><div class="code-word">};
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2334">
+                      在上述示例中，因为interface
+                      类型的属性必须是字面量类型(string、number) 或者是 unique
+                      symbol 类型，所以在第 2 行提示了 TS1169 错误。
+                    </p>
+                    <p data-nodeid="2335">关于接口类型支持的用法如下示例：</p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> symbol: unique symbol = Symbol();
+</div></li><li><div class="code-word">​
+</div></li><li><div class="code-word"><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Obj</span> </span>{
+</div></li><li><div class="code-word">  [key: string]: any;
+</div></li><li><div class="code-word">  [key: number]: any;
+</div></li><li><div class="code-word">  [symbol]: any;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2337">
+                      在上述示例中的第 4~6 行，我们使用了 string、number 和
+                      symbol 作为接口属性，所以不会提示类型错误。
+                    </p>
+                    <p data-nodeid="2338">
+                      但是，在 type
+                      关键字声明的类型别名中，我们却可以使用映射类型定义属性，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">type Obj = {
+</div></li><li><div class="code-word">  [key in <span class="hljs-string">'id'</span> | <span class="hljs-string">'name'</span>]: any;
+</div></li><li><div class="code-word">};
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2340">
+                      在示例中的第 2 行，我们定义了一个包含 id 和 name
+                      属性的类型别名 Obj。
+                    </p>
+                    <h4 data-nodeid="2341">TS2345</h4>
+                    <p data-nodeid="2342">
+                      接下来我们介绍一下非常常见的 TS2345
+                      类型错误，它是在传参时由于类型不兼容造成的，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">enum</span> A {
+</div></li><li><div class="code-word"> &nbsp;x = <span class="hljs-string">'x'</span>,
+</div></li><li><div class="code-word"> &nbsp;y = <span class="hljs-string">'y'</span>,
+</div></li><li><div class="code-word"> &nbsp;z = <span class="hljs-string">'z'</span>,
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">enum</span> B {
+</div></li><li><div class="code-word"> &nbsp;x = <span class="hljs-string">'x'</span>,
+</div></li><li><div class="code-word"> &nbsp;y = <span class="hljs-string">'y'</span>,
+</div></li><li><div class="code-word"> &nbsp;z = <span class="hljs-string">'z'</span>,
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">​
+</div></li><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">fn</span><span class="hljs-params">(val: A)</span> </span>{}
+</div></li><li><div class="code-word">fn(B.x); <span class="hljs-comment">// TS2345: Argument of type 'B.x' is not assignable to parameter of type 'A'.</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2344">
+                      如上面的例子所示，函数 fn 参数的 val 类型是枚举 A，在 13
+                      行我们传入了与枚举 A 类似的枚举 B 的值，此时 TypeScript
+                      提示了类型不匹配的错误。这是因为枚举是在运行时真正存在的对象，因此
+                      TypeScript 并不会判断两个枚举是否可以互相兼容。
+                    </p>
+                    <p data-nodeid="2345">
+                      此时解决这个错误的方式也很简单，我们只需要让这两个枚举类型互相兼容就行，比如使用类型断言绕过
+                      TypeScript 的类型检查，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function">function <span class="hljs-title">fn</span><span class="hljs-params">(val: A)</span> </span>{}
+</div></li><li><div class="code-word">fn((B.x as unknown) as A);
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2347">
+                      在示例中的第 2 行，我们使用了 as 双重类型断言让枚举 B.x
+                      兼容枚举类型 A，从而不再提示类型错误。
+                    </p>
+                    <h4 data-nodeid="2348">TS2589</h4>
+                    <p data-nodeid="2349">
+                      接下来我们介绍 TS2589
+                      类型错误，它是由泛型实例化递归嵌套过深造成的，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">type RepeatX&lt;N extends number, T extends any[] = []&gt; = T[<span class="hljs-string">'length'</span>] extends N
+</div></li><li><div class="code-word"> &nbsp;? T
+</div></li><li><div class="code-word">  : RepeatX&lt;N, [...T, <span class="hljs-string">'X'</span>]&gt;;
+</div></li><li><div class="code-word">type T1 = RepeatX&lt;<span class="hljs-number">5</span>&gt;; <span class="hljs-comment">// =&gt; ["X", "X", "X", "X", "X"]</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// TS2589: Type instantiation is excessively deep and possibly infinite.</span>
+</div></li><li><div class="code-word">type T2 = RepeatX&lt;<span class="hljs-number">50</span>&gt;; <span class="hljs-comment">// =&gt; any</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2351">
+                      在上面的例子中，因为第 1 行的泛型 RepeatX
+                      接收了一个数字类型入参 N，并返回了一个长度为 N、元素都是
+                      'X' 的数组类型，所以第 4 行的类型 T1 包含了 5 个 "X"
+                      的数组类型；但是第 6 行的类型 T2 的类型却是
+                      any，并且提示了 TS2589 类型错误。这是因为 TypeScript
+                      在处理递归类型的时候，最多实例化 50
+                      层，如果超出了递归层数的限制，TypeScript
+                      便不会继续实例化，并且类型会变为 top 类型 any。
+                    </p>
+                    <p data-nodeid="2352">
+                      对于上面的错误，我们使用 @ts-ignore 注释忽略即可。
+                    </p>
+                    <h4 data-nodeid="2353">TS2322</h4>
+                    <p data-nodeid="2354">
+                      接下来需要介绍的是一个常见的字符串字面量类型的 TS2322
+                      错误，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-keyword">interface</span> CSSProperties {
+</div></li><li><div class="code-word">  display: <span class="hljs-string">'block'</span> | <span class="hljs-string">'flex'</span> | <span class="hljs-string">'grid'</span>;
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> style = {
+</div></li><li><div class="code-word">  display: <span class="hljs-string">'flex'</span>,
+</div></li><li><div class="code-word">};
+</div></li><li><div class="code-word"><span class="hljs-comment">// TS2322: Type '{ display: string; }' is not assignable to type 'CSSProperties'.</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">//  Types of property 'display' are incompatible.</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">//   Type 'string' is not assignable to type '"block" | "flex" | "grid"'.</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> cssStyle: CSSProperties = style;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2356">
+                      在上面的例子中，CSSProperties 的 display
+                      属性的类型是字符串字面量类型 'block' | 'flex' |
+                      'grid'，虽然变量 style 的 display 属性看起来与
+                      CSSProperties 类型完全兼容，但是 TypeScript 提示了 TS2322
+                      类型不兼容的错误。这是因为变量 style 的类型被自动推断成了
+                      { display: string }，string
+                      类型自然无法兼容字符串字面量类型 'block' | 'flex' |
+                      'grid'，所以变量 style 不能赋值给 cssStyle。
+                    </p>
+                    <p data-nodeid="2357">
+                      如下我提供了两种解决这个错误的方法。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-comment">// 方法 1</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> style: CSSProperties = {
+</div></li><li><div class="code-word">  display: <span class="hljs-string">'flex'</span>,
+</div></li><li><div class="code-word">};
+</div></li><li><div class="code-word"><span class="hljs-comment">// 方法 2</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> style = {
+</div></li><li><div class="code-word">  display: <span class="hljs-string">'flex'</span> <span class="hljs-keyword">as</span> <span class="hljs-string">'flex'</span>,
+</div></li><li><div class="code-word">};
+</div></li><li><div class="code-word"><span class="hljs-comment">// typeof style = { display: 'flex' }</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2359">
+                      在方法 1 中，我们显式声明了 style 类型为
+                      CSSProperties，因此变量 style 类型与 cssStyle
+                      期望的类型兼容。在方法 2 中，我们使用了类型断言声明
+                      display 属性的值为字符串字面量类型 'flex'，因此 style
+                      的类型被自动推断成了 { display: 'flex' }，与 CSSProperties
+                      类型兼容。
+                    </p>
+                    <h4 data-nodeid="2360">TS2352</h4>
+                    <p data-nodeid="2361">
+                      接下来我要介绍的是一个 TypeScript 类型收缩特性的 TS2352
+                      类型错误，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-keyword">let</span> x: <span class="hljs-built_in">string</span> | <span class="hljs-literal">undefined</span>;
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (x) {
+</div></li><li><div class="code-word">  x.trim();
+</div></li><li><div class="code-word">  setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">    x.trim(); <span class="hljs-comment">// TS2532: Object is possibly 'undefined'.</span>
+</div></li><li><div class="code-word">  });
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">class</span> Person {
+</div></li><li><div class="code-word">  greet() {}
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">let</span> person: Person | <span class="hljs-built_in">string</span>;
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (person <span class="hljs-keyword">instanceof</span> Person) {
+</div></li><li><div class="code-word">  person.greet();
+</div></li><li><div class="code-word">  <span class="hljs-keyword">const</span> innerFn = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">    person.greet(); <span class="hljs-comment">// TS2532: Object is possibly 'undefined'.</span>
+</div></li><li><div class="code-word">  };
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2363">
+                      在上述示例中的第 1 行，变量 x 的类型是 sting |
+                      undefined。在第 3 行的 if 语句中，变量 x
+                      的类型按照之前讲的类型收缩特性应该是 string，可以看到第 4
+                      行的代码可以通过类型检查，而第 6 行的代码报错 x 类型可能是
+                      undefined（因为 setTimeout 的类型守卫失效，所以 x
+                      的类型不会缩小为 string）。
+                    </p>
+                    <p data-nodeid="2364">
+                      同样，对于第 10 行的变量 person ，我们可以使用 instanceof
+                      将它的类型收缩为 Person，因此第 16
+                      行的代码通过了类型检查，而第 18 行则提示了 TS2352
+                      错误。这是因为函数中对捕获的变量不会使用类型收缩的结果，因为编译器不知道回调函数什么时候被执行，也就无法使用之前类型收缩的结果。
+                    </p>
+                    <p data-nodeid="2365">
+                      针对这种错误的处理方式也很简单，将类型收缩的代码放入函数体内部即可，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-keyword">let</span> x: <span class="hljs-built_in">string</span> | <span class="hljs-literal">undefined</span>;
+</div></li><li><div class="code-word">setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (x) {
+</div></li><li><div class="code-word">    x.trim(); <span class="hljs-comment">// OK</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-keyword">class</span> Person {
+</div></li><li><div class="code-word">  greet() {}
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">let</span> person: Person | <span class="hljs-literal">undefined</span>;
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> innerFn = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (person <span class="hljs-keyword">instanceof</span> Person) {
+</div></li><li><div class="code-word">    person.greet(); <span class="hljs-comment">// Ok</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">};
+</div></li></ol></code></pre>
+                    </div>
+                    <h3 data-nodeid="2367">单元测试</h3>
+                    <p data-nodeid="2368">
+                      在单元测试中，我们需要测试的是函数的输出与预计的输出是否相等。在
+                      TypeScript
+                      的类型测试中，我们需要测试的是编写的工具函数转换后的类型与预计的类型是否一致。
+                    </p>
+                    <p data-nodeid="2369">
+                      我们知道当赋值、传参的类型与预期不一致，TypeScript
+                      就会抛出类型错误，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> x: string = <span class="hljs-number">1</span>; <span class="hljs-comment">// TS2322: Type 'number' is not assignable to type 'string'.</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2371">
+                      在上述示例中可以看到，把数字字面量 1 赋值给 string
+                      类型变量 x 时，会提示 TS2322 错误。
+                    </p>
+                    <p data-nodeid="2372">
+                      因此，我们可以通过泛型限定需要测试的类型。只有需要测试的类型与预期类型一致时，才可以通过
+                      TypeScript 编译器的检查，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">type ExpectTrue&lt;T extends <span class="hljs-keyword">true</span>&gt; = T;
+</div></li><li><div class="code-word">type T1 = ExpectTrue&lt;<span class="hljs-keyword">true</span>&gt;;
+</div></li><li><div class="code-word">type T2 = ExpectTrue&lt;<span class="hljs-keyword">null</span>&gt;; <span class="hljs-comment">// TS2344: Type 'null' does not satisfy the constraint 'true'.</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2374">
+                      在上面 ExpectTrue 的测试方法中，因为第 1 行预期的类型是
+                      true，所以第 2 行的入参为 true
+                      时不会出现错误提示。但是，因为第 3 行的入参是 null
+                      ，所以会提示类型错误。
+                    </p>
+                    <p data-nodeid="2375">
+                      自 TS 3.9 版本起，官方支持了与 @ts-ignore 注释相反功能的
+                      @ts-expect-error 注释。使用 @ts-expect-error
+                      注释，我们可以标记代码中应该有类型错误的部分。
+                    </p>
+                    <p data-nodeid="2376">
+                      与 ts-ignore 不同的是，如果下一行代码中没有错误，则会提示
+                      TS2578 的错误，如下示例：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="typescript"><ol><li><div class="code-word"><span class="hljs-comment">// @ts-expect-error</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> x: <span class="hljs-built_in">number</span> = <span class="hljs-string">'42'</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// TS2578: Unused '@ts-expect-error' directive.</span>
+</div></li><li><div class="code-word"><span class="hljs-comment">// @ts-expect-error</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> y: <span class="hljs-built_in">number</span> = <span class="hljs-number">42</span>;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="2378">
+                      在上述示例的第 2
+                      行代码处并不会提示类型不兼容的错误，这是因为
+                      @ts-expect-error
+                      注释命令表示下一行应当有类型错误，符合预期。而第 6
+                      行的代码会提示 TS2578 未使用的 @ts-expect-error
+                      命令，这是因为第 6 行的代码没有类型错误。
+                    </p>
+                    <blockquote data-nodeid="2379">
+                      <p data-nodeid="2380">
+                        <strong data-nodeid="2509">备注</strong>：<code
+                          data-backticks="1"
+                          data-nodeid="2507"
+                          >@ts-expect-error</code
+                        >注释命令在编写预期失败的单元测试中很有用处。
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="2381">小结与预告</h3>
+                    <p data-nodeid="2382">
+                      这一讲我们介绍了一些 TypeScript
+                      开发中可能遇到的错误码，并分析解析了错误的原因，同时介绍了如何为之前学习的工具类型、自定义函数编写单元测试。
+                    </p>
+                    <p data-nodeid="2383">
+                      18 讲我们将正式进入实践环节，教你如何使用 TypeScript
+                      开发类型安全的 HTTP 静态文件服务，敬请期待！
+                    </p>
+                    <p data-nodeid="2384">
+                      另外，如果你觉得本专栏有价值，欢迎分享给更多好友。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >TypeScript 入门实战笔记</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **桐
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      这一章回写的不错。
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **林
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div
+                      data-v-4bc80e00=""
+                      class="message-list-content ellipsis"
+                    >
+                      TS2554第一个示例貌似在
+                      4.3.5中已经不报错了。https://www.typescriptlang.org/zh/play?ts=4.3.5#code/GYVwdgxgLglg9mABFOBlKAnGYDmAKADwC5EwQBbAIwFMNEAfRcAE2uG2uYEoSBnTbDkQBvAFCIABTGCJCiALyKmYVuzCcuI8RMkZqUEBiQByYwG5xiAL7a9Bo4gIA6FOiy48XCzcDQBKNcCHl6IAPQhiAAqqABMAKyxACwkAKIEAA7U0JyIAIyIAIYYOBTUYFC8ADSIlCBQiDhwdQAMTqJAA
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-expand">
+                      全部
+                    </div>
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 885,
+      courseCId: "",
+      courseName: "TypeScript 入门实战笔记",
+      teachers: [
+        {
+          id: 679,
+          teacherName: "乾元",
+          position: "快手资深前端技术专家，快手轻雀协作前端负责人",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/3D/D2/CioPOWCWT1mAXaU9AAAXP44Khsk814.png",
+          description: "<p>1</p>",
+        },
+      ],
+      totalCourseTime: 22,
+      totalDuration: 330,
+      sales: 11770,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/3D/D2/CioPOWCWT1mAXaU9AAAXP44Khsk814.png",
+      sellGoodsId: 968,
+      sellGoodsPriceId: 40885,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "TypeScript 很好地弥补了 JavaScript 在静态类型检查方面的缺陷，在不严重破坏代码的情况下，开发人员可以更轻松地避免错误并进行代码重构。TypeScript 在国内成了一个主流的技术方向，国内各大互联网公司和中小型团队都在使用 TS 开发项目。",
+      seoKeywords:
+        "TypeScript,JavaScript,开源语言,Babel,ECMAScript,装饰器,前端,开发,jQuery,MongoDB，\tNode.js和D3.js,静态类型,动态类型,JScript .NET,Visual Studio,\tCodePlex,IntelliSense,TS,编程,流行库,\t类型批注,类,接口,模块,Microsoft,number, bool,string,any",
+      seoTitle:
+        "Type script 入门实战笔记 - 快手资深前端技术专家，快手轻雀协作前端负责人 - 拉勾教育",
+      shareTitle: "搞定 Type script 就是这么简单！",
+      shareDescription: "前端大佬带你掌握 TypeScript",
+      brief: "从入门到实战，系统掌握 TypeScript 核心技术",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/3B/75/CioPOWCFE-qAI1j-AAEVxeXd9lc749.png",
+      courseType: 1,
+      previewFirstField: "共22讲",
+      previewSecondField: "每周二、四更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 862,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 862,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "0f9d716a013948ad81f002ef24fff396"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>
