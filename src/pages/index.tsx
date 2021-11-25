@@ -2,10 +2,13 @@ import axios from "axios"
 import React, { useEffect, useState } from "react"
 import { navigate } from "gatsby"
 import LinkButton from "../components/LinkButton"
-interface SectionData {
+export interface SectionData {
   title: string // 章节标题名
   filename: string // 章节文件名
 }
+
+export type SectionDataList = SectionData[]
+
 interface CourseData {
   id: string
   title: string

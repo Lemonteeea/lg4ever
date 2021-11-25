@@ -5,21 +5,19 @@ import Article from "../components/Article"
 import LinkButton from "../components/LinkButton"
 import { Transition } from "@headlessui/react"
 import Loading from "../components/Loading"
-interface SectionData {
-  title: string // 章节标题名
-  filename: string // 章节文件名
-}
+import { SectionDataList } from "."
+import Catelog from "../components/Catelog"
 interface CourseData {
   id: string
   title: string
-  list: SectionData[]
+  list: SectionDataList
 }
 export default function Course(props: PageProps<object, object, CourseData>) {
   const course = props.location.state
   const [articleNode, setArticleNode] = useState(<div></div>)
   const [currSelect, setCurrSelect] = useState(0)
   const [showCategory, setShowCategory] = useState(false)
-  const [list, setList] = useState([] as SectionData[])
+  const [list, setList] = useState([] as SectionDataList)
   const ref = useRef(null as null | HTMLDivElement)
 
   // 界面第一次加载时读取数据
@@ -117,28 +115,11 @@ export default function Course(props: PageProps<object, object, CourseData>) {
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <div className="lg:w-40 xl:w-60 2xl:w-80 w-0 h-full shadow-lg overflow-y-auto">
-              <header className="container font-semibold text-base p-6 mt-16 sticky top-0 bg-white">
-                章节目录
-              </header>
-              <ul>
-                {list.map((section, index) => {
-                  const basicClass =
-                    "text-gray-800 mb-2 overflow-ellipsis border-b-2 p-2 cursor-pointer overflow-hidden hover:text-blue-500"
-                  const classString =
-                    (index === currSelect ? "text-blue-400 " : "") + basicClass
-                  return (
-                    <li
-                      onClick={() => clickSection(index)}
-                      className={classString}
-                      key={section.title}
-                    >
-                      {section.title}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
+            <Catelog
+              clickSection={clickSection}
+              list={list}
+              currSelect={currSelect}
+            ></Catelog>
           </Transition>
           <div
             ref={ref}
