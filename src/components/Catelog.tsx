@@ -26,7 +26,7 @@ const Catelog: React.FC<CatelogProps> = props => {
   }, [scrollY])
   return (
     <div
-      className="lg:w-40 xl:w-60 2xl:w-80 w-0 h-full shadow-lg overflow-y-auto"
+      className="2xl:w-80 md:w-60 w-40 h-full shadow-lg overflow-y-auto"
       ref={ref}
     >
       <header className="container font-semibold text-base p-6 mt-16 sticky top-0 bg-white">

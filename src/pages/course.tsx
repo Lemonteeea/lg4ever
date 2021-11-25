@@ -105,7 +105,7 @@ export default function Course(props: PageProps<object, object, CourseData>) {
         </LinkButton>
       </div>
       <div className="flex flex-1 w-full justify-center overflow-hidden">
-        <div className="flex 2xl:w-1280 xl:w-1024 lg:w-950 w-full h-full shadow-lg overflow-x-hidden">
+        <div className="flex 2xl:w-1280 xl:w-1024 lg:w-950 md:w-700 sm:w-500  w-full h-full shadow-lg overflow-x-hidden">
           <Transition
             show={showCategory}
             enter="transform transition ease-in-out duration-500"
@@ -123,7 +123,7 @@ export default function Course(props: PageProps<object, object, CourseData>) {
           </Transition>
           <div
             ref={ref}
-            className="flex-1 h-full lg:p-20 p-5 pt-10 overflow-y-auto context"
+            className="w-full h-full lg:p-20 p-5 pt-10 overflow-y-auto context transition-all"
           >
             {articleNode}
           </div>
