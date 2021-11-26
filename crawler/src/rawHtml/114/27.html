@@ -1,0 +1,2086 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">数据结构与算法面试宝典 - 拉勾教育</h1>
+
+  <meta
+    content="数据结构,算法,面试,互联网大厂,微软,C++,Java,Python,阿里,腾讯,头条,百度, Google,Facebook,Apple,一解多题,一题多解,面试实战,栈,队列,优先级队列,链表,树,并查集,排序,二分搜索,双指针,贪心,回溯,搜索,DP,金三银四,招聘季"
+    name="keywords"
+  />
+
+  <meta
+    content="数据结构与算法是程序员面试的必考要点，为了攻克算法面试拿下心仪 offer，很多程序员面试前都会在 LeetCode 上刷题备战面试。然而面对海量题目，你很难在短时间内刷完并熟练掌握。那我们该如何高效准备，快速应对即将到来的算法面试？专栏以解题为核心， 300+ 道大厂高频面试题为切入点，引出很多你在面试中常踩的坑和卡壳的知识点，给你一套通用的解题方法论。"
+    name="description"
+  />
+
+  <title>数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div
+              data-v-130a0286=""
+              class="item-wrap inline-block next disable-button"
+            >
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M01/0E/27/CioPOWA8SL-Aflz3AAFSxYqXH4o426.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  数据结构与算法面试宝典
+                </div>
+                <div data-v-5f686215="" class="name">
+                  德鲁伊
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  前微软资深软件工程师
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 |&nbsp;告别盲目刷题，击破算法面试
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 759px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：数据结构之一解多题篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 栈：从简单栈到单调栈，解决经典栈问题
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 队列：FIFO 队列与单调队列的深挖与扩展
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 优先级队列：堆与优先级队列，筛选最优元素
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 |
+                          链表：如何利用“假头、新链表、双指针”解决链表题？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 |
+                          链表：如何利用“假头、新链表、双指针”解决链表题？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 树：如何深度运用树的遍历？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 并查集：如何利用两行代码写并查集？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          加餐与答疑 | 第一期 ：一问一答
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：算法之一解多题篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08&nbsp;|
+                          排序：如何利用合并与快排的小技巧，解决算法难题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09&nbsp;| 二分搜索：为什么说有序皆可用二分？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10&nbsp;|
+                          双指针：如何掌握最长、定长、最短区间问题的解题决窍？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11&nbsp;| 贪心：这种思想，没有模板，如何才能掌握它？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12&nbsp;|
+                          回溯：我把回溯总结成一个公式，回溯题一出就用它
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13&nbsp;| 搜索：如何掌握 DFS 与 BFS 的解题套路？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | DP：我是怎么治好“DP&nbsp;头痛症”的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：一题多解篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15&nbsp;| 字符串查找：为什么我最终选择了 BM 算法？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16&nbsp;| 如何利用 DP 与单调队列寻找最大矩形？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17&nbsp;| 深度思考子集：如何掌握 5 种通用解法？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18&nbsp;| 单词接龙：如何巧用深搜与广搜的变形？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19&nbsp;|
+                          最小体力消耗路径：如何突破经典题型，掌握解题模板？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20&nbsp;| 5
+                          种解法，如何利用常量空间求解最长有效括号长度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21&nbsp;| 安排会议室：如何利用多种方法安排会议室？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：代码模板篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 |&nbsp;数据结构模板：如何让解题变成搭积木？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 |&nbsp;算法模板：如何让高频算法考点秒变默写题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    彩蛋
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          彩蛋 | 聊聊我的大厂面试经历，谈谈我对算法学习的看法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 |&nbsp;算法的精进之路
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 146px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  结束语 |&nbsp;算法的精进之路
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/05/24
+                  <span data-v-1605a430="" class="auth">德鲁伊</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/09:39"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="579"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/09:39</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">25.2M</div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/09:39
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="3">
+                      专栏的最后一篇内容，我想和你聊聊天，讲一讲我平时如何磨炼自己的算法能力。我会从<strong
+                        data-nodeid="114"
+                        >目标、方法、执行力</strong
+                      >这三个方面展开，和你分享我总结出的一些经验。但是没有一把万能的钥匙可以打开所有的门，所以你还需要根据自身的情况对“我的总结”做一些调整。
+                    </p>
+                    <h3 data-nodeid="4">目标</h3>
+                    <p data-nodeid="5">
+                      我有一个朋友在准备算法的时候，首先想到的是找到最牛逼的书，然后开始啃书，比如《算法导论》。其实，要做的第一件事，应该是确定目标。你可以思考一下：
+                    </p>
+                    <ul data-nodeid="6">
+                      <li data-nodeid="7">
+                        <p data-nodeid="8">
+                          你的目标是能够流畅地通过一线大厂的算法面试吗？
+                        </p>
+                      </li>
+                      <li data-nodeid="9">
+                        <p data-nodeid="10">
+                          你的目标是要去参加一些算法竞赛吗？
+                        </p>
+                      </li>
+                      <li data-nodeid="11">
+                        <p data-nodeid="12">
+                          你的目标是要成为算法领域的大牛吗？
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="13">
+                      这里面，每一个目标需要花费的精力、制定的路线都不同。如果你要参加算法竞赛，那么需要掌握的数据结构/算法要<strong
+                        data-nodeid="125"
+                        >多得多</strong
+                      >，而多出来的这部分知识只有极低的概率会出现在大厂的算法面试中（比如数论算法）。
+                    </p>
+                    <p data-nodeid="14">
+                      我想，阅读这个专栏的同学，大多数制定的目标应该是通过大厂的算法面试。所以这里我们暂且将目标定为<strong
+                        data-nodeid="135"
+                        >通过面试</strong
+                      >。如果你在刷题或者看书的时候，看到一些超纲的知识点，其实可以降低优先级，跳过它。那么哪些知识点是超纲的呢？我在学习算法前，会有针对性地罗列一下大厂面试中高频出现的<strong
+                        data-nodeid="136"
+                        >知识点</strong
+                      >，如下图所示：
+                    </p>
+                    <p data-nodeid="1383" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/40/E0/CioPOWCna7yAbR5gAABloprC1Ew727.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="1386"
+                      />
+                    </p>
+
+                    <p data-nodeid="16">
+                      在后面看书、刷题的时候，99%
+                      的精力会花在这些知识点上，暂且不去理会超纲的题目。而只有这些知识点都烂熟于心之后，再去学习一些超纲的知识点。
+                    </p>
+                    <h3 data-nodeid="17">学习方法</h3>
+                    <p data-nodeid="18">
+                      每个人的基本情况不同，那么这里，我会从基础能力由弱到强说起。你可以根据自身能力跳过某些阶段。
+                    </p>
+                    <h4 data-nodeid="19">基础扫盲</h4>
+                    <p data-nodeid="20">
+                      如果你以前的专业不是计算机，或者你以前并没有接触过算法与数据结构。你首先需要做
+                      1 件事情：
+                    </p>
+                    <ul data-nodeid="21">
+                      <li data-nodeid="22">
+                        <p data-nodeid="23">
+                          拿一本<strong data-nodeid="152">基础入门</strong
+                          >的书/专栏，把基础的知识点都过<strong
+                            data-nodeid="153"
+                            >一遍</strong
+                          >。
+                        </p>
+                      </li>
+                    </ul>
+                    <blockquote data-nodeid="24">
+                      <p data-nodeid="25">
+                        这个阶段不建议看《算法导论》《计算机程序设计艺术》等大部头的书。我一般是挑一本比简单的书或者某个网课/专栏把这个阶段尽快过掉。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="1939" class="">
+                      这个阶段看书要达到的效果是：要知道各种基础概念（比如
+                      DFS/BFS/回溯等）、各种基础数据结构（二叉树/链表/哈希等）、基础算法名词（贪心/DP
+                      等），都要弄明白说的是什么。<strong data-nodeid="1945"
+                        >这一阶段，你不需要达到能够写出各种代码的程度，只需要看懂书上的代码，会用笔通过画画的方式，来解决数据结构和算法的某个具体的输入。</strong
+                      >
+                      比如：
+                    </p>
+
+                    <ul data-nodeid="27">
+                      <li data-nodeid="28">
+                        <p data-nodeid="29">
+                          当给定有序数组 A[] = {1,2,3,4,9} 的时候，你能<strong
+                            data-nodeid="168"
+                            >用笔</strong
+                          >写出二分搜索的流程。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="30">
+                      接着做<strong data-nodeid="174">第 2 件事情</strong>：
+                    </p>
+                    <ul data-nodeid="31">
+                      <li data-nodeid="32">
+                        <p data-nodeid="33">
+                          重新打开书，按照<strong data-nodeid="184"
+                            >知识点的顺序</strong
+                          >，打开你喜欢的刷题网站，每个知识点<strong
+                            data-nodeid="185"
+                            >先刷 10 道左右简单题</strong
+                          >。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="34">
+                      这个阶段花费的时间，根据个人情况，一般 1
+                      个月左右。此外，你的目的是过掉各种基础知识点，所以不需要看很多书。
+                    </p>
+                    <h4 data-nodeid="35">刷题阶段</h4>
+                    <p data-nodeid="36">先说一个简单的结论：跟着本专栏走！</p>
+                    <p data-nodeid="37">
+                      因为当基础知识扫盲之后，接下来就需要通过实践来提升我们的算法能力。在刷题阶段，我们的目标是击破中等难度的题目。
+                    </p>
+                    <p data-nodeid="38">
+                      <strong data-nodeid="193">阶段 1：一解多题</strong>
+                    </p>
+                    <p data-nodeid="39">
+                      这一阶段是以知识点为出发点，我们需要按照以下方式来刷题。
+                    </p>
+                    <ul data-nodeid="40">
+                      <li data-nodeid="41">
+                        <p data-nodeid="42">
+                          高频出现的知识点作为 Tag，只刷这个 Tag
+                          中等难度的题目！
+                        </p>
+                      </li>
+                      <li data-nodeid="43">
+                        <p data-nodeid="44">
+                          看题解！无论一个题是否 Resolve，一定要看题解！
+                        </p>
+                      </li>
+                      <li data-nodeid="45">
+                        <p data-nodeid="46">
+                          抓住数据结构与算法的特点！形成一解多题的能力。<strong
+                            data-nodeid="202"
+                            >整理</strong
+                          >代码模板！
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="47">
+                      你会发现，这正是我们专栏《模块一：数据结构之一解多题篇》介绍的内容。这个阶段的产出，就
+                      3 个字“<strong data-nodeid="208">写得出</strong
+                      >”。比如当我直白地告诉你需要用
+                      DFS/回溯/二分的时候，你能快速地把相应的代码写出来。
+                    </p>
+                    <blockquote data-nodeid="48">
+                      <p data-nodeid="49">
+                        注意：这一阶段不要按照刷题网站的顺序，按照题号来刷题，这样做效率非常低！
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="50">
+                      此外，整理好的代码模板还需要用起来。所以，这里我再讲一下如何将代码模板放到
+                      Vscode 中，方便你在后面的写题中加快刷题的速度（<a
+                        href="https://snippet-generator.app/?fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="213"
+                        >制作代码模板的网站</a
+                      >）。
+                    </p>
+                    <p data-nodeid="2500" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/40/E0/CioPOWCna86AIKUTAAKcKMDNif0795.png"
+                        alt="Drawing 1.png"
+                        data-nodeid="2503"
+                      />
+                    </p>
+
+                    <p data-nodeid="52">Step 1. 输入模板关键字和描述。</p>
+                    <p data-nodeid="3062" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/40/D8/Cgp9HWCna9aAE5V-AAJfqe14csQ341.png"
+                        alt="Drawing 2.png"
+                        data-nodeid="3065"
+                      />
+                    </p>
+
+                    <p data-nodeid="54">Step 2. 放上并查集的模板代码。</p>
+                    <p data-nodeid="3628" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/40/E0/CioPOWCna92AOE9BAAX3NcmR8bY969.png"
+                        alt="Drawing 3.png"
+                        data-nodeid="3631"
+                      />
+                    </p>
+
+                    <p data-nodeid="56">
+                      Step 3. 复制整个 json 格式的代码模板。
+                    </p>
+                    <p data-nodeid="4198" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/40/E0/CioPOWCna-SAQvgEAATDO0xeDlg700.png"
+                        alt="Drawing 4.png"
+                        data-nodeid="4201"
+                      />
+                    </p>
+
+                    <p data-nodeid="58">
+                      Step 4. 打开 Vscode，找到 User Snippets。
+                    </p>
+                    <p data-nodeid="4772" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/40/D8/Cgp9HWCna-mAV2VqAACacHgsh5E729.png"
+                        alt="Drawing 5.png"
+                        data-nodeid="4775"
+                      />
+                    </p>
+
+                    <p data-nodeid="60">
+                      Step 5. 选中代码模板要放到哪个文件中，比如放到 global
+                      中。<strong data-nodeid="229"
+                        >注意，Vscode 中这个文件的格式一定要满足 json
+                        格式</strong
+                      >。
+                    </p>
+                    <p data-nodeid="61">
+                      至此，代码模板就成功添加到了编辑器中，在刷题的时候，都可以用上它。
+                    </p>
+                    <p data-nodeid="5350" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/40/E0/CioPOWCna_CAV0LiAAIg8AyGcA4899.png"
+                        alt="Drawing 6.png"
+                        data-nodeid="5353"
+                      />
+                    </p>
+
+                    <p data-nodeid="63">
+                      Step 6.
+                      输入我们的模板关键字，再回车，一份完整的并查集模板代码就可以直接使用了。
+                    </p>
+                    <blockquote data-nodeid="6513">
+                      <p data-nodeid="6514">
+                        注意：不要小看添加模板和使用模板的小妙招。我曾经用这个绝招，10
+                        个小时刷完了所有的二叉树的题目！
+                      </p>
+                      <p data-nodeid="6515" class="te-preview-highlight">
+                        我们是在学习算法，不是在练习打字。所以一些固定的代码模板，没有必要重复地敲来敲去，以及浪费时间在一些低级的
+                        Bug 调试。
+                      </p>
+                    </blockquote>
+
+                    <p data-nodeid="68">
+                      <strong data-nodeid="238">阶段 2：一题多解</strong>
+                    </p>
+                    <p data-nodeid="69">
+                      这一阶段是以<strong data-nodeid="244">解题</strong
+                      >为核心，你需要回顾一遍刷过的题，这里我给你划了有三个重点：
+                    </p>
+                    <ul data-nodeid="70">
+                      <li data-nodeid="71">
+                        <p data-nodeid="72">每个题尽量需要做到有多种解法；</p>
+                      </li>
+                      <li data-nodeid="73">
+                        <p data-nodeid="74">
+                          找到不同的题目之间的联系、差异、变化规律；
+                        </p>
+                      </li>
+                      <li data-nodeid="75">
+                        <p data-nodeid="76">
+                          重点关照没思路的题、经常写错的题、有多种解法的题。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="77">
+                      这一阶段的产出就 3 个字——<strong data-nodeid="253"
+                        >有思路</strong
+                      >。具体来说，就是看到题目能够辨别出题目的考点，能够联想到我们的算法与数据结构，然后快速想到解题思路。
+                    </p>
+                    <blockquote data-nodeid="78">
+                      <p data-nodeid="79">
+                        注意：这一阶段不是去突击困难的题，而是要保证拿到中等难度的题要有思路。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="80">
+                      所以你在刷题的时候，要快速利用你之前整理好的代码模板。比如我会将阶段
+                      1 整理好的代码模板放到 Vscode
+                      编辑器中。写题的时候就可以一键写好我的代码。刷题速度快到飞起！
+                    </p>
+                    <h4 data-nodeid="81">面试准备</h4>
+                    <p data-nodeid="82">
+                      如果你的目标是面试，那么在面试前，就只需要做两件事：
+                    </p>
+                    <ul data-nodeid="83">
+                      <li data-nodeid="84">
+                        <p data-nodeid="85">
+                          复习整理好的代码模板，把这些代码模板写熟练，能背着打出来最好；
+                        </p>
+                      </li>
+                      <li data-nodeid="86">
+                        <p data-nodeid="87">
+                          复习不容易形成思路的题目，利用碎片化时间不停抽查这些题目。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="88">
+                      准备面试阶段，我们在写题时，一定要计时！人为加一点心理压力，对面试有非常好的帮助。
+                    </p>
+                    <h4 data-nodeid="89">超越自我</h4>
+                    <p data-nodeid="90">
+                      如果你还想更进一步提升自己的能力，那么可以跳出舒适区，积极地参加一些算法竞赛。与更多的选手、大佬们交流，并且积极地写题解帮助更多的朋友。有时候，“以赛代练”能够更加有效地提升你的算法能力。你需要做到：
+                    </p>
+                    <ul data-nodeid="91">
+                      <li data-nodeid="92">
+                        <p data-nodeid="93">不要在意排名</p>
+                      </li>
+                      <li data-nodeid="94">
+                        <p data-nodeid="95">
+                          比赛做不出来没关系，赛后一定要补题
+                        </p>
+                      </li>
+                      <li data-nodeid="96">
+                        <p data-nodeid="97">写题解</p>
+                      </li>
+                      <li data-nodeid="98">
+                        <p data-nodeid="99">看别人的题解</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="100">
+                      有了以上几步，相信你的算法能力会迅速提高。
+                    </p>
+                    <h3 data-nodeid="101">执行力</h3>
+                    <p data-nodeid="102">
+                      以上就是我针对自身情况，以及分享给我身边的朋友们的学习方法。至少就突破面试而言，已经够用了。
+                    </p>
+                    <p data-nodeid="103">
+                      不过，算法是一门实践性非常强的学科。当你有了这么一份好的计划，那么接下来你要做的事情就是：执行它！坚决地执行它！
+                    </p>
+                    <h3 data-nodeid="104">总结</h3>
+                    <p data-nodeid="105">
+                      这就是我学习算法的过程与方法。看到这里，希望你能够根据这个方法制定出适合自己的方法和计划，并且<strong
+                        data-nodeid="277"
+                        >一定要执行到位</strong
+                      >。
+                    </p>
+                    <p data-nodeid="106">
+                      如果你有什么更好的方法、建议，欢迎写在留言区，我们一起讨论。再见。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >数据结构与算法面试宝典</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **思
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        6
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      给大佬点赞，谢谢老师
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **赢
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      感谢老师精彩分享
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 685,
+      courseCId: "",
+      courseName: "数据结构与算法面试宝典",
+      teachers: [
+        {
+          id: 630,
+          teacherName: "德鲁伊",
+          position: "前微软资深软件工程师",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/0E/B5/CioPOWA8uS6AMKX5AAAUwKendGs238.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;;"><span class="ql-author-13568064 ql-font-microsoftyahei" style="margin: 0px; padding: 0px; outline: none; box-sizing: border-box; caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-size: 14.6667px; text-size-adjust: auto; background-color: rgb(255, 255, 255);">9&nbsp;年技术研发经验，主导过&nbsp;40PB&nbsp;级别的分布式存储系统架构设计与实现。带领团队实现核心模块，如用户态文件系统、存储引擎、分布式&nbsp;KV&nbsp;缓存。负责部门技术面试，有丰富的技术面试经验。此外，曾</span><span class="ql-font-microsoftyahei ql-author-13568064" style="margin: 0px; padding: 0px; outline: none; box-sizing: border-box; caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-size: 14.6667px; text-size-adjust: auto;">作为复旦大学特聘讲师，面向研究生学院开展 IT 类课程，拥有多年授课经验。擅长架构设计、机器学习、云计算、大数据等领域。</span></span></p>',
+        },
+      ],
+      totalCourseTime: 23,
+      totalDuration: 340,
+      sales: 18623,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/0E/B5/CioPOWA8uS6AMKX5AAAUwKendGs238.png",
+      sellGoodsId: 748,
+      sellGoodsPriceId: 73322,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "数据结构与算法是程序员面试的必考要点，为了攻克算法面试拿下心仪 offer，很多程序员面试前都会在 LeetCode 上刷题备战面试。然而面对海量题目，你很难在短时间内刷完并熟练掌握。那我们该如何高效准备，快速应对即将到来的算法面试？专栏以解题为核心， 300+ 道大厂高频面试题为切入点，引出很多你在面试中常踩的坑和卡壳的知识点，给你一套通用的解题方法论。",
+      seoKeywords:
+        "数据结构,算法,面试,互联网大厂,微软,C++,Java,Python,阿里,腾讯,头条,百度, Google,Facebook,Apple,一解多题,一题多解,面试实战,栈,队列,优先级队列,链表,树,并查集,排序,二分搜索,双指针,贪心,回溯,搜索,DP,金三银四,招聘季",
+      seoTitle: "数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育",
+      shareTitle: "这15种题型，算法面试肯定会问！",
+      shareDescription: "300+高频真题详解，一题多解攻克算法面试",
+      brief: "300+大厂高频真题，一题多解攻克算法面试",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M01/0E/27/CioPOWA8SL-Aflz3AAFSxYqXH4o426.png",
+      courseType: 1,
+      previewFirstField: "共23讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 638,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 638,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "83ec46930d5245bcae30be7a5f7786a2"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+</body>

@@ -28,7 +28,7 @@ export default function Home() {
       state: course,
     })
   return (
-    <div className=" mt-24">
+    <div className="h-screen w-screen text-center py-10 lg:px-32 overflow-y-auto">
       <ul>
         {courseList.map(course => (
           <li key={course.id}>

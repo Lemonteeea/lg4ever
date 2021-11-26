@@ -1,0 +1,3451 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">数据结构与算法面试宝典 - 拉勾教育</h1>
+
+  <meta
+    content="数据结构,算法,面试,互联网大厂,微软,C++,Java,Python,阿里,腾讯,头条,百度, Google,Facebook,Apple,一解多题,一题多解,面试实战,栈,队列,优先级队列,链表,树,并查集,排序,二分搜索,双指针,贪心,回溯,搜索,DP,金三银四,招聘季"
+    name="keywords"
+  />
+
+  <meta
+    content="数据结构与算法是程序员面试的必考要点，为了攻克算法面试拿下心仪 offer，很多程序员面试前都会在 LeetCode 上刷题备战面试。然而面对海量题目，你很难在短时间内刷完并熟练掌握。那我们该如何高效准备，快速应对即将到来的算法面试？专栏以解题为核心， 300+ 道大厂高频面试题为切入点，引出很多你在面试中常踩的坑和卡壳的知识点，给你一套通用的解题方法论。"
+    name="description"
+  />
+
+  <title>数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M01/0E/27/CioPOWA8SL-Aflz3AAFSxYqXH4o426.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">
+                  数据结构与算法面试宝典
+                </div>
+                <div data-v-5f686215="" class="name">
+                  德鲁伊
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  前微软资深软件工程师
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 |&nbsp;告别盲目刷题，击破算法面试
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 759px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：数据结构之一解多题篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 栈：从简单栈到单调栈，解决经典栈问题
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 队列：FIFO 队列与单调队列的深挖与扩展
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 优先级队列：堆与优先级队列，筛选最优元素
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 |
+                          链表：如何利用“假头、新链表、双指针”解决链表题？（上）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 |
+                          链表：如何利用“假头、新链表、双指针”解决链表题？（下）
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 树：如何深度运用树的遍历？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 并查集：如何利用两行代码写并查集？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          加餐与答疑 | 第一期 ：一问一答
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：算法之一解多题篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08&nbsp;|
+                          排序：如何利用合并与快排的小技巧，解决算法难题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09&nbsp;| 二分搜索：为什么说有序皆可用二分？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10&nbsp;|
+                          双指针：如何掌握最长、定长、最短区间问题的解题决窍？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11&nbsp;| 贪心：这种思想，没有模板，如何才能掌握它？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12&nbsp;|
+                          回溯：我把回溯总结成一个公式，回溯题一出就用它
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13&nbsp;| 搜索：如何掌握 DFS 与 BFS 的解题套路？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | DP：我是怎么治好“DP&nbsp;头痛症”的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 677px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：一题多解篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15&nbsp;| 字符串查找：为什么我最终选择了 BM 算法？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16&nbsp;| 如何利用 DP 与单调队列寻找最大矩形？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17&nbsp;| 深度思考子集：如何掌握 5 种通用解法？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18&nbsp;| 单词接龙：如何巧用深搜与广搜的变形？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19&nbsp;|
+                          最小体力消耗路径：如何突破经典题型，掌握解题模板？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20&nbsp;| 5
+                          种解法，如何利用常量空间求解最长有效括号长度？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21&nbsp;| 安排会议室：如何利用多种方法安排会议室？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块四：代码模板篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 |&nbsp;数据结构模板：如何让解题变成搭积木？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          23 |&nbsp;算法模板：如何让高频算法考点秒变默写题？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    彩蛋
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          彩蛋 | 聊聊我的大厂面试经历，谈谈我对算法学习的看法
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 |&nbsp;算法的精进之路
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 146px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  11&nbsp;| 贪心：这种思想，没有模板，如何才能掌握它？
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/04/05
+                  <span data-v-1605a430="" class="auth">德鲁伊</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/34:06"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="2046"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/34:06</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            88.98M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/34:06
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="95200" class="">
+                      贪心算法（Greedy
+                      Algorithms）指的是求解问题时，总是做出在当前看来是最好的选择。
+                      一个全局最优解可以通过选择局部最优解来达到。
+                    </p>
+                    <p data-nodeid="95201">
+                      贪心算法的运用非常广泛，比如哈夫曼（Huffman）树，单源最短路径（Dijkstra），构建最小生成树的
+                      Prim 算法和 Kruskal 算法等。
+                    </p>
+                    <p data-nodeid="95202">学完这一讲，你将会收获：</p>
+                    <ul data-nodeid="95203">
+                      <li data-nodeid="95204">
+                        <p data-nodeid="95205">贪心算法类题目的特点</p>
+                      </li>
+                      <li data-nodeid="95206">
+                        <p data-nodeid="95207">贪心算法的解题思路</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95208">
+                      <em data-nodeid="95531"
+                        >注：贪心算法没有模板可以套，其重点在于对题目的分析，对结论的推导。因此，这一讲，我们不再延用“模拟、规律、匹配、画图”四步分析法，而是将重点放在介绍一些题目是如何演变而来的，以及如何推导出贪心所用的结论。我会尝试用尽量少的数学公式，且让你能看懂的方式来讲解。</em
+                      >
+                    </p>
+                    <h3 data-nodeid="95209">贪心的特点</h3>
+                    <p data-nodeid="95210">
+                      面试中考察贪心算法的题目必然具备以下<strong
+                        data-nodeid="95543"
+                        >2 个特点，<strong data-nodeid="95542">这里我用</strong
+                        >最通俗的话</strong
+                      >给你描述。
+                    </p>
+                    <h4 data-nodeid="95211">特点 1：只选局部最优解</h4>
+                    <p data-nodeid="95212">
+                      在求解过程中，我们可以通过<strong data-nodeid="95550"
+                        >每一步都选择最优解</strong
+                      >，最终得到整个问题的最优解。下面我们通过一个简单的题目：寻找数组中最大的数，进一步说明一下这个特点。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">maxValue</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> maxValue = Integer.MIN_VALUE; <span class="hljs-comment">// 初始集合里面的最大值</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">    maxValue = Math.max(maxValue, A[i]);  <span class="hljs-comment">// 迭代当前最优解</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> maxValue; <span class="hljs-comment">// 结束后，当前最优解变身全局最优解。</span>
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95214">
+                      <strong data-nodeid="95557">首先：</strong>
+                      在一个初始集（这里是一个空集），设置一个初始解。在这里，我们设置为
+                      Integer.MIN_VALUE。
+                    </p>
+                    <p data-nodeid="95215">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C9/CioPOWBm7DyAevBHAAB4d_r01V8988.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="95560"
+                      />
+                    </p>
+                    <p data-nodeid="95216">
+                      <strong data-nodeid="95565">迭代</strong
+                      >：当有新元素进来的时候，我们需要迭代当前最优解。迭代后的最优解是已知数据的最优解。
+                    </p>
+                    <p data-nodeid="95217">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C9/CioPOWBm7EOAYHjdAACrP3SVk1w191.png"
+                        alt="Drawing 1.png"
+                        data-nodeid="95568"
+                      />
+                    </p>
+                    <p data-nodeid="95218">
+                      <strong data-nodeid="95581">答案</strong
+                      >：当处理完所有的数据之后，<strong data-nodeid="95582"
+                        >当前最优解</strong
+                      >立马<strong data-nodeid="95583">变身全局最优解</strong>。
+                    </p>
+                    <p data-nodeid="95219">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CA/CioPOWBm7KuAMBTnAACDRzs75_E116.png"
+                        alt="Drawing 2.png"
+                        data-nodeid="95586"
+                      />
+                    </p>
+                    <p data-nodeid="95220">
+                      <em data-nodeid="95590"
+                        >由此，我们也可以看出，贪心算法在操作的时候，总是把局部次优解直接扔掉，保留局部最优解，最终得到整个问题的最优解。</em
+                      >
+                    </p>
+                    <h4 data-nodeid="95221">特点 2：不能“逆袭”</h4>
+                    <p data-nodeid="95222">
+                      下面我们用一道题目说明<strong data-nodeid="95597"
+                        >什么是“逆袭”</strong
+                      >。给定如下图所示的图形，从上往下走的时候，只能走到相邻格子的左边或者右边。求从顶部走到底部的最大和。
+                    </p>
+                    <p data-nodeid="95223">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C1/Cgp9HWBm7LSAaCRaAADJvxICzaI478.png"
+                        alt="Drawing 3.png"
+                        data-nodeid="95600"
+                      />
+                    </p>
+                    <p data-nodeid="95224">
+                      比如，这里我们给出合法与不合法的两种情况，如下图所示：
+                    </p>
+                    <p data-nodeid="95225">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CA/CioPOWBm7LuAEeDiAAEUHK2pjOY488.png"
+                        alt="Drawing 4.png"
+                        data-nodeid="95604"
+                      />
+                    </p>
+                    <p data-nodeid="95226">
+                      如果使用贪心算法求解这个问题，你可以结合下图进行思考：
+                    </p>
+                    <p data-nodeid="95227">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CA/CioPOWBm7MGALOGVAADo12H0WNA033.png"
+                        alt="Drawing 5.png"
+                        data-nodeid="95608"
+                      />
+                    </p>
+                    <p data-nodeid="95228">
+                      如果在每一步，我们总是选择当前能选择的最大值，那么得到的解就不是最优解。因为最优解是
+                      2 + 3 + 100 = 105。
+                    </p>
+                    <p data-nodeid="95229">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C1/Cgp9HWBm7MeAa4e_AAEETkRZECs168.png"
+                        alt="Drawing 6.png"
+                        data-nodeid="95612"
+                      />
+                    </p>
+                    <p data-nodeid="95230">
+                      那么问题出在哪里？这是因为在第二层有一个<strong
+                        data-nodeid="95618"
+                        >次优解</strong
+                      >
+                      2 + 3，在第三层能够从 3 跳到
+                      100，最终变成整个问题的最优解。
+                    </p>
+                    <p data-nodeid="95231">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C1/Cgp9HWBm7M6AWo3fAADom4u66Ss987.png"
+                        alt="Drawing 7.png"
+                        data-nodeid="95621"
+                      />
+                    </p>
+                    <p data-nodeid="95232">
+                      因此，在利用贪心算法的时候，必须要满足“<strong
+                        data-nodeid="95627"
+                        >不能逆袭</strong
+                      >”的特性：
+                    </p>
+                    <blockquote data-nodeid="95233">
+                      <p data-nodeid="95234">
+                        局部次优解不能反超，不能成为问题的最终最优解！
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95235">
+                      <em data-nodeid="95632"
+                        >注：这里我只是用一个例子来说明“不能逆袭”的特性，你能够意会到这种“次优解反超的特点”即可。</em
+                      >
+                    </p>
+                    <h4 data-nodeid="95236">记忆</h4>
+                    <p data-nodeid="95237">
+                      在生活中，有一句有趣的歌诀形象地表现了贪心算法的特点：龙生龙，凤生凤，老鼠生儿会打洞。
+                    </p>
+                    <p data-nodeid="95238">
+                      之前的最优解“龙”生成新的“龙”，依然处在食物链的高层，最后得出的仍然是最优解。而次优解“凤”和“老鼠”通过繁育是无法完成“逆袭”的，因此无法变成最优解。
+                    </p>
+                    <p data-nodeid="95239">
+                      另外，贪心算法的题目比较依赖一些现有的结论。在日常学习算法和数据结构的过程中，你要特别注意总结经验和积累结论。下面我们一起通过几道例题深入学习贪心算法，然后我还会带你总结出一些有趣的结论。
+                    </p>
+                    <h3 data-nodeid="95240">例 1：木桶装水</h3>
+                    <p data-nodeid="95241">
+                      【<strong data-nodeid="95647">题目</strong
+                      >】给定一个数组，表示不同的木板的高度，在装水的时候，你可以选择<strong
+                        data-nodeid="95648"
+                        >两根木板</strong
+                      >，然后装满水，在不能倾斜的情况下，里面能装多少水，应该由较短的木板决定。请问最多能装多少水？
+                    </p>
+                    <p data-nodeid="95242">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CA/CioPOWBm7NeAbj76AAQd0dopTpA832.png"
+                        alt="Drawing 8.png"
+                        data-nodeid="95651"
+                      />
+                    </p>
+                    <p data-nodeid="95243">输入：A = [1, 0, 1, 1, 0]</p>
+                    <p data-nodeid="95244">输出：3</p>
+                    <p data-nodeid="95245">
+                      解释：你可以选择 index = 0 和 index = 3，由于高度都为
+                      1，宽度为 3，装水为 3 x 1 = 3。这样组合装的水最多。
+                    </p>
+                    <p data-nodeid="95246">
+                      【<strong data-nodeid="95663">分析</strong
+                      >】在正式求解这道题目之前，我们先从一些简单的题目进行展开。比如我们非常熟悉的：求一个数组中的最大值。相信你拿到这道题目就可以开始写代码了：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">getMaxValue</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> ans = Integer.MIN_VALUE;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">    ans = Math.max(ans, A[i]);
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> ans;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95248">
+                      如果我们仔细观察上述解法，可以发现贪心算法成立的关键在于：贪心的策略保证了在已知求解范围（绿色）区域里面始终是最大的。如下图所示：
+                    </p>
+                    <p data-nodeid="95249">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C3/Cgp9HWBm8cmAJOBqAAC4ja2Veks049.png"
+                        alt="Drawing 9.png"
+                        data-nodeid="95667"
+                      />
+                    </p>
+                    <p data-nodeid="95250">
+                      在这个解法里面，我们采用的是从一侧推进来求最大值，如果我问你，是否有其他我们已经学过的办法可以解决这道题目呢？答案就是“<a
+                        href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=685#/detail/pc?id=6699"
+                        data-nodeid="95673"
+                        >10 |
+                        双指针：如何掌握解决最长，定长，最短区间问题的决窍？</a
+                      >”介绍的<strong data-nodeid="95679">双指针</strong
+                      >。我们可以利用双指针从数组的两侧来推进，求解这个数组的最大值，代码可以写成如下这样：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">getMaxValue</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A<span class="hljs-comment">/*输入保证非空*/</span>)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>, j = N - <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">while</span> (i &lt; j) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (A[i] &gt; A[j]) {
+</div></li><li><div class="code-word">      j--;
+</div></li><li><div class="code-word">    } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      i++;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> A[i];
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95252">
+                      如果用比武打个比方，这种思路的依据就是每次取两个人来比武，胜者留下，那么留下来的当然是数组中的最大值。因此，可以得到<strong
+                        data-nodeid="95685"
+                        >结论 1</strong
+                      >。
+                    </p>
+                    <p data-nodeid="95253">
+                      <strong data-nodeid="95690">结论 1</strong>：
+                    </p>
+                    <blockquote data-nodeid="95254">
+                      <p data-nodeid="95255">
+                        max(A[i]，A[j]) 就是 [0...i] 和 [j ... N)
+                        这两个区间里面的最大值。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95256">
+                      前面我们都把注意力放在了较大的数。那么，有没有什么结论留给“较小的数”呢？
+                    </p>
+                    <p data-nodeid="95257">
+                      实际上，对于较小的数，还有一个有用的结论。下面我们从头开始推导一下。
+                    </p>
+                    <p data-nodeid="95258">
+                      首先，数组的最大值所在位置，最终肯定可以将数组切分成 3
+                      个区域，分别用 3
+                      种颜色来表示（如果数组中有多个同值的最大值，只需要挑一个出来当最大值即可）。但是具体如何切分，我们一开始并不清楚。
+                    </p>
+                    <p data-nodeid="95259">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/CB/CioPOWBm8jCASGnfAACa3H_KBpM205.png"
+                        alt="Drawing 10.png"
+                        data-nodeid="95711"
+                      />
+                    </p>
+                    <p data-nodeid="95260">
+                      但是，如果利用 i，j 左右同时向中间走，最大值一定出现在 [i,
+                      j] 这个范围里面，所以
+                      <strong data-nodeid="95722"
+                        >[0, i) 区域肯定是绿色的，而 (j, N)
+                        区域肯定是红色的</strong
+                      >。
+                    </p>
+                    <p data-nodeid="95261">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C3/Cgp9HWBm8jeAPZokAACCr2BAJUs411.png"
+                        alt="Drawing 11.png"
+                        data-nodeid="95725"
+                      />
+                    </p>
+                    <p data-nodeid="95262">
+                      那么，如果 A[i] &gt; A[j]，留给较小的数 A[j]
+                      的结论是什么呢？
+                    </p>
+                    <p data-nodeid="95263">
+                      留下的便是<strong data-nodeid="95744">结论 2</strong>：
+                    </p>
+                    <blockquote data-nodeid="95264">
+                      <p data-nodeid="95265">
+                        异色区域，大于等于 A[j] 且离 j 最远的元素就是 A[i]。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95266">
+                      我们用反证法简略证明一下：假设程序执行到 A[i] &gt; A[j]
+                      成立，但是数组中有另外一个元素 0 &lt;= x &lt; i，并且 A[x]
+                      &gt; A[j] 成立。那么：
+                    </p>
+                    <ul data-nodeid="95267">
+                      <li data-nodeid="95268">
+                        <p data-nodeid="95269">
+                          根据结论 1，[0, x] 区域，和 [j, N)
+                          区域里面的最大值必然是 max(A[x], A[j])；
+                        </p>
+                      </li>
+                      <li data-nodeid="95270">
+                        <p data-nodeid="95271">
+                          由于A[x] &gt; A[j]，所以 [0, x] 区域和 [j, N)
+                          区域里面的最大值必然是 A[x]；
+                        </p>
+                      </li>
+                      <li data-nodeid="95272">
+                        <p data-nodeid="95273">
+                          那么在执行算法的时候，当执行到 A[x] &gt; A[j]
+                          时，会接着执行 j--，也就是说，程序不可能执行到 A[i]
+                          &gt; A[j] 位置，这与假设矛盾。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95274">
+                      当然，结论 2 也可以针对 A[i] &lt; A[j] 写成：
+                    </p>
+                    <blockquote data-nodeid="95275">
+                      <p data-nodeid="95276">
+                        异色区域，大于等于 A[i] 且离 i 最远的元素就是 A[j]。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95277">
+                      那么利用结论
+                      2，我们能做什么呢？由于已经知道异色区域中更大的元素的位置。我们再回到原题，用木板装水的过程中，装水量是由最短的木板决定的。
+                    </p>
+                    <p data-nodeid="95278">
+                      根据上述分析，我们是不是可以得出第三个结论：装水最多的时候，是否就是<strong
+                        data-nodeid="95854"
+                        >异色且成对</strong
+                      >的 &lt;i, j&gt; 呢？我们假设该结论成立。
+                    </p>
+                    <p data-nodeid="95279">
+                      <strong data-nodeid="95859">结论 3</strong>：
+                    </p>
+                    <blockquote data-nodeid="95280">
+                      <p data-nodeid="95281">
+                        装水最多的时候，必定由异色区域两根木板来装。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95282">
+                      但是你可能很快会找到一个反例。如下图所示（注意，不同位置的竖线高度，分别表示相应位置元素的值的大小）：
+                    </p>
+                    <p data-nodeid="97095" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/3B/15/Cgp9HWCCh6uAG6fTAACBJOzbUF4404.png"
+                        alt="2021423-163817.png"
+                        data-nodeid="97098"
+                      />
+                    </p>
+
+                    <p data-nodeid="95284">
+                      在 j 的同侧，还有一个 A[k] 比 A[j] 稍大且 A[k]，A[j]
+                      离得很远。此时 A[i] 和 A[j] 装的水（1 号区域）肯定比 A[j]
+                      和 A[k] 装的水（2 号区域）少。
+                    </p>
+                    <p data-nodeid="95285">
+                      但是，既然已经出现这种情况，那么可以肯定的是，此时 A[i]
+                      &gt; A[j] 且 A[i] &gt; A[k]。并且 A[k] &gt;
+                      A[j]，实际上可以得到一个更大的装水区域。即由 A[i]，A[k]
+                      形成的下图中 3 号区域：
+                    </p>
+                    <p data-nodeid="100889" class="te-preview-highlight">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/3B/1D/CioPOWCCh7OACEAIAAB4ET8YQCk104.png"
+                        alt="2021423-163823.png"
+                        data-nodeid="100892"
+                      />
+                    </p>
+
+                    <p data-nodeid="95287">同样也得出结论 3 是成立的。</p>
+                    <p data-nodeid="95288">
+                      那么根据结论
+                      3，我们就知道最优答案只能在异色区域里面选（可以想象成装水的水桶两根木板一定要不一样的颜色）。然后根据结论
+                      2，我们又可以知道每个元素 A[x] 在异色区域里面离 x
+                      最远且更大的是谁。那么这道题目就可以求解了。
+                    </p>
+                    <p data-nodeid="95289">
+                      【<strong data-nodeid="95945">代码</strong>】根据结论 2
+                      和结论 3 我们可以写出代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">maxArea</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>, j = N - <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">while</span> (i &lt; j) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">int</span> height = Math.min(A[i], A[j]);
+</div></li><li><div class="code-word">    <span class="hljs-keyword">int</span> width = j - i;
+</div></li><li><div class="code-word">    ans = Math.max(ans, height * width);
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (A[i] &gt; A[j]) {
+</div></li><li><div class="code-word">      j--;
+</div></li><li><div class="code-word">    } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      i++;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> ans;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <blockquote data-nodeid="95291">
+                      <p data-nodeid="95292">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/11.%E7%9B%9B%E6%9C%80%E5%A4%9A%E6%B0%B4%E7%9A%84%E5%AE%B9%E5%99%A8.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="95949"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/11.%E7%9B%9B%E6%9C%80%E5%A4%9A%E6%B0%B4%E7%9A%84%E5%AE%B9%E5%99%A8.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="95953"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/11.%E7%9B%9B%E6%9C%80%E5%A4%9A%E6%B0%B4%E7%9A%84%E5%AE%B9%E5%99%A8.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="95957"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95293">
+                      <strong data-nodeid="95962">复杂度分析</strong
+                      >：双指针左右同时遍历数组的元素，每个元素只访问一遍，因此，其复杂度为
+                      O(N)，空间复杂度为 O(1)。
+                    </p>
+                    <p data-nodeid="95294">
+                      【<strong data-nodeid="95968">小结</strong
+                      >】本质上这道题就是从“求一个求数组的最大值”延伸和演变而来。只是我们通过双指针求解数组最大值的过程中，总结出了结论
+                      1 和结论 2。然后再结合题意要求，得到结论
+                      3，最后使这个问题得到解决。
+                    </p>
+                    <p data-nodeid="95295">这道题目的考点我们进行一下归纳。</p>
+                    <ul data-nodeid="95296">
+                      <li data-nodeid="95297">
+                        <p data-nodeid="95298">
+                          双指针：需要从左右两端向中间走（这和我们前面所讲的双指针略有不同）。
+                        </p>
+                      </li>
+                      <li data-nodeid="95299">
+                        <p data-nodeid="95300">
+                          贪心算法：通过结论 1、结论 2、结论
+                          3，每一步都选择最优解，最终得到整个问题的最优解。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95301">
+                      为了帮助你巩固上述解题方法，这里我再给你留一道类似的题目。
+                    </p>
+                    <p data-nodeid="95302">
+                      <strong data-nodeid="95984">练习题 1</strong
+                      >：给定一个数组 A[]，A[i]
+                      表示柱子的高度，宽度为一个单位。如果我们不停往里面加水，直到所有柱子之间都加满为止。请问：给定一个图形，最多能接多少单位面积的水？
+                    </p>
+                    <p data-nodeid="95303">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C4/Cgp9HWBm8nKAdTAFAAVvP6TxkfM792.png"
+                        alt="Drawing 14.png"
+                        data-nodeid="95987"
+                      />
+                    </p>
+                    <p data-nodeid="95304">
+                      输入：A = [0,1,0,2,1,0,1,3,2,1,2,1]
+                    </p>
+                    <p data-nodeid="95305">输出：6</p>
+                    <p data-nodeid="95306">
+                      解释：如图所示，最多只能接 6
+                      个单位面积的水。蓝色部分是水，而黑色部分是柱子，数组中不同的值，由不同高度的柱子表示。
+                    </p>
+                    <blockquote data-nodeid="95307">
+                      <p data-nodeid="95308">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/42.%E6%8E%A5%E9%9B%A8%E6%B0%B4.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="95997"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/42.%E6%8E%A5%E9%9B%A8%E6%B0%B4.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96001"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/42.%E6%8E%A5%E9%9B%A8%E6%B0%B4.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96005"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="95309">例 2：不重叠区间</h3>
+                    <p data-nodeid="95310">
+                      【<strong data-nodeid="96054">题目</strong
+                      >】给定一系列区间，请你选一个子集，使得这个子集里面区间都不相互重叠，并且这个子集里面元素个数最多。不重叠的定义：区间
+                      [3,4] 和 [4,5] 就是不重叠。<br />
+                      输入：A = [[1,2],[2, 3], [3,4], [1,3]<br />
+                      输出：3<br />
+                      解释：最多只能选出 3 个区间相互不重叠[1,2], [2,3], [3,4]。
+                    </p>
+                    <p data-nodeid="95311">
+                      【<strong data-nodeid="96060">分析</strong
+                      >】这个问题，最后相互不重叠的区间应该是初始集合的一个子集。那么，当我们遇到一个区间的时候，应该取还是不取呢？
+                    </p>
+                    <p data-nodeid="95312">
+                      下面我们从“单个区间：取和不取”来展开讲解。这里我们需要稍微进行一下推导。假设：
+                    </p>
+                    <ol data-nodeid="95313">
+                      <li data-nodeid="95314">
+                        <p data-nodeid="95315">
+                          已经求解了下图中的绿色区域，并且得到了绿色区域的最优解
+                          maxNum；
+                        </p>
+                      </li>
+                      <li data-nodeid="95316">
+                        <p data-nodeid="95317">
+                          接下来我们要处理红色元素（也就是单个的区间）。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="95318">
+                      （注意：下文的 maxNum 和 newMaxNum
+                      均表示区间里面的不重合区间的最大数目，其中 newMaxNum
+                      表示区间<strong data-nodeid="96077">范围变长</strong
+                      >之后的<strong data-nodeid="96078">新的不重合区间</strong
+                      >的<strong data-nodeid="96079">最大数目</strong>）
+                    </p>
+                    <p data-nodeid="95319">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CC/CioPOWBm8nuAQENIAACKoN1sPiQ926.png"
+                        alt="Drawing 15.png"
+                        data-nodeid="96082"
+                      />
+                    </p>
+                    <p data-nodeid="95320">
+                      那么当红色区间进来的时候，应该如何更新 maxNum 的值呢？新的
+                      newMaxNum 的值又如何决定呢？
+                    </p>
+                    <p data-nodeid="95321">这里可以分为两种情况。</p>
+                    <p data-nodeid="95322">
+                      Case 1：newMaxNum
+                      <strong data-nodeid="96090">不包含</strong
+                      >新来的区间（红色部分），应该直接等于旧的 maxNum
+                    </p>
+                    <p data-nodeid="95323">
+                      Case 2：newMaxNum<strong data-nodeid="96096"
+                        >一定包含</strong
+                      >新来的区间（红色部分）
+                    </p>
+                    <p data-nodeid="95324">如果进行迭代的话，就是：</p>
+                    <blockquote data-nodeid="95325">
+                      <p data-nodeid="95326">
+                        更新后的最优解 = max（不包含红色区间 =maxNum，
+                        一定包含红色区间的最优解）
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95327">
+                      Case 1 的值是不需要求解的。那么接下来，我们只需要看 Case
+                      2。
+                    </p>
+                    <p data-nodeid="95328">这种情况又可以分为两种小情况。</p>
+                    <p data-nodeid="95329">
+                      Case 2.1：新来的区间与旧的任何区间都没有交集，那么
+                      newMaxNum = maxNum + 1。
+                    </p>
+                    <p data-nodeid="95330">
+                      Case 2.2：新来的区间与旧的区间有交集。
+                    </p>
+                    <p data-nodeid="95331">
+                      Case 2.1 的值已经计算出来了，我们再来看 Case 2.2。
+                    </p>
+                    <p data-nodeid="95332">
+                      求解 Case
+                      2.2，需要从区间的不重叠性出发。关于“区间不重叠”，有一个<strong
+                        data-nodeid="96109"
+                        >性质</strong
+                      >：
+                    </p>
+                    <blockquote data-nodeid="95333">
+                      <p data-nodeid="95334">
+                        两个区间 [a, b] 和 [c,d] 不相交，只需要满足 b &lt;= c ||
+                        d &lt;= a 就可以了。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95335">
+                      现在，我们知道：区间的重叠只需要看两端的大小。可以将绿色区间部分<strong
+                        data-nodeid="96139"
+                        >排序</strong
+                      >。<strong data-nodeid="96140">绿色区间集合</strong
+                      >将分为两部分：
+                    </p>
+                    <ul data-nodeid="95336">
+                      <li data-nodeid="95337">
+                        <p data-nodeid="95338">
+                          集合 a. 与红色新进来的区间有交集（下图紫色部分）；
+                        </p>
+                      </li>
+                      <li data-nodeid="95339">
+                        <p data-nodeid="95340">
+                          集合 b. 与红色新进来的区间没有交集（下图绿色部分）。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95341">我们画图如下：</p>
+                    <p data-nodeid="95342">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C4/Cgp9HWBm8oeACww_AACubbwdL_c165.png"
+                        alt="Drawing 16.png"
+                        data-nodeid="96146"
+                      />
+                    </p>
+                    <p data-nodeid="95343">
+                      假设已知集合 a 中不重叠的区间个数为
+                      preMaxNum，那么我们就得到了 Case 2.2 的解：preMaxNum + 1。
+                    </p>
+                    <p data-nodeid="95344">
+                      此外， preMaxNum 肯定小于 maxNum，所以此时 preMaxNum + 1
+                      &lt;= maxNum。也就是说，Case 2.2 最优的时候，都没有 Case 1
+                      好。所以对于整个问题：我们只需要考虑 Case 1 和 Case 2.1。
+                    </p>
+                    <blockquote data-nodeid="95345">
+                      <p data-nodeid="95346">
+                        Case 2.2 逆袭的最优情况也只是等同于 Case
+                        1。次优解不能逆袭超车，正好使用贪心算法。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95347">
+                      那么接下来，我们看 Case 1 与 Case
+                      2.1，由此可以得到一个<strong data-nodeid="96157"
+                        >结论 1</strong
+                      >：
+                    </p>
+                    <blockquote data-nodeid="95348">
+                      <p data-nodeid="95349">
+                        <strong data-nodeid="96161"
+                          >如果新来的区间与前面的区间不重叠，那么不重叠区间数目就能增加一个。</strong
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95350">
+                      至此，我们知道通过排序，并且依赖性质 1
+                      可以得出两个区间是否重叠。那么如何排序呢？区间有两个端点
+                      [start, end]，是按照 start 排序还是按 end 排序呢？
+                    </p>
+                    <p data-nodeid="95351">
+                      这里我们先用 end 来排序（很多博客上说不能用 start
+                      排序，实际上是可以的，下面我们会具体分析）。
+                    </p>
+                    <p data-nodeid="95352">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/CC/CioPOWBm8pGAPhp2AACThtOxY5g556.png"
+                        alt="Drawing 17.png"
+                        data-nodeid="96170"
+                      />
+                    </p>
+                    <p data-nodeid="95353">
+                      由于我们是按照每个区间的 [start, end]
+                      来排序的，并且用了一个变量 maxEnd 记录已经处理的区间的最大
+                      maxEnd。那么当新区间 [c, d] 进来的时候，只需要判断：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">newMaxNum = maxNum + (maxEnd &lt;= c ? <span class="hljs-number">1</span> : <span class="hljs-number">0</span>);
+</div></li><li><div class="code-word">maxNum = newMaxNum;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95355">
+                      此外，还需要注意 maxEnd
+                      的更新。在前面的图中，为了简化条件，我并没有清晰地指出
+                      maxEnd 指代的含义。你需要注意 maxEnd
+                      的含义：如果你选取的区间都是不重叠的，maxEnd 是你<strong
+                        data-nodeid="96189"
+                        >选中的区间</strong
+                      >的最大 end，而<strong data-nodeid="96190"
+                        >不是你查看过的区间</strong
+                      >的最大 end。
+                    </p>
+                    <p data-nodeid="95356">
+                      因为，只有这样，我们才可以知道<strong data-nodeid="96196"
+                        >要不要把新区间加入不重叠的集合</strong
+                      >里面。
+                    </p>
+                    <p data-nodeid="95357">
+                      【<strong data-nodeid="96202">代码</strong
+                      >】原理已经讲清楚了，下面可以开始写代码了（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">nonOverlapIntervals</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[][] A)</span> </span>{
+</div></li><li><div class="code-word"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 将区间进行排序</span>
+</div></li><li><div class="code-word">Arrays.sort(A, <span class="hljs-keyword">new</span> Comparator&lt;<span class="hljs-keyword">int</span>[]&gt;() {
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compare</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] a, <span class="hljs-keyword">int</span>[] b)</span> </span>{
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> a[<span class="hljs-number">1</span>] == b[<span class="hljs-number">1</span>] ? <span class="hljs-number">0</span> : (a[<span class="hljs-number">1</span>] &lt; b[<span class="hljs-number">1</span>] ? -<span class="hljs-number">1</span> : <span class="hljs-number">1</span>);
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-comment">// 已重叠的区间的最右端点</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> maxEnd = Integer.MIN_VALUE;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 不重叠 的区间的个数</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 开始贪心算法</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> start = A[i][<span class="hljs-number">0</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (maxEnd &lt;= start) {
+</div></li><li><div class="code-word">maxEnd = A[i][<span class="hljs-number">1</span>];
+</div></li><li><div class="code-word">ans++;
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> ans;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <blockquote data-nodeid="95359">
+                      <p data-nodeid="95360">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.1.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96206"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.1.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96210"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.1.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96214"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95361">
+                      <strong data-nodeid="96219">复杂度分析</strong>：假设有
+                      N个 区间，程序的核心分为排序与贪心。排序的时间复杂度为
+                      O(NlgN)，而贪心的算法复杂度为 O(N)，空间复杂度为 O(1)。
+                    </p>
+                    <p data-nodeid="95362">
+                      【<strong data-nodeid="96225">小结</strong
+                      >】我们分析这道题目的时候，并不清楚是否要引入排序，而是一步步推导得出“需要使用排序来进行预处理”，然后再使用贪心算法。
+                    </p>
+                    <p data-nodeid="95363">
+                      不过前文说到，排序的时候也可以使用区间 [start, end] 中的
+                      start 排序。这里我就再给出根据 start
+                      进行排序的代码。核心思路：<strong data-nodeid="96235"
+                        >如果在区间排序的时候，根据 start
+                        来排序，那么在处理的时候，需要逆序进行</strong
+                      >。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">eraseOverlapIntervals</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[][] A)</span> </span>{
+</div></li><li><div class="code-word"><span class="hljs-comment">// 区间的总数</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 将区间[start, end]根据start来排序</span>
+</div></li><li><div class="code-word">Arrays.sort(A, <span class="hljs-keyword">new</span> Comparator&lt;<span class="hljs-keyword">int</span>[]&gt;() {
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compare</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] a, <span class="hljs-keyword">int</span>[] b)</span> </span>{
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>] == b[<span class="hljs-number">0</span>] ? <span class="hljs-number">0</span> : (a[<span class="hljs-number">0</span>] &lt; b[<span class="hljs-number">0</span>] ? -<span class="hljs-number">1</span> : <span class="hljs-number">1</span>);
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> preStart = Integer.MAX_VALUE;
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 处理的时候，从后面开始处理</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = N - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) {
+</div></li><li><div class="code-word"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> start = A[i][<span class="hljs-number">0</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> end = A[i][<span class="hljs-number">1</span>];
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (end &lt;= preStart) {
+</div></li><li><div class="code-word">preStart = start;
+</div></li><li><div class="code-word">ans++;
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> ans;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <blockquote data-nodeid="95365">
+                      <p data-nodeid="95366">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.2.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96239"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.2.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96243"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/nonOverlap.2.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96247"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95367">
+                      不重叠区间问题是很多问题的模板题。你掌握了这个模板就可以解决掉更多题目。下面请你尝试完成下面一批练习题。你一定要自己动手练习，不要偷懒哦！如果有你对哪里有疑问，也欢迎你写在留言区，我们一起讨论。
+                    </p>
+                    <p data-nodeid="95368">
+                      <strong data-nodeid="96253">练习题 2</strong
+                      >：给定一系列区间，返回最少需要删除的区间数目，使得剩下的区间不重叠。
+                    </p>
+                    <p data-nodeid="95369">输入：A = [[1,2], [2,3], [1,4]]</p>
+                    <p data-nodeid="95370">输出：1</p>
+                    <p data-nodeid="95371">
+                      解释：这里我们选择删除 [1, 4]
+                      剩下的区间便不再重叠。这是最少的删除区间的数目。
+                    </p>
+                    <blockquote data-nodeid="95372">
+                      <p data-nodeid="95373">
+                        解法 1：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.1.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96277"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.1.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96281"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.1.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96285"
+                          >Python</a
+                        ><br />
+                        解法 2：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.2.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96290"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.2.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96294"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/435.%E6%97%A0%E9%87%8D%E5%8F%A0%E5%8C%BA%E9%97%B4.2.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96298"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95374">
+                      <strong data-nodeid="96303">练习题 3</strong
+                      >：给定一个字符串，需要切分成尽可能多的切片，但是一个字母只能放在一个切片里面。
+                    </p>
+                    <p data-nodeid="95375">输入：A = "abcabdefg"</p>
+                    <p data-nodeid="95376">输出：5</p>
+                    <p data-nodeid="95377">
+                      解释：最多可以分为 ["abcab" "d" "e" "f" "g"]。你不能切成
+                      ["a", "b", "c", "a", "b", "d", "e", "f",
+                      "g"]，在这种情况下 'a' 字母并没有处于同一个切片。
+                    </p>
+                    <blockquote data-nodeid="95378">
+                      <p data-nodeid="95379">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/763.%E5%88%92%E5%88%86%E5%AD%97%E6%AF%8D%E5%8C%BA%E9%97%B4.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96377"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/763.%E5%88%92%E5%88%86%E5%AD%97%E6%AF%8D%E5%8C%BA%E9%97%B4.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96381"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/763.%E5%88%92%E5%88%86%E5%AD%97%E6%AF%8D%E5%8C%BA%E9%97%B4.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96385"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95380">
+                      <strong data-nodeid="96390">练习题 4</strong
+                      >：给定一系列区间，将重合的区间合并在一起。
+                    </p>
+                    <p data-nodeid="95381">
+                      输入：A = [[1,2], [2,3], [2,6], [7, 8]]
+                    </p>
+                    <p data-nodeid="95382">输出：[[1, 6], [7,8]]</p>
+                    <blockquote data-nodeid="95383">
+                      <p data-nodeid="95384">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/56.%E5%90%88%E5%B9%B6%E5%8C%BA%E9%97%B4.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96422"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/56.%E5%90%88%E5%B9%B6%E5%8C%BA%E9%97%B4.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96426"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/56.%E5%90%88%E5%B9%B6%E5%8C%BA%E9%97%B4.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96430"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="95385">例 3：青蛙跳</h3>
+                    <p data-nodeid="95386">
+                      【<strong data-nodeid="96455">题目</strong>】给定一个数组
+                      A[]，元素 A[i] &gt;= 0，一只青蛙站在 index =
+                      i，那它可以跳到 A[i+1], …,
+                      A[i+A[i]]（当然，它是不能跳出数组的）。那么请问这只青蛙从
+                      index = 0 出发，能不能跳到 index = A.length - 1。
+                    </p>
+                    <p data-nodeid="95387">输入：A = [2, 3, 1, 2, 1]</p>
+                    <p data-nodeid="95388">输出：true</p>
+                    <p data-nodeid="95389">
+                      解释：青蛙可以这样跳，A[0] → A[1] → A[4]
+                    </p>
+                    <p data-nodeid="95390">
+                      【<strong data-nodeid="96488">分析</strong
+                      >】这个问题的重点在于，<strong data-nodeid="96489"
+                        >站在 index = i，那它可以跳到 [i, ..., i + A[i]]</strong
+                      >。
+                    </p>
+                    <p data-nodeid="95391">因此，它表示的信息就是两点：</p>
+                    <ul data-nodeid="95392">
+                      <li data-nodeid="95393">
+                        <p data-nodeid="95394">起点 i</p>
+                      </li>
+                      <li data-nodeid="95395">
+                        <p data-nodeid="95396">终点 i + A[i]</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95397">
+                      这货不就是一个区间吗？因此，数组里面的每一个元素，实际上都表示了一段区间
+                      [i, i +
+                      A[i]]。并且，这些区间都已经按照区间的起始点排好序了。
+                    </p>
+                    <p data-nodeid="95398">
+                      那么问题就演变成：给定一系列区间，这段区间是否可以<strong
+                        data-nodeid="96513"
+                        >连续</strong
+                      >覆盖 [0, N-1] 这个范围。题目也就变成一个区间覆盖问题。
+                    </p>
+                    <p data-nodeid="95399">
+                      当走到位置 i 的时候，相当于已经覆盖了范围 [0, i +
+                      A[i]]。那么接下来，由于我们需要实现的目标是：连续覆盖得越远越好。
+                    </p>
+                    <p data-nodeid="95400">因此只需要选择这样的区间：</p>
+                    <ul data-nodeid="95401">
+                      <li data-nodeid="95402">
+                        <p data-nodeid="95403">
+                          区间的起始位置 x 一定要在 [0, i + A[i]]
+                          范围里面，也就是要<strong data-nodeid="96535"
+                            >满足相连</strong
+                          >；
+                        </p>
+                      </li>
+                      <li data-nodeid="95404">
+                        <p data-nodeid="95405">
+                          区间的终止位置 x + A[x] 一定要越远越好。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95406">
+                      那么，我们可以写出暴力的算法<strong data-nodeid="96546"
+                        >版本 1</strong
+                      >如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">canJump</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A)</span> </span>{
+</div></li><li><div class="code-word">        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 起始位置能拿到的区间是[0, 0 + A[0]]</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">int</span> coveredRange = A[<span class="hljs-number">0</span>];
+</div></li><li><div class="code-word">        <span class="hljs-keyword">int</span> used = <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">        <span class="hljs-keyword">while</span> (coveredRange &lt; N - <span class="hljs-number">1</span> &amp;&amp; used &lt; N) {
+</div></li><li><div class="code-word">            <span class="hljs-keyword">int</span> oldCoveredRange = coveredRange;
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 我们从0 ~ N - 1里面选一个区间</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 注意，我们并不害怕重复选择同一个区间</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 因为重复选择同一个区间，并不能让覆盖范围变长。</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 不能变长的情况，我们就直接return false.</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">//</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// （扫描循环:待优化）.....</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 1. 如果这个区间和我们已经覆盖的范围是相连的!</span>
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 满足相连性</span>
+</div></li><li><div class="code-word">                <span class="hljs-keyword">if</span> (i &lt;= oldCoveredRange) {
+</div></li><li><div class="code-word">                    <span class="hljs-comment">// 2. 如果这个区间能覆盖得更远</span>
+</div></li><li><div class="code-word">                    <span class="hljs-keyword">if</span> (i + A[i] &gt; coveredRange) {
+</div></li><li><div class="code-word">                        <span class="hljs-comment">// 更新我们能cover的范围</span>
+</div></li><li><div class="code-word">                        coveredRange = i + A[i];
+</div></li><li><div class="code-word">                    } 
+</div></li><li><div class="code-word">                }
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 如果发现不能更新覆盖范围，说明已经没有变长的可能性了。</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">if</span> (oldCoveredRange == coveredRange) {
+</div></li><li><div class="code-word">                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 否则，已经使用的区间数目++</span>
+</div></li><li><div class="code-word">            used++;
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95408">
+                      暴力算法每次在完成区间更新的时候，都是搜索所有可能的解，因此其正确性是可以得到保证的。（在<a
+                        href="https://leetcode-cn.com/problems/jump-game/?fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="96550"
+                        >测试平台</a
+                      >上也可以通过）。但是面试官要的肯定不是复杂度这么高的算法。因此，我们需要在此基础上继续优化。
+                    </p>
+                    <p data-nodeid="95409">
+                      <strong data-nodeid="96562">【优化 1</strong
+                      >】由于连续性的要求，在扫描的时候，不需要遍历 [0, N)
+                      的所有元素，只需要遍历 [0,oldCoveredRange]
+                      这个范围里面的元素。那么扫描循环可以优化如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">            <span class="hljs-comment">// （扫描循环:待优化）.....</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt;= oldCoveredRange; i++) {
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 1. 这个区间和我们已经覆盖的范围是相连的!</span>
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 满足相连性</span>
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 2. 如果这个区间能覆盖得更远</span>
+</div></li><li><div class="code-word">                <span class="hljs-keyword">if</span> (i + A[i] &gt; coveredRange) {
+</div></li><li><div class="code-word">                    <span class="hljs-comment">// 更新我们能cover的范围</span>
+</div></li><li><div class="code-word">                    coveredRange = i + A[i];
+</div></li><li><div class="code-word">                } 
+</div></li><li><div class="code-word">            }
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95411">
+                      <strong data-nodeid="96567">【优化 2</strong>】我们发现：
+                    </p>
+                    <ul data-nodeid="95412">
+                      <li data-nodeid="95413">
+                        <p data-nodeid="95414">
+                          如果有区间在覆盖范围 [0, A] 里面被扫描过了；
+                        </p>
+                      </li>
+                      <li data-nodeid="95415">
+                        <p data-nodeid="95416">
+                          在下一轮覆盖范围 [0, B] 里面还会被扫描；
+                        </p>
+                      </li>
+                      <li data-nodeid="95417">
+                        <p data-nodeid="95418">B &gt;= A。</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95419">
+                      而 [0, B] 实际上可以分为两段，[0, A] 和 [A+1, B]。既然
+                      [0,A]
+                      这一段已经扫描过了，那么为了避免重复扫描，接下来只需要扫描
+                      [A+1, B]
+                      即可。因此，每次扫描的时候，你都需要记住当前这次扫描的终点
+                      A。
+                    </p>
+                    <p data-nodeid="95420">
+                      【<strong data-nodeid="96605">代码</strong
+                      >】根据上述分析，我们就可以写出如下代码了（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>{
+</div></li><li><div class="code-word">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">canJump</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] A)</span> </span>{
+</div></li><li><div class="code-word">        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = A == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : A.length;
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 一开始，在正式开始第一次扫描之前，肯定什么元素都还没有扫描过</span>
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 所以之记录之前扫描位置设置为-1</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">int</span> preScanedPos = -<span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 根据题意</span>
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 当前能覆盖到数组的第0个元素。也就是当前可以够得着的元素</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">int</span> curCoveredRange = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 如果当前</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">while</span> (curCoveredRange &lt; N - <span class="hljs-number">1</span>) {
+</div></li><li><div class="code-word">            <span class="hljs-keyword">int</span> oldCoveredRange = curCoveredRange;
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 根据优化1和优化2，我们只需要遍历</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// [preScanedPos + 1, oldCoveredRange]即可。</span>
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 然后不停更新curCoveredRange</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = preScanedPos + <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">                i &lt;= oldCoveredRange; i++) {
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 1. 这个区间和我们已经覆盖的范围是相连的!</span>
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 满足相连性</span>
+</div></li><li><div class="code-word">                <span class="hljs-comment">// 2. 如果这个区间能覆盖得更远</span>
+</div></li><li><div class="code-word">                <span class="hljs-keyword">if</span> (i + A[i] &gt; curCoveredRange) {
+</div></li><li><div class="code-word">                    <span class="hljs-comment">// 更新我们能cover的范围</span>
+</div></li><li><div class="code-word">                    curCoveredRange = i + A[i];
+</div></li><li><div class="code-word">                } 
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 如果发现不能更新覆盖范围，说明已经没有变长的可能性了。</span>
+</div></li><li><div class="code-word">            <span class="hljs-keyword">if</span> (oldCoveredRange == curCoveredRange) {
+</div></li><li><div class="code-word">                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+</div></li><li><div class="code-word">            }
+</div></li><li><div class="code-word">            <span class="hljs-comment">// 我们记住上次已经扫描过的位置</span>
+</div></li><li><div class="code-word">            preScanedPos = oldCoveredRange;
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <blockquote data-nodeid="95422">
+                      <p data-nodeid="95423">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/55.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96609"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/55.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96613"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/55.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96617"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95424">
+                      <strong data-nodeid="96622">复杂度分析</strong
+                      >：时间复杂度 O(N)，空间复杂度
+                      O(1)。实际上，这里最多每个点遍历一次，所以时间复杂度为
+                      O(N)。
+                    </p>
+                    <p data-nodeid="95425">
+                      【<strong data-nodeid="96632">小结</strong
+                      >】在做完这个题之后，不妨和我们“<a
+                        href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=685#/detail/pc?id=6691&amp;fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="96630"
+                        >第 02 讲</a
+                      >”学过的 FIFO 队列进行一个知识上的联动。
+                    </p>
+                    <p data-nodeid="95426">
+                      记得我以前学习队列的时候，访问一个点时，会把后续的点都放到队列中，如下图所示：
+                    </p>
+                    <p data-nodeid="95427">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/CD/CioPOWBm8tCAH_xHAADOxSUIRfw102.png"
+                        alt="Drawing 18.png"
+                        data-nodeid="96636"
+                      />
+                    </p>
+                    <p data-nodeid="95428">
+                      但是在这道题中，当访问 i 这个点的时候，后续能够走的点是
+                      A[i+1] …
+                      A[i+A[i]]，但并没有把所有的点都入队，而是从里面选择了一个最优的点。
+                    </p>
+                    <p data-nodeid="95429">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/2D/C5/Cgp9HWBm8taAUbvHAADTudQRn6s636.png"
+                        alt="Drawing 19.png"
+                        data-nodeid="96651"
+                      />
+                    </p>
+                    <p data-nodeid="95430">
+                      如果把遍历的顺序也放到一个队列中，那么入队的时候，就只是把后面最优的点放到队列中。这个性质和优先级队列不太一样。优先级队列会把所有的元素都放到堆里面，然后堆内有序。但是对于贪心来说，只需要把最优秀的元素入队即可。
+                    </p>
+                    <p data-nodeid="95431">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C5/Cgp9HWBm8t2ASM7CAADVY3j8Qig907.png"
+                        alt="Drawing 20.png"
+                        data-nodeid="96655"
+                      />
+                    </p>
+                    <p data-nodeid="95432">
+                      当然，由于每次都只选一个后续最优元素入队，因此这个 Queue
+                      的长度最长是
+                      1。这和我们之前学过的队列知识存在相似之处，但也有不同的地方。
+                    </p>
+                    <p data-nodeid="95433">
+                      如果我们再从深度上挖掘一下这道题，还可以有得到下面这些练习题。
+                    </p>
+                    <p data-nodeid="95434">
+                      <strong data-nodeid="96662">练习题 5</strong>：问题与例 3
+                      一样，只不过这个题：需要输出最少跳跃的次数？如果不能跳到
+                      A.length-1，请输出 -1。
+                    </p>
+                    <p data-nodeid="95435">输入：A = [2, 3, 1, 2, 1]</p>
+                    <p data-nodeid="95436">输出：2</p>
+                    <p data-nodeid="95437">
+                      解释：A[0]→A[1]→A[4] 最少跳两次就可以到达最后一个下标。
+                    </p>
+                    <blockquote data-nodeid="95438">
+                      <p data-nodeid="95439">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/45.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F-ii.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96684"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/45.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F-ii.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96688"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/45.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F-ii.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96692"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95440">
+                      接下来我们看一下：给定一系列区间，如果要完全覆盖 [start,
+                      end] 这个区间，应该如何处理呢？请看练习题 6。
+                    </p>
+                    <p data-nodeid="95441">
+                      <strong data-nodeid="96710">练习题 6</strong
+                      >：一个大门安装了好几个摄像头，每个摄像头会录下一段时间的视频（假设起始时间与结束时间都是一个整数，可能为负数）。如果想找到
+                      [0, T]
+                      时间段的视频，请问最少需要提取几个摄像头的视频？如果不能得到
+                      [0, T] 这个时间段的视频，输出 -1。
+                    </p>
+                    <p data-nodeid="95442">
+                      输入：[[1,2], [0,2], [0,1], [2,3], [2,6], [3,8]], T = 5
+                    </p>
+                    <p data-nodeid="95443">输出：2</p>
+                    <p data-nodeid="95444">
+                      解释：只需要用 [0, 2]，[2,6] 就可以完全覆盖 [0, 5]
+                      这个时间段。因此，最少需要看 2 个摄像头。
+                    </p>
+                    <blockquote data-nodeid="95445">
+                      <p data-nodeid="95446">
+                        代码：J<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/1024.%E8%A7%86%E9%A2%91%E6%8B%BC%E6%8E%A5.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96755"
+                          >ava/</a
+                        ><a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/1024.%E8%A7%86%E9%A2%91%E6%8B%BC%E6%8E%A5.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96758"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/1024.%E8%A7%86%E9%A2%91%E6%8B%BC%E6%8E%A5.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96762"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="95447">例 4： 加油站</h3>
+                    <p data-nodeid="95448">
+                      【<strong data-nodeid="96777">题目</strong
+                      >】巨大的环形赛道上有 N 个加油站，第 i 个加油站可以加油
+                      G[i] 升，而从第 i 个加油站开到下一个加油站，需要 C[i]
+                      升汽油。请你选择一个起始加油站，能够跑完环形赛道一圈。
+                    </p>
+                    <p data-nodeid="95449">
+                      条件：1. 注意是环形赛道；2. 汽车油箱总是足够大。
+                    </p>
+                    <p data-nodeid="95450">输入：G = [1,2], C=[2, 1]</p>
+                    <p data-nodeid="95451">输出：1</p>
+                    <p data-nodeid="95452">
+                      解释：从站点 0 出发，一开始只能收获 1 升油，而从 index = 0
+                      跑到 index = 1 需要用掉 2 升汽油，所以不能从站点 0
+                      出发。而从站点 1 出发，则可以绕着环形跑道跑一圈。
+                    </p>
+                    <p data-nodeid="95453">
+                      【<strong data-nodeid="96796">分析</strong
+                      >】当拿到这个题的时候，我们首先考虑一种极端情况，那就是收入与付出不成正比。当
+                      sum(G) &lt; sum(C)
+                      的时候，应该是无论如何也不可能跑一圈的。
+                    </p>
+                    <p data-nodeid="95454">
+                      那么接下来就<strong data-nodeid="96805"
+                        >只需要考虑 sum(G) &gt;= sum(C) 的情况</strong
+                      >。在这种情况下，可以得到<strong data-nodeid="96806"
+                        >结论 1：</strong
+                      >
+                    </p>
+                    <blockquote data-nodeid="95455">
+                      <p data-nodeid="95456">
+                        当 sum(G) &gt;= sum(C)
+                        时，必然存在某个点出发可以绕着赛道跑一圈的情况。
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95457">
+                      证明这个结论需要使用反证法。假设：当 sum(G) &gt;=
+                      sum(C)，<strong data-nodeid="96813">不存在</strong
+                      >某个点出发，可以绕着赛道跑一圈。若假设成立，那么必然可以将环形跑道切成几段，如下图所示：
+                    </p>
+                    <p data-nodeid="95458">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/C5/Cgp9HWBm8uqAES68AAIfEBlAW9s655.png"
+                        alt="Drawing 21.png"
+                        data-nodeid="96816"
+                      />
+                    </p>
+                    <p data-nodeid="95459">
+                      并且每一段都是负数（因为不能绕着跑道跑一圈）。这时不同的段用不同的颜色表示。由于每一个小段和都是
+                      sub_sum(G) &lt; sub_sum(C)，那么必然可以得到总和 sum(G)
+                      &lt; sum(C)。这与题目条件相矛盾。
+                    </p>
+                    <p data-nodeid="95460">
+                      <em data-nodeid="96831"
+                        >注：我们用 sub_sum()
+                        函数表示求这一小段对应子数组的和。</em
+                      >
+                    </p>
+                    <p data-nodeid="95461">
+                      根据<strong data-nodeid="96837">结论 1</strong>，可以将
+                      sum(G) &gt;= sum(C) 的情况再次分为两种。
+                    </p>
+                    <ul data-nodeid="95462">
+                      <li data-nodeid="95463">
+                        <p data-nodeid="95464">
+                          Case 1：从站点 0 出发可以跑遍全场。
+                        </p>
+                      </li>
+                      <li data-nodeid="95465">
+                        <p data-nodeid="95466">
+                          Case 2：从非 0 站点出发可以跑遍全场。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95467">
+                      如果是Case 1，那么我们可以写出代码如下（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// ans表示从哪里出发 </span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 车里剩余的油量。</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 开始遍历每个站点</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">  total += G[i] - C[i];
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (left + G[i] - C[i] &gt;= <span class="hljs-number">0</span>) { <span class="hljs-comment">// 油量足够</span>
+</div></li><li><div class="code-word">    left += G[i] - C[i]; <span class="hljs-comment">// 把油耗算上去</span>
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> { <span class="hljs-comment">// &lt;-- 油量不够</span>
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 不能从站点0出发。! &lt;!待处理!&gt;</span>
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word"><span class="hljs-comment">// 可以从站点0出发，此时ans = 0</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> ans;
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95469">
+                      如果是Case 2，接下来我们再看一下<strong
+                        data-nodeid="96856"
+                        >不能从站点 0 出发</strong
+                      >的情况。也就是存在某个点 i，使得汽油不够了。会有
+                      left（余下的汽油） + G[i] - C[i] &lt;
+                      0，那接下来应该从哪里开始呢？
+                    </p>
+                    <ul data-nodeid="95470">
+                      <li data-nodeid="95471">
+                        <p data-nodeid="95472">
+                          首先，当 G[0] - C[0] &lt; 0 的时候，肯定是不能从 0
+                          开始。
+                        </p>
+                      </li>
+                      <li data-nodeid="95473">
+                        <p data-nodeid="95474">
+                          其次，当 G[0] - C[0] &gt;= 0 的时候，如果 [0, i]
+                          的油量收益为负数。那么中间任意选一个点 x，且 0 &lt; x
+                          &lt;= i，那么 [x, i]
+                          这个区间上的油量收益也必然为负（因为去掉了从 0
+                          位置出发的正收益 G[0] - C[0]）。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95475">
+                      这两种情况可以<strong data-nodeid="96902">统一处理</strong
+                      >如下：当出现油量不够的时候，下一个尝试的起点应该是 i +
+                      1。
+                    </p>
+                    <p data-nodeid="95476">
+                      此时我们可以统一用代码处理如下（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-comment">// ans表示从哪里出发 </span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 车里剩余的油量。</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word"><span class="hljs-comment">// 开始遍历每个站点</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">int</span> total = <span class="hljs-number">0</span>; <span class="hljs-comment">// &lt;-- 结论1</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">  total += G[i] - C[i]; <span class="hljs-comment">// &lt;-- 结论1</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">if</span> (left + G[i] - C[i] &gt;= <span class="hljs-number">0</span>) { <span class="hljs-comment">// 油量足够</span>
+</div></li><li><div class="code-word">    left += G[i] - C[i]; <span class="hljs-comment">// 把油耗算上去</span>
+</div></li><li><div class="code-word">  } <span class="hljs-keyword">else</span> { <span class="hljs-comment">// &lt;-- 油量不够</span>
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 尝试新站点出发</span>
+</div></li><li><div class="code-word">    ans = i + <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">    left = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">}
+</div></li><li><div class="code-word">
+</div></li><li><div class="code-word"><span class="hljs-keyword">return</span> total &lt; <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : ans; <span class="hljs-comment">// &lt;-- 结论1</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="95478">
+                      但是需要验证找到的 ans
+                      站点出发，可以绕赛道一圈？答案是不需要的，下面我们证明一下这个结论。
+                    </p>
+                    <p data-nodeid="95479">
+                      假设从 ans=start
+                      站点出发，那么环形区域必然可以分为两半部分，[0, start) 和
+                      [start, N)。由于不能从 index = 0 出发，那么 [0, start)
+                      这个区域油量收益肯定是 sub_sum(G) &lt;
+                      sub_sum(C)，即油量收益肯定是负数。
+                    </p>
+                    <p data-nodeid="95480">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/2D/CE/CioPOWBm8xOAKZD3AAEboP-L1yM535.png"
+                        alt="Drawing 22.png"
+                        data-nodeid="96920"
+                      />
+                    </p>
+                    <p data-nodeid="95481">
+                      由于油的总量是 sum(G) &gt;= sum(C)，那么后半段油的收益
+                      sub_sum(G) - sub_sum(C) &gt; 0
+                      必然成立。并且，我们可以得到：后半段的收益肯定可以平衡掉前半段的负收益。因此，从
+                      start 出发，就必然可以绕着赛道跑一圈。
+                    </p>
+                    <p data-nodeid="95482">
+                      【<strong data-nodeid="96931">代码</strong
+                      >】到此时，我们已经可以写出代码了（解析在注释里）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">canCompleteCircuit</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] G, <span class="hljs-keyword">int</span>[] C)</span> </span>{
+</div></li><li><div class="code-word">  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> N = G == <span class="hljs-keyword">null</span> ? <span class="hljs-number">0</span> : G.length;
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 找一个子数组和最大的地方</span>
+</div></li><li><div class="code-word">  <span class="hljs-comment">// 那么也是相当于找一个子数组和最小的地方</span>
+</div></li><li><div class="code-word">  <span class="hljs-keyword">long</span> left = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">long</span> total = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> get = G[i];
+</div></li><li><div class="code-word">    <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> cost = C[i];
+</div></li><li><div class="code-word">    total += get - cost;
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 如果我还能开到下一站，好的，那么继续开</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span> (left + get - cost &gt;= <span class="hljs-number">0</span>) {
+</div></li><li><div class="code-word">      left += get - cost;
+</div></li><li><div class="code-word">    } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">      <span class="hljs-comment">// 如果从[ans ...i]这段区间里面的收益为负数</span>
+</div></li><li><div class="code-word">      left = <span class="hljs-number">0</span>;
+</div></li><li><div class="code-word">      ans = i + <span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">  }
+</div></li><li><div class="code-word">  <span class="hljs-keyword">return</span> total &gt;= <span class="hljs-number">0</span> ? ans : -<span class="hljs-number">1</span>;
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <blockquote data-nodeid="95484">
+                      <p data-nodeid="95485">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96935"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96939"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96943"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95486">
+                      <strong data-nodeid="96948">复杂度分析</strong
+                      >：时间复杂度为 O(N)，空间复杂度为 O(1)。
+                    </p>
+                    <p data-nodeid="95487">
+                      【<strong data-nodeid="96954">小结</strong
+                      >】我们经过层层分析，得到最终求解的代码。最后还证明了不需要额外的代码去验证
+                      ans 站点出发的有效性。在这个题中用到的结论 1
+                      是我们分析问题的关键。
+                    </p>
+                    <p data-nodeid="95488">
+                      不过这个题还有一个比较<strong data-nodeid="96960"
+                        >有趣的解法</strong
+                      >，解题思路是这样的：
+                    </p>
+                    <ul data-nodeid="95489">
+                      <li data-nodeid="95490">
+                        <p data-nodeid="95491">
+                          当总和小于 0 的时候，肯定没有解；
+                        </p>
+                      </li>
+                      <li data-nodeid="95492">
+                        <p data-nodeid="95493">
+                          当总和大于等于 0
+                          的时候，总是有解的，那么在选择起点的时候，可以选择一个子数组，这个子数组是数组里面的最大和，然后就以这里作为起点。（可以反证一下，如果从最大子数组和的起点出发都不能绕赛道一圈，那么其他的点就更没戏了）。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="95494">
+                      不过想要通关这种解法，需要你依次解决以下几道练习题哦。
+                    </p>
+                    <p data-nodeid="95495">
+                      <strong data-nodeid="96968">练习题 7</strong
+                      >：给定一个数组，求这个子数组里面的最大子数组和。
+                    </p>
+                    <p data-nodeid="95496">输入：A = [1,-5,3,4]</p>
+                    <p data-nodeid="95497">输出：7</p>
+                    <p data-nodeid="95498">
+                      解释：最大子数组和为 [3,4]，形成的和为 7，没有比 7
+                      更大的子数组和了。
+                    </p>
+                    <blockquote data-nodeid="95499">
+                      <p data-nodeid="95500">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E5%BA%8F%E5%92%8C.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96982"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E5%BA%8F%E5%92%8C.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96986"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/53.%E6%9C%80%E5%A4%A7%E5%AD%90%E5%BA%8F%E5%92%8C.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="96990"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95501">
+                      <strong data-nodeid="96995">练习题 8</strong
+                      >：给定一个数组，这个数组首尾成环，求这个环形数组里面的最大子数组和。
+                    </p>
+                    <p data-nodeid="95502">输入：A = [2, -2, -2, -2, 2]</p>
+                    <p data-nodeid="95503">输出：4</p>
+                    <p data-nodeid="95504">
+                      解释：最大子数组为首尾的 [2, 2]，形成的和为 4，没有比 4
+                      更大的子数组和了。
+                    </p>
+                    <blockquote data-nodeid="95505">
+                      <p data-nodeid="95506">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97009"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97013"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97017"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95507">
+                      <strong data-nodeid="97026">练习题 9</strong>：同样是例题
+                      4，你能使用我们前面提过的“<strong data-nodeid="97027"
+                        >从最大子数组和的起点出发</strong
+                      >”这种思路进行求解吗？
+                    </p>
+                    <blockquote data-nodeid="95508">
+                      <p data-nodeid="95509">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.2.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97031"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.2.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97035"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/134.%E5%8A%A0%E6%B2%B9%E7%AB%99.2.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97039"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <h3 data-nodeid="95510">总结与延伸</h3>
+                    <p data-nodeid="95511">
+                      贪心算法是一种思路，没有模板和套路。不过经过今天的学习。可以发现，贪心算法的两个特点中，第一个特点<strong
+                        data-nodeid="97050"
+                        >只选局部最优解</strong
+                      >是比较容易做到的。但是难点在于：
+                      <strong data-nodeid="97051">次优解不能逆袭</strong>。
+                    </p>
+                    <p data-nodeid="95512">
+                      往往我们要花非常多的时间证明，才能够保证次优解可以扔掉。这里面还涉及了非常多的数学思维，需要你活学活用。
+                    </p>
+                    <p data-nodeid="95513">
+                      作为面试官，我给你的建议是：刷贪心题目的时候，<strong
+                        data-nodeid="97062"
+                        >一定要注意推导</strong
+                      >！如果你不会证明：“<strong data-nodeid="97063"
+                        >为什么次优解可以扔掉？</strong
+                      >”，但知道如何进行操作，这说明你还没有真正掌握贪心这种思想。
+                    </p>
+                    <h3 data-nodeid="95514">
+                      <strong data-nodeid="97067">思考题</strong>
+                    </h3>
+                    <p data-nodeid="95515">
+                      最后我再给你留一道思考题：既然可以用练习题 8 思路解决例 4
+                      的问题，那么肯定也可以用例 4 的思路解决练习题
+                      8，你能想一下代码应该怎么写吗？
+                    </p>
+                    <p data-nodeid="95516">
+                      给定一个数组，这个数组首尾成环，求这个环形子数组里面的最大子数组和。
+                    </p>
+                    <p data-nodeid="95517">输入：A = [2, -2, -2, -2, 2]</p>
+                    <p data-nodeid="95518">输出：4</p>
+                    <p data-nodeid="95519">
+                      解释：最大子数组为首尾的 [2, 2]，形成的和为 4，没有比 4
+                      更大的子数组和了。
+                    </p>
+                    <blockquote data-nodeid="95520">
+                      <p data-nodeid="95521">
+                        代码：<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.java?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97083"
+                          >Java</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.cpp?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97087"
+                          >C++</a
+                        >/<a
+                          href="https://github.com/lagoueduCol/Algorithm-Dryad/blob/main/11.Greedy/918.%E7%8E%AF%E5%BD%A2%E5%AD%90%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%92%8C.py?fileGuid=xxQTRXtVcqtHK6j8"
+                          data-nodeid="97091"
+                          >Python</a
+                        >
+                      </p>
+                    </blockquote>
+                    <p data-nodeid="95522" class="">
+                      希望你可以自己动一动手，也欢迎在留言区分享你的思路，我们一起讨论。接下来请和我一起踏上更加奇妙的算法旅程，下一讲将介绍
+                      12
+                      |回溯：我把回溯总结成一个公式，回溯题一出就用它。记得按时来探险。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >数据结构与算法面试宝典</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **江
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      问一下那个跑道的题，为什么反证法中说如果不存在一个点可以跑完的话，每一个线段都需要是负数
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    假设：当 sum(G) &gt;=
+                    sum(C)，不存在某个点出发，可以绕着赛道跑一圈。若假设成立，那么必然可以将环形跑道切成几段，如下图所示：要注意这个假设。首先，如果不存在一个点可以跑完。那么假设我们从A出发，由于A不能跑完全场，那么必然会在某个点（设为B）累计和成了负数。如果我们再从B出发，同样，会也在某个点（设为C）累计和成为了负数。那么A-B这一段是负数，B-C这一段也是负数。以此类推，必然是每一个小段都会是负数。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **兵
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      例2,如果输入是1,2],[2,3],[3,4这种情况，按照题目意思，输出应该是4({[1,2],[2,3]}、{[1,2],[3,4]},{[2,3],[3,4]}、{[1,2],[2,3],[3,4]})，但是代码跑出来的却是3。
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    好像示例是有点模糊，我重新更新了一下题意
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **兵
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      老师，maxNum指的是什么？case1和case2的表述看不懂呀。
+                    </div>
+                    <!---->
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    我的锅。嗯。这个要注意看图。maxNum指的是绿色部分的“不重合的区间的最大的数目”。newMaxNumber是的是，当你在右边加入一个区间之后，也就是红色部分。那你会你得到一个新的newMaxNum：也就是新的不重合区间的目数。那么，这个新的newMaxNum，可以不包括这个新进来的红色的区间，也可能包含，所以需要分为case
+                    1, case 2
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 685,
+      courseCId: "",
+      courseName: "数据结构与算法面试宝典",
+      teachers: [
+        {
+          id: 630,
+          teacherName: "德鲁伊",
+          position: "前微软资深软件工程师",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/0E/B5/CioPOWA8uS6AMKX5AAAUwKendGs238.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;;"><span class="ql-author-13568064 ql-font-microsoftyahei" style="margin: 0px; padding: 0px; outline: none; box-sizing: border-box; caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-size: 14.6667px; text-size-adjust: auto; background-color: rgb(255, 255, 255);">9&nbsp;年技术研发经验，主导过&nbsp;40PB&nbsp;级别的分布式存储系统架构设计与实现。带领团队实现核心模块，如用户态文件系统、存储引擎、分布式&nbsp;KV&nbsp;缓存。负责部门技术面试，有丰富的技术面试经验。此外，曾</span><span class="ql-font-microsoftyahei ql-author-13568064" style="margin: 0px; padding: 0px; outline: none; box-sizing: border-box; caret-color: rgb(73, 73, 73); color: rgb(73, 73, 73); font-size: 14.6667px; text-size-adjust: auto;">作为复旦大学特聘讲师，面向研究生学院开展 IT 类课程，拥有多年授课经验。擅长架构设计、机器学习、云计算、大数据等领域。</span></span></p>',
+        },
+      ],
+      totalCourseTime: 23,
+      totalDuration: 340,
+      sales: 18623,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M00/0E/B5/CioPOWA8uS6AMKX5AAAUwKendGs238.png",
+      sellGoodsId: 748,
+      sellGoodsPriceId: 73322,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "数据结构与算法是程序员面试的必考要点，为了攻克算法面试拿下心仪 offer，很多程序员面试前都会在 LeetCode 上刷题备战面试。然而面对海量题目，你很难在短时间内刷完并熟练掌握。那我们该如何高效准备，快速应对即将到来的算法面试？专栏以解题为核心， 300+ 道大厂高频面试题为切入点，引出很多你在面试中常踩的坑和卡壳的知识点，给你一套通用的解题方法论。",
+      seoKeywords:
+        "数据结构,算法,面试,互联网大厂,微软,C++,Java,Python,阿里,腾讯,头条,百度, Google,Facebook,Apple,一解多题,一题多解,面试实战,栈,队列,优先级队列,链表,树,并查集,排序,二分搜索,双指针,贪心,回溯,搜索,DP,金三银四,招聘季",
+      seoTitle: "数据结构与算法面试宝典- 前微软资深软件工程师 - 拉勾教育",
+      shareTitle: "这15种题型，算法面试肯定会问！",
+      shareDescription: "300+高频真题详解，一题多解攻克算法面试",
+      brief: "300+大厂高频真题，一题多解攻克算法面试",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M01/0E/27/CioPOWA8SL-Aflz3AAFSxYqXH4o426.png",
+      courseType: 1,
+      previewFirstField: "共23讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 638,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 638,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "83ec46930d5245bcae30be7a5f7786a2"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+</body>

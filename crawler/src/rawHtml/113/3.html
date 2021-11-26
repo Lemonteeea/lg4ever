@@ -1,0 +1,2485 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+>
+  <h1 style="display: none">前端工程化精讲 - 拉勾教育</h1>
+
+  <meta
+    content="前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化"
+    name="keywords"
+  />
+
+  <meta
+    content="随着Web 业务日益复杂化和多元化，性能优化、体验优化的重要性有增无减，效率提升被一线企业作为技术层面的一个重点优化方向。而在面试中，对效率工程化的理解程度和实践中的优化产出情况，也是衡量前端工程师能力高低的常见标准。"
+    name="description"
+  />
+
+  <title>前端工程化精讲 - 贝壳找房前端架构组资深工程师 - 拉勾教育</title>
+  <meta
+    name="apple-mobile-web-app-title"
+    content="前端工程化精讲 - 贝壳找房前端架构组资深工程师 - 拉勾教育"
+  />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.9f883843.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.793fddbd.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M01/60/E8/Cgp9HWGMxW-AYT_TAAE16bQXukg451.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">前端工程化精讲</div>
+                <div data-v-5f686215="" class="name">
+                  李思嘉
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  贝壳找房前端架构组资深工程师
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | 建立上帝视角，全面系统掌握前端效率工程化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 759px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    第一部分：开发效率
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 项目基石：前端脚手架工具探秘
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 界面调试：热更新技术如何开着飞机修引擎？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 构建提速：如何正确使用 SourceMap？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 接口调试：Mock 工具如何快速进行接口调试？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 编码效率：如何提高编写代码的效率？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 团队工具：如何利用云开发提升团队开发效率？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | 低代码工具：如何用更少的代码实现更灵活的需求？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 无代码工具：如何做到不写代码就能高效交付？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 759px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    第二部分：构建效率
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 构建总览：前端构建工具的演进
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 流程分解：Webpack 的完整构建流程
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 编译提效：如何为 Webpack 编译阶段提速？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 打包提效：如何为 Webpack 打包阶段提速？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 缓存优化：那些基于缓存的优化方案
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 增量构建：Webpack 中的增量构建
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 版本特性：Webpack 5 中的优化细节
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | 无包构建：盘点那些 No-bundle 的构建方案
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 595px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    第三部分：部署效率
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 部署初探：为什么一般不在开发环境下部署代码？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 工具盘点：掌握那些流行的代码部署工具
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | 安装提效：部署流程中的依赖安装效率优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          20 | 流程优化：部署流程中的构建流程策略优化
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          21 | 容器方案：从构建到部署，容器化方案的优势有哪些？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          22 | 案例分析：搭建基本的前端高效部署系统
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 前端效率工程化的未来展望
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 140px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  02 | 界面调试：热更新技术如何开着飞机修引擎？
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2020/08/14
+                  <span data-v-1605a430="" class="auth">李思嘉</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/17:36"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="1056"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/17:36</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            10.16M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/17:36
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="1201">
+                      你好，我是李思嘉，上一课时我们聊了几个典型脚手架的特点和使用，课后给大家留的思考题是在实际项目里使用的是哪一类脚手架工具以及使用的理由，希望你能通过这个题目来思考工具之间的差异性。这个思考的过程有助于加深我们对工具本身的细节认知，也能够锻炼技术选型的思维。
+                    </p>
+                    <p data-nodeid="1202">
+                      这一课时，我们再来聊聊前端开发过程中一个经典的提高开发效率的技术：浏览器的热更新。
+                    </p>
+                    <h3 data-nodeid="1203">什么是浏览器的热更新</h3>
+                    <p data-nodeid="1501">
+                      看见浏览器热更新，相信你很容易想到 webpack 和
+                      webpack-dev-server
+                      。确实，现在各类型的脚手架工具在创建项目时通常已配置好了开启各种优化选项的
+                      webpack
+                      ，其中自然也包含了开发服务器。大家在上手开发时，可以简单地执行
+                      npm start (cra) 或 npm run serve (vue
+                      cli)，就能体验到热更新的效果。
+                    </p>
+
+                    <p data-nodeid="1205">
+                      但是在我过去担任中高级前端岗位的面试官时，经常发现很多来面试的同学对于到底什么是热更新都很难讲清楚，热更新是保存后自动编译（Auto
+                      Compile）吗？还是自动刷新浏览器（Live Reload）？还是指
+                      HMR（Hot Module
+                      Replacement，模块热替换）？这些不同的效果背后的技术原理是什么呢？今天我们就来回答下这些问题。
+                    </p>
+                    <p data-nodeid="1206">
+                      先来看下，究竟什么是浏览器的热更新。浏览器的热更新，指的是我们在本地开发的同时打开浏览器进行预览，当代码文件发生变化时，浏览器自动更新页面内容的技术。这里的自动更新，表现上又分为自动刷新整个页面，以及页面整体无刷新而只更新页面的部分内容。
+                    </p>
+                    <p data-nodeid="1207">
+                      与之相对的是在早期开发流程中，每次代码变更后需要手动刷新浏览器才能看到变更效果的情况。甚至于，代码变更后还需要手动执行打包脚本，完成编译打包后再刷新浏览器。而使用浏览器的热更新，可以大大减少这些麻烦。
+                    </p>
+                    <h3 data-nodeid="1208">webpack 中的热更新配置</h3>
+                    <p data-nodeid="1209">
+                      下面我们就以 webpack
+                      工具为例，来看下四种不同配置对结果的影响（完整示例代码
+                      <a
+                        href="https://github.com/fe-efficiency/lessons_fe_efficiency/tree/master/02_webpack_hmr"
+                        data-nodeid="1322"
+                        >https://github.com/fe-efficiency/lessons_fe_efficiency/02_webpack_hmr</a
+                      >）。
+                    </p>
+                    <h4 data-nodeid="1210">一切依赖手动</h4>
+                    <p data-nodeid="1211">
+                      首先来看第一个最简单的配置，在入口 js
+                      中我们简单地打印一个文本，然后在构建配置里只有最简单的
+                      entry 和 mode 配置。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">src/index0.js 
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params"></span>) </span>{ 
+</div></li><li><div class="code-word">  div = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>) 
+</div></li><li><div class="code-word">  div.innerHTML = <span class="hljs-string">'Hello World0'</span>; 
+</div></li><li><div class="code-word">  <span class="hljs-built_in">document</span>.body.appendChild(div) 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word">render() 
+</div></li><li><div class="code-word">webpack.config.basic.js 
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = { 
+</div></li><li><div class="code-word">  <span class="hljs-attr">entry</span>: <span class="hljs-string">'./src/index0.js'</span>, 
+</div></li><li><div class="code-word">  <span class="hljs-attr">mode</span>: <span class="hljs-string">'development'</span>, 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word">package.json 
+</div></li><li><div class="code-word"><span class="hljs-string">"scripts"</span>: { 
+</div></li><li><div class="code-word">  <span class="hljs-string">"build:basic"</span>: <span class="hljs-string">"webpack --config webpack.config.basic.js"</span> 
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="3307">
+                      当我们执行 npm run build:basic 时，webpack 将 entry
+                      中的源文件 index0.js 打包为
+                      dist/main.js，并退出进程。流程很简单，但是如果我们接下来改动了源文件的输出文本，会发现由于构建配置中没有任何对应处理，所以在保存后，打包后的文件内容并没有更新。为了同步改动效果，我们需要再次手动执行该命令。
+                    </p>
+
+                    <h4 data-nodeid="1214">Watch 模式</h4>
+                    <p data-nodeid="3909">
+                      第二种配置是 watch
+                      模式。为了摆脱每次修改文件后都需要手动执行脚本才能进行编译的问题，webpack
+                      中增加了 watch
+                      模式，通过监控源码文件的变化来解决上面不能自动编译问题。我们可以在配置脚本中增加
+                      watch:true，如下：
+                    </p>
+
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">webpack.config.watch.js 
+</div></li><li><div class="code-word">{... 
+</div></li><li><div class="code-word">  watch: <span class="hljs-literal">true</span> 
+</div></li><li><div class="code-word">...} 
+</div></li><li><div class="code-word">package.json 
+</div></li><li><div class="code-word"><span class="hljs-string">"scripts"</span>: { 
+</div></li><li><div class="code-word">  <span class="hljs-string">"build:watch"</span>: <span class="hljs-string">"webpack --config webpack.config.watch.js"</span> 
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="4511">
+                      当我们执行 npm run build:watch，webpack
+                      同样执行一次打包过程，但在打包结束后并未退出当前进程，而是继续<strong
+                        data-nodeid="4517"
+                        >监控源文件内容是否发生变化</strong
+                      >，当源文件发生变更后将再次执行该流程，直到用户主动退出（除了在配置文件中加入参数外，也可以在
+                      webpack 命令中增加 --watch 来实现）。
+                    </p>
+
+                    <p data-nodeid="1218">
+                      有了 watch
+                      模式之后，我们在开发时就不用每次手动执行打包脚本了。但问题并未解决，为了看到执行效果，我们需要在浏览器中进行预览，但在预览时我们会发现，即使产物文件发生了变化，在浏览器里依然需要手动点击刷新才能看到变更后的效果。那么这个问题又该如何解决呢？
+                    </p>
+                    <h4 data-nodeid="1219">Live Reload</h4>
+                    <p data-nodeid="5118">
+                      第三种配置是 Live
+                      Reload。为了使每次代码变更后浏览器中的预览页面能自动显示最新效果而无须手动点击刷新，我们需要<strong
+                        data-nodeid="5124"
+                        >一种通信机制来连接浏览器中的预览页面与本地监控代码变更的进程</strong
+                      >。在 webpack
+                      中，我们可以使用官方提供的开发服务器来实现这一目的，配置如下：
+                    </p>
+
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">webpack.config.reload.js 
+</div></li><li><div class="code-word">{... 
+</div></li><li><div class="code-word">  devServer: { 
+</div></li><li><div class="code-word">    <span class="hljs-attr">contentBase</span>: <span class="hljs-string">'./dist'</span>, <span class="hljs-comment">//为./dist目录中的静态页面文件提供本地服务渲染 </span>
+</div></li><li><div class="code-word">    <span class="hljs-attr">open</span>: <span class="hljs-literal">true</span>          <span class="hljs-comment">//启动服务后自动打开浏览器网页 </span>
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">...} 
+</div></li><li><div class="code-word">package.json 
+</div></li><li><div class="code-word"><span class="hljs-string">"scripts"</span>: { 
+</div></li><li><div class="code-word">  <span class="hljs-string">"dev:reload"</span>: <span class="hljs-string">"webpack-dev-server --config webpack.config.reload.js"</span> 
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="5725">
+                      当我们执行 npm run dev:reload，从日志中可以看到本地服务
+                      http://localhost:8080/ 已启动，然后我们在浏览器中输入网址
+                      http://localhost:8080/index.html （也可以在 devServer
+                      的配置中加入 open 和 openPage
+                      来自动打开网页）并打开控制台网络面板，可以看到在加载完页面和页面中引用的
+                      js 文件后，服务还加载了路径前缀名为 /sockjs-node 的
+                      websocket 链接，如下图：
+                    </p>
+
+                    <p data-nodeid="1223">
+                      <img
+                        alt="Drawing 0.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/4C/Ciqc1F807EuAEAxNAADYSkon5ms681.png"
+                        data-nodeid="1346"
+                      />
+                    </p>
+                    <p data-nodeid="1224">
+                      通过这个 websocket
+                      链接，就可以使打开的网页和本地服务间建立持久化的通信。当源代码发生变更时，我们就可以通过
+                      Socket
+                      通知到网页端，网页端在接到通知后会自动触发页面刷新。
+                    </p>
+                    <p data-nodeid="1225">
+                      到了这里，在使用体验上我们似乎已经达到预期的效果了，但是在以下场景中仍然会遇到阻碍：在开发调试过程中，我们可能会在网页中进行一些操作，例如输入了一些表单数据想要调试错误提示的样式、打开了一个弹窗想要调试其中按钮的位置，然后切换回编辑器，修改样式文件进行保存。可是当我们再次返回网页时却发现，网页刷新后，之前输入的内容与打开的弹窗都消失了，网页又回到了初始化的状态。于是，我们不得不再次重复操作才能确认改动后的效果。对于这个问题，又该如何解决呢？
+                    </p>
+                    <h4 data-nodeid="1226">Hot Module Replacement</h4>
+                    <p data-nodeid="1227">
+                      第四种配置就是我们常说的 HMR（Hot Module
+                      Replacement，模块热替换）了。为了解决页面刷新导致的状态丢失问题，webpack
+                      提出了模块热替换的概念。下面我们通过一个复杂一些的示例来了解热替换的配置与使用场景：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">src/index1.js 
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> <span class="hljs-string">'./style.css'</span> 
+</div></li><li><div class="code-word">... 
+</div></li><li><div class="code-word">src/style.css 
+</div></li><li><div class="code-word">div { <span class="hljs-attr">color</span>: red } 
+</div></li><li><div class="code-word">webpack.config.hmr.js 
+</div></li><li><div class="code-word">{... 
+</div></li><li><div class="code-word">  entry: <span class="hljs-string">'./src/index1.js'</span>, 
+</div></li><li><div class="code-word">  ... 
+</div></li><li><div class="code-word">  devServer: { 
+</div></li><li><div class="code-word">    ... 
+</div></li><li><div class="code-word">    hot: <span class="hljs-literal">true</span> 
+</div></li><li><div class="code-word">  }, 
+</div></li><li><div class="code-word">  <span class="hljs-attr">module</span>: { 
+</div></li><li><div class="code-word">    <span class="hljs-attr">rules</span>: [ 
+</div></li><li><div class="code-word">      { 
+</div></li><li><div class="code-word">        <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.css$/</span>, 
+</div></li><li><div class="code-word">        use: [<span class="hljs-string">'style-loader'</span>, <span class="hljs-string">'css-loader'</span>] 
+</div></li><li><div class="code-word">      } 
+</div></li><li><div class="code-word">    ] 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word">package.json 
+</div></li><li><div class="code-word"><span class="hljs-string">"scripts"</span>: { 
+</div></li><li><div class="code-word">  <span class="hljs-string">"dev:hmr"</span>: <span class="hljs-string">"webpack-dev-server --config webpack.config.hmr.js"</span> 
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="6327">
+                      在上面的代码改动中，我们只是在源码部分新增导入了一个简单的
+                      CSS 文件，用于演示热替换的效果。在配置文件中，首先我们在
+                      devServer 配置中新增了 hot:true，其次，新增 module
+                      的配置，使用 style-loader 和 css-loader 来解析导入的 CSS
+                      文件。其中 css-loader 处理的是将导入的 CSS
+                      文件转化为模块供后续 Loader 处理；而 style-loader
+                      则是负责将 CSS 模块的内容在运行时添加到页面的 style
+                      标签中。
+                    </p>
+
+                    <p data-nodeid="1230">
+                      当我们执行 npm run dev:hmr
+                      命令，可以看到页面控制台的网络面板与上个示例并无区别，而在审查元素面板中可以看到源码中的
+                      CSS 被添加到了页面头部的新增 style 标签中。
+                    </p>
+                    <p data-nodeid="1231">
+                      <img
+                        alt="Drawing 1.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/4C/Ciqc1F807FmAZaa4AAEDscUHKXk227.png"
+                        data-nodeid="1355"
+                      />
+                    </p>
+                    <p data-nodeid="1232">
+                      而当修改源码中 CSS
+                      的样式后，再回到网页端，我们则会发现这样一些变化：
+                    </p>
+                    <p data-nodeid="7531">
+                      首先在网络面板中，只是新增了两个请求：hot-update.json 和
+                      hot-update.js，而不像上一个立即刷新的示例中那样，会刷新页面重载所有请求。
+                    </p>
+
+                    <p data-nodeid="1234">
+                      <img
+                        alt="Drawing 2.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/58/CgqCHl807GGAYoLGAABmQj838Ag823.png"
+                        data-nodeid="1360"
+                      />
+                    </p>
+                    <p data-nodeid="8133">
+                      其次，在审查元素面板中我们可以看到，在页面的头部新增了
+                      hot-update.js，并替换了原先 style 标签中的样式内容。
+                    </p>
+
+                    <p data-nodeid="1236">
+                      <img
+                        alt="Drawing 3.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/58/CgqCHl807GeAFYunAAEuKSDazpo633.png"
+                        data-nodeid="1364"
+                      />
+                    </p>
+                    <p data-nodeid="8735">
+                      正如我们所见，对于代码中引入的样式文件，可以通过上述设置来开启热替换。但是有同学也许会问，我们为什么不像上一个例子中那样改动
+                      JS
+                      的内容（例如改动显示的文本）来观察热替换的效果呢？原因在于，简单改动
+                      JS
+                      中的显示文本并不能达到热替换的效果。尽管网络端同样新增了
+                      hot-update.json 和
+                      hot-update.js，但紧随其后的是如上一个示例一般的刷新了整个页面。
+                    </p>
+
+                    <p data-nodeid="1238">
+                      那么，为什么导入的 CSS 能触发模块热替换，而 JS
+                      文件的内容修改就失效了呢？要回答这个问题，我们还得从
+                      webpack 的热更新原理说起。
+                    </p>
+                    <h3 data-nodeid="1239">webpack 中的热更新原理</h3>
+                    <p data-nodeid="1240">
+                      下图是 webpackDevServer 中 HMR 的基本流程图，完整的 HMR
+                      功能主要包含了三方面的技术：
+                    </p>
+                    <ol data-nodeid="1241">
+                      <li data-nodeid="1242">
+                        <p data-nodeid="1243">
+                          watch 示例中体现的，对本地源代码文件内容变更的监控。
+                        </p>
+                      </li>
+                      <li data-nodeid="1244">
+                        <p data-nodeid="1245">
+                          instant reload
+                          示例中体现的，浏览器网页端与本地服务器端的 Websocket
+                          通信。
+                        </p>
+                      </li>
+                      <li data-nodeid="1246">
+                        <p data-nodeid="1247">
+                          hmr 示例中体现的，也即是最核心的，模块解析与替换功能。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1248">
+                      <img
+                        alt="3.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/C7/Ciqc1F82OZmAFYuKAAC7WNDPQB4766.png"
+                        data-nodeid="1374"
+                      />
+                    </p>
+                    <p data-nodeid="1249">
+                      也就是说在这三种技术中，我们可以基于 Node.js
+                      中提供的文件模块 fs.watch
+                      来实现对文件和文件夹的监控，同样也可以使用 sockjs-node 或
+                      socket.io 来实现 Websocket
+                      的通信。而在这里，我们重点来看下第三种， webpack
+                      中的模块解析与替换功能。
+                    </p>
+                    <h4 data-nodeid="1250">webpack 中的打包流程</h4>
+                    <p data-nodeid="1251">
+                      在讲 webpack 的打包流程之前我们先解释几个 webpack
+                      中的术语：
+                    </p>
+                    <ul data-nodeid="9973">
+                      <li data-nodeid="9974">
+                        <p data-nodeid="9975">
+                          <strong data-nodeid="9988">module</strong
+                          >：指在模块化编程中我们把应用程序分割成的独立功能的代码模块。
+                        </p>
+                      </li>
+                      <li data-nodeid="9976">
+                        <p data-nodeid="9977">
+                          <strong data-nodeid="9993">chunk</strong
+                          >：指模块间按照引用关系组合成的代码块，一个 chunk
+                          中可以包含多个 module。
+                        </p>
+                      </li>
+                      <li data-nodeid="9978">
+                        <p data-nodeid="9979">
+                          <strong data-nodeid="9998">chunk group</strong
+                          >：指通过配置入口点（entry point）区分的块组，一个
+                          chunk group 中可包含一到多个 chunk。
+                        </p>
+                      </li>
+                      <li data-nodeid="9980">
+                        <p data-nodeid="9981">
+                          <strong data-nodeid="10003">bundling</strong>：webpack
+                          打包的过程。
+                        </p>
+                      </li>
+                      <li data-nodeid="9982">
+                        <p data-nodeid="9983">
+                          <strong data-nodeid="10008">asset/bundle</strong
+                          >：打包产物。
+                        </p>
+                      </li>
+                    </ul>
+
+                    <p data-nodeid="1263">
+                      webpack 的打包思想可以简化为 3 点：
+                    </p>
+                    <ol data-nodeid="1264">
+                      <li data-nodeid="1265">
+                        <p data-nodeid="1266">
+                          一切源代码文件均可通过各种 Loader 转换为 JS 模块
+                          （<strong data-nodeid="1409">module</strong
+                          >），模块之间可以互相引用。
+                        </p>
+                      </li>
+                      <li data-nodeid="1267">
+                        <p data-nodeid="1268">
+                          webpack 通过入口点（<strong data-nodeid="1415"
+                            >entry point</strong
+                          >）递归处理各模块引用关系，最后输出为一个或多个产物包
+                          js(bundle) 文件。
+                        </p>
+                      </li>
+                      <li data-nodeid="1269">
+                        <p data-nodeid="1270">
+                          每一个入口点都是一个块组（<strong data-nodeid="1429"
+                            >chunk group</strong
+                          >），在不考虑分包的情况下，一个 chunk group 中只有一个
+                          <strong data-nodeid="1430">chunk</strong>，该 chunk
+                          包含递归分析后的所有模块。每一个 chunk
+                          都有对应的一个打包后的输出文件（<strong
+                            data-nodeid="1431"
+                            >asset/bundle</strong
+                          >）。
+                        </p>
+                      </li>
+                    </ol>
+                    <p data-nodeid="1271">
+                      <img
+                        alt="4.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/D2/CgqCHl82OaWAMXDLAABdNTOV1dY952.png"
+                        data-nodeid="1434"
+                      />
+                    </p>
+                    <p data-nodeid="1272">
+                      <img
+                        alt="Drawing 6.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/58/CgqCHl807JGAPDOBAAJufukFuEU205.png"
+                        data-nodeid="1437"
+                      />
+                    </p>
+                    <p data-nodeid="10609">
+                      在上面的 hmr 示例中，从 entry 中的 './src/index1.js'
+                      到打包产物的
+                      dist/main.js，以模块的角度而言，其基本流程是：
+                    </p>
+
+                    <ol data-nodeid="12479">
+                      <li data-nodeid="12480">
+                        <p data-nodeid="12481">
+                          唯一 entry 创建一个块组（chunk group）， name 为
+                          main，包含了 ./src/index1.js 这一个模块。
+                        </p>
+                      </li>
+                      <li data-nodeid="12482">
+                        <p data-nodeid="12483">
+                          在解析器中处理 ./src/index1.js
+                          模块的代码，找到了其依赖的 './style.css'，找到匹配的
+                          loader: css-loader 和 style-loader。
+                        </p>
+                      </li>
+                      <li data-nodeid="12484">
+                        <p data-nodeid="12485">
+                          首先通过 css-loader 处理，将
+                          css-loader/dist/cjs.js!./src/style.css 模块（即把 CSS
+                          文件内容转化为 js 可执行代码的模块，这里简称为
+                          <strong data-nodeid="12503">Content 模块</strong>）和
+                          css-loader/dist/runtime/api.js 模块打入 chunk 中。
+                        </p>
+                      </li>
+                      <li data-nodeid="12486">
+                        <p data-nodeid="12487">
+                          然后通过 style-loader 处理，将
+                          style-loader/dist/runtime/injectStylesIntoStyleTag.js
+                          模块 （我们这里简称为
+                          <strong data-nodeid="12509">API 模块</strong
+                          >），以及处理后的 .src/style.css
+                          模块（作用是运行时中通过 API 模块将 Content
+                          模块内容注入 Style 标签）导入 chunk 中。
+                        </p>
+                      </li>
+                      <li data-nodeid="12488">
+                        <p data-nodeid="12489">
+                          依次类推，直到将所有依赖的模块均打入到 chunk
+                          中，最后输出名为 main.js 的产物（我们称为 Asset 或
+                          Bundle）。
+                        </p>
+                      </li>
+                    </ol>
+
+                    <p data-nodeid="1285">
+                      上述流程的结果我们可以在预览页面中控制台的 Sources
+                      面板中看到，这里，我们重点看经过 style-loader 处理的
+                      style.css 模块的代码：
+                    </p>
+                    <p data-nodeid="1286">
+                      <img
+                        alt="Drawing 7.png"
+                        src="https://s0.lgstatic.com/i/image/M00/41/58/CgqCHl807JuAERI6AAMPF3IKpN0961.png"
+                        data-nodeid="1467"
+                      />
+                    </p>
+                    <h4 data-nodeid="1287">style-loader 中的热替换代码</h4>
+                    <p data-nodeid="1288">
+                      我们简化一下上述控制台中看到的 style-loader
+                      处理后的模块代码，只看其热替换相关的部分。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">//为了清晰期间，我们将模块名称注释以及与热更新无关的逻辑省略，并将 css 内容模块路径赋值为变量 cssContentPath 以便多处引用，实际代码可从示例运行时中查看 </span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> cssContentPath = <span class="hljs-string">"./node_modules/css-loader/dist/cjs.js!./src/style.css"</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">var</span> api = __webpack_require__(<span class="hljs-string">"./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js"</span>); 
+</div></li><li><div class="code-word">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="hljs-keyword">var</span> content = __webpack_require__(cssContentPath); 
+</div></li><li><div class="code-word">... 
+</div></li><li><div class="code-word">var update = api(content, options); 
+</div></li><li><div class="code-word">... 
+</div></li><li><div class="code-word">module.hot.accept( 
+</div></li><li><div class="code-word">  cssContentPath, 
+</div></li><li><div class="code-word">  <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{ 
+</div></li><li><div class="code-word">    content = __webpack_require__(cssContentPath); 
+</div></li><li><div class="code-word">    ... 
+</div></li><li><div class="code-word">    update(content); 
+</div></li><li><div class="code-word">  } 
+</div></li><li><div class="code-word">) 
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.hot.dispose(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ 
+</div></li><li><div class="code-word">&nbsp; update(); 
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="13713">
+                      从上面的代码中我们可以看到，在运行时调用 API
+                      实现将样式注入新生成的 style 标签，并将返回函数传递给
+                      update 变量。然后，在 module.hot.accept
+                      方法的回调函数中执行 update(content)，在
+                      module.hot.dispose 中执行 update()。通过查看上述 API
+                      的代码，可以发现 update(content) 是将新的样式内容更新到原
+                      style 标签中，而 update() 则是移除注入的 style
+                      标签，那么这里的 module.hot 究竟是什么呢？
+                    </p>
+
+                    <h4 data-nodeid="1291">
+                      模块热替换插件（HotModuleReplacementPlugin）
+                    </h4>
+                    <p data-nodeid="14315">
+                      上面的 module.hot 实际上是一个来自 webpack 的基础插件
+                      HotModuleReplacementPlugin，该插件作为热替换功能的基础插件，其
+                      API 方法导出到了 module.hot 的属性中。
+                    </p>
+
+                    <p data-nodeid="1293">
+                      在上面代码的两个 API 中，<strong data-nodeid="1482"
+                        >hot.accept</strong
+                      >
+                      方法传入依赖模块名称和回调方法，当依赖模块发生更新时，其回调方法就会被执行，而开发者就可以在回调中实现对应的替换逻辑，即上面的用更新的样式替换原标签中的样式。另一个
+                      <strong data-nodeid="1483">hot.dispose</strong>
+                      方法则是传入一个回调，当代码上下文的模块被移除时，其回调方法就会被执行。例如当我们在源代码中移除导入的
+                      CSS 模块时，运行时原有的模块中的 update()
+                      就会被执行，从而在页面移除对应的 style 标签。
+                    </p>
+                    <p data-nodeid="1294">
+                      module.hot 中还包含了该插件提供的其他热更新相关的 API
+                      方法，这里就不再赘述了，感兴趣的同学可以从
+                      <a
+                        href="https://webpack.js.org/api/hot-module-replacement/"
+                        data-nodeid="1487"
+                        >官方文档</a
+                      >中进一步了解。
+                    </p>
+                    <p data-nodeid="14917">
+                      通过上面的分析，我们就了解了热替换的基本原理，这也解释了为什么我们替换
+                      index1.js
+                      中的输出文本内容时，并没有观察到热更新，而是看到了整个页面的刷新：因为代码中并未包含对热替换插件
+                      API 的调用，代码的解析也没有配置额外能对特定代码调用热替换
+                      API 的 Loader。所以在最后，我们就来实现下 JS
+                      中更新文本内容的热替换。
+                    </p>
+
+                    <h3 data-nodeid="1296">示例：JS 代码中的热替换</h3>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">./text.js 
+</div></li><li><div class="code-word"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> text = <span class="hljs-string">'Hello World'</span> 
+</div></li><li><div class="code-word">./index2.js 
+</div></li><li><div class="code-word"><span class="hljs-keyword">import</span> {text} <span class="hljs-keyword">from</span> <span class="hljs-string">'./text.js'</span> 
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> div = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>) 
+</div></li><li><div class="code-word"><span class="hljs-built_in">document</span>.body.appendChild(div) 
+</div></li><li><div class="code-word"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span>(<span class="hljs-params"></span>) </span>{ 
+</div></li><li><div class="code-word">  div.innerHTML = text; 
+</div></li><li><div class="code-word">} 
+</div></li><li><div class="code-word">render() 
+</div></li><li><div class="code-word"><span class="hljs-keyword">if</span> (<span class="hljs-built_in">module</span>.hot) { 
+</div></li><li><div class="code-word">  <span class="hljs-built_in">module</span>.hot.accept(<span class="hljs-string">'./text.js'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ 
+</div></li><li><div class="code-word">    render() 
+</div></li><li><div class="code-word">  }) 
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="15519">
+                      在上面的代码中，我们将用于修改的文本单独作为一个 JS
+                      模块，以便传入 hot.accept
+                      方法。当文本发生变更时，可以观察到浏览器端显示最新内容的同时并未触发页面刷新，验证生效。此外，
+                      accept 方法也支持监控当前文件的变更，对应的 DOM
+                      更新逻辑稍做调整也能达到无刷新效果，区别在于替换自身模块时示例中不可避免地需要更改
+                      DOM。
+                    </p>
+
+                    <p data-nodeid="16121">
+                      从上面的例子中我们可以看到，热替换的实现，既依赖 webpack
+                      核心代码中 HotModuleReplacementPlugin 所提供的相关
+                      API，也依赖在具体模块的加载器中实现相应 API
+                      的更新替换逻辑。因此，在配置中开启 hot:true
+                      并不意味着任何代码的变更都能实现热替换，除了示例中演示的
+                      style-loader 外， vue-loader、 react-hot-loader
+                      等加载器也都实现了该功能。当开发时遇到 hmr
+                      不生效的情况时，可以优先确认对应加载器是否支持该功能，以及是否使用了正确的配置。
+                    </p>
+
+                    <h3 data-nodeid="1300">总结</h3>
+                    <p data-nodeid="1301">
+                      在这一讲中我们讨论了浏览器的热更新，并结合示例代码，了解了
+                      webpack
+                      中实现热更新的不同配置，并进一步分析了其中热替换技术的原理。相信你通过这一讲，对
+                      hmr
+                      的原理和实现就有了一定的概念。在实际项目的开发中，我们可以确认项目是否正确开启了热替换的功能。
+                    </p>
+                    <p data-nodeid="17330">
+                      课后<strong data-nodeid="17336">布置一个小作业</strong
+                      >供有兴趣的同学们巩固：找到一个实现热替换的
+                      Loader，看看其代码中都用到了哪些相关的 API。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >前端工程化精讲</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **艳
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        7
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      干货 很赞
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **飞
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        2
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      为啥我没有那种豁然开朗的感觉呢一个转前端的程序员
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *禹
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      豁然开朗
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **发
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      讲的太清楚了 由浅入深
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **啦啦啦
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      非常有意思
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **祥
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      佩服
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **之路
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      学习了
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **龙
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      哇~
+                      不错！比市面上大多数教程讲的都清晰明了，不赘述。值得花时间多看看这篇。
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        Lemon
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      干货
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,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"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 416,
+      courseCId: "",
+      courseName: "前端工程化精讲",
+      teachers: [
+        {
+          id: 418,
+          teacherName: "李思嘉",
+          position: "贝壳找房前端架构组资深工程师",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image/M00/3E/51/CgqCHl8r4TuADZt3AAAXmH5xVw8375.png",
+          description:
+            '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px;">在前端开发领域有十多年的开发经验，曾先后在多家大型互联网公司从事前端架构工作，在前端工程化领域有比较深厚的知识和经验积累。目前担任贝壳找房前端架构组资深工程师，专注于公司内前端通用构建平台，以及前端开发工具生态的服务建设。</span></p>',
+        },
+      ],
+      totalCourseTime: 22,
+      totalDuration: 0,
+      sales: 12194,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image/M00/3E/51/CgqCHl8r4TuADZt3AAAXmH5xVw8375.png",
+      sellGoodsId: 436,
+      sellGoodsPriceId: 60851,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "随着Web 业务日益复杂化和多元化，性能优化、体验优化的重要性有增无减，效率提升被一线企业作为技术层面的一个重点优化方向。而在面试中，对效率工程化的理解程度和实践中的优化产出情况，也是衡量前端工程师能力高低的常见标准。",
+      seoKeywords:
+        "前端开发,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化",
+      seoTitle: "前端工程化精讲 - 贝壳找房前端架构组资深工程师 - 拉勾教育",
+      shareTitle: "在么？送你一份前端工程师的进阶秘籍，请查收！",
+      shareDescription: "效率优化搞得好，大厂 offer 没得跑",
+      brief: "一站攻克前端工程化难题",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M01/60/E8/Cgp9HWGMxW-AYT_TAAE16bQXukg451.png",
+      courseType: 1,
+      previewFirstField: "共22讲",
+      previewSecondField: "已全部更新",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 169,
+      successShowType: "COURSE_COMMUNITY",
+      weixinQrUrl:
+        "https://s0.lgstatic.com/i/image/M00/51/3E/CgqCHl9kj7yALq99AAQZpJsm9Ps367.png",
+      appDecorateId: 169,
+      recruitAppDecorateId: 169,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 169,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: false,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "3fa324a87f6d4b599d5cc355694948bd"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = false
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s1.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.807e6d9.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.29b3b88.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~4141e3fd.69f9030.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.9a9f2f8.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+</body>
