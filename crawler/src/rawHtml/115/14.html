@@ -1,0 +1,2629 @@
+<body
+  style="
+    font-size: 15px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(237, 237, 237);
+  "
+  class=""
+>
+  <h1 style="display: none">Node.js 应用开发实战 - 拉勾教育</h1>
+
+  <meta
+    content="JavaScript,Node.js,脚本语言,前端开发,前端面试,性能优化,性能指标,首屏时间,白屏,卡顿,性能平台搭建,性能监控,预警,诊断,Hybrid,加载,骨架屏,SSR 优化,WebView层,预渲染,预加载,RN,Flutter,小程序,Enhance Hybrid,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React"
+    name="keywords"
+  />
+
+  <meta
+    content="Node.js 是目前非常火热的技术，现已广泛应用于 Web 服务、工作流、客户端应用等诸多领域。淘宝、天猫、京东等很多大公司都在用 Node.js，并且招聘也明确提出了要掌握Node.js，所以掌握 Node.js 是前端开发者想要进入大厂、获得高薪，绕不过去的坎。"
+    name="description"
+  />
+
+  <title>Node.js 应用开发实战</title>
+  <meta name="apple-mobile-web-app-title" content="Node.js 应用开发实战" />
+
+  <script>
+    // 全局token变量，防CSRF，防重复提交
+    window.X_Anti_Forge_Code = ""
+    window.X_Anti_Forge_Token = ""
+    var mds = {
+      userInfo: {
+        shortName: "",
+      },
+    }
+    window.mds = mds
+  </script>
+  <script
+    type="text/javascript"
+    src="//g.alicdn.com/AWSC/AWSC/awsc.js"
+  ></script>
+  <script src="//s20.lgstatic.com/components/edu-fe/edu-pay-component/1.0.12/main.js"></script>
+  <script>
+    window.userInfo = {
+      userId: "20015885",
+    }
+    //风控系统
+    ;(function () {
+      console.log(window)
+      window._smReadyFuncs = []
+      window.SMSdk = {
+        ready: function (fn) {
+          fn && _smReadyFuncs.push(fn)
+        },
+      }
+      // 1. 通用配置项
+      window._smConf = {
+        organization: "uTuOLHj2zLGJgglbtLOC", //必填，组织标识，邮件中organization项
+        staticHost: "static.fengkongcloud.com", //必填, 设置JS-SDK文件域名
+
+        //2.连接海外机房特殊配置项，仅供设备数据上报海外机房客户使用
+        //
+        // 2.1 业务机房在国内
+        //     1) 用户分布：国内（默认设置）
+        // apiHost:'fp-it.fengkongcloud.com'
+        //      2) 用户分布：全球
+        //  apiHost:'fp-it-acc.fengkongcloud.com'
+        //
+        // 2.2 业务机房在欧美
+        //    1) 用户分布：欧美
+        // apiHost: 'fp-na-it.fengkongcloud.com'
+        //    2) 用户分布：全球
+        // apiHost: 'fp-na-it-acc.fengkongcloud.com'
+        //
+        //2.3 业务机房在东南亚
+        //   1) 用户分布：东南亚
+        // apiHost:'fp-sa-it.fengkongcloud.com'
+        //   2) 用户分布：全球
+        // apiHost:'fp-sa-it-acc.fengkongcloud.com'
+
+        // 2.4 私有化特殊配置
+        // staticHost: 'xxxxxx';  // 私有化部署的JS-SDK文件域名
+        // apiHost: 'xxxxxx';  // 私有化部署的服务域名
+      }
+
+      var url = (function () {
+        var originHost = "static2.fengkongcloud.com"
+        var isHttps = document.location.protocol === "https:"
+        var protocol = isHttps ? "https://" : "http://"
+        var fpJsPath = "/fpv2.js"
+        var url = protocol + _smConf.staticHost + fpJsPath
+        var ua = navigator.userAgent.toLowerCase()
+        var isWinXP = /windows\s(?:nt\s5.1)|(?:xp)/.test(ua)
+        var isLowIE = /msie\s[678]\.0/.test(ua)
+
+        if (isHttps && isWinXP && isLowIE) {
+          url = protocol + originHost + fpJsPath
+        }
+
+        return url
+      })()
+      var sm = document.createElement("script")
+      var s = document.getElementsByTagName("script")[0]
+      sm.src = url
+      s.parentNode.insertBefore(sm, s)
+    })()
+    //阿里云风控系统
+    var uabModule
+    var webUmidToken
+    //人机识别模块，只需初始化一次
+    AWSC.use("uab", function (state, uab) {
+      if (state === "loaded") {
+        uabModule = uab
+      }
+    })
+    //设备指纹模块，得到设备token，只需初始化一次
+    AWSC.use("um", function (state, um) {
+      if (state === "loaded") {
+        um.init(
+          {
+            //appName请直接使用'saf-aliyun-com'
+            appName: "saf-aliyun-com",
+          },
+          function (initState, result) {
+            if (initState === "success") {
+              webUmidToken = result.tn
+            }
+          }
+        )
+      }
+    })
+    /////
+    function dealSmDeviceId(cb) {
+      var smTimeoutTime = 200
+      var smDeviceId = ""
+      var smDeviceIdReady = false
+      var smTimer = setTimeout(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      }, smTimeoutTime)
+
+      SMSdk.ready(function () {
+        smDeviceId = SMSdk.getDeviceId ? SMSdk.getDeviceId() : smDeviceId
+        clearTimeout(smTimer)
+
+        if (!smDeviceIdReady && smDeviceId) {
+          smDeviceIdReady = true
+          //执行业务逻辑
+          cb && cb(smDeviceId)
+        }
+      })
+    }
+    function getCookie(name) {
+      var arr,
+        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)")
+      if ((arr = document.cookie.match(reg))) {
+        return unescape(arr[2])
+      } else {
+        return null
+      }
+    }
+    function getHost() {
+      let host = window.location.host.split(".")
+      if (host[1] && host[1] == "lagou") {
+        return true
+      }
+      return false
+    }
+    const getdeviceld = function (deviceId) {
+      if (deviceId) {
+        let data = []
+        data.push({ channel: 1, thirdDeviceId: deviceId })
+        data.push({
+          channel: 2,
+          thirdDeviceId: uabModule && uabModule.getUA() + "," + webUmidToken,
+        })
+        var expats = new Date()
+        expats.setTime(expats.getTime() + 7 * 24 * 60 * 60 * 1000)
+        if (getHost()) {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;domain=.lagou.com;"
+        } else {
+          document.cookie =
+            "thirdDeviceIdInfo=" +
+            escape(JSON.stringify(data)) +
+            ";expires=" +
+            expats.toGMTString() +
+            ";path=/;"
+        }
+      } else {
+        dealSmDeviceId(getdeviceld)
+      }
+    }
+    if (!getCookie("thirdDeviceIdInfo")) {
+      dealSmDeviceId(getdeviceld)
+    }
+    // Note: onepass h5无感本机认证
+    // https://docs.geetest.com/onelogin/deploy/h5
+    ;(function () {
+      const isPc = !/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(
+        window.navigator.userAgent
+      )
+      if (isPc) return
+      // 网络判断方法
+      function getNetworkType() {
+        var common_cell = ["cellular", "2g", "3g", "4g", "5g", "3G/2G"]
+        var user_agent = navigator.userAgent.toLowerCase()
+        var connection = navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection || { type: "unknown" }
+        var type
+        // 判断是否是微信内置浏览器
+        var isWeixin = /micromessenger/.test(user_agent)
+        if (isWeixin) {
+          if (user_agent.indexOf("nettype") !== -1) {
+            type = user_agent.match(/nettype\/\w+/)
+              ? user_agent.match(/nettype\/\w+/)[0]
+              : "nettype/unknow"
+            type = type.replace("nettype/", "")
+          } else {
+            var weixinType = {
+              "network_type:wifi": "wifi",
+              "network_type:edge": "3G/2G",
+              "network_type:fail": "fail",
+              "network_type:wwan": "3G/2G",
+            }
+            document.addEventListener(
+              "WeixinJSBridgeReady",
+              function onBridgeReady() {
+                WeixinJSBridge.invoke("getNetworkType", {}, function (e) {
+                  type = weixinType[e.err_msg]
+                })
+              }
+            )
+          }
+        } else {
+          type = (connection && connection.type) || "unknown"
+        }
+        // 对type 做统一处理
+        if (type && common_cell.indexOf(type) !== -1) {
+          return "cellular"
+        } else if (type === "wifi") {
+          return "wifi"
+        }
+        return "unknown"
+      }
+      var metaEle = document.createElement("meta")
+      metaEle.content = "always"
+      metaEle.name = "referrer"
+      document.head.appendChild(metaEle)
+      var scriptEle = document.createElement("script")
+      scriptEle.src =
+        "https://s21.lgstatic.com/components/onepassh5/2.3.0/onepassh5.min.js"
+      document.head.appendChild(scriptEle)
+      scriptEle.onload = function () {
+        console.log(GOP, "GOP 加载成功")
+        if (typeof GOP !== "function") return
+        var nettype = getNetworkType()
+        // Note: onepass api h5场景只支持数据网络的场景
+        var ispre = nettype === "wifi" ? false : true
+        window.OP_INSTANCE = new GOP({
+          app_id: "000760cd4c8bb48a3860e5070ded2717", // 在极验后台获取，生成app_id后等待极验审核成功后生效
+          timeout: 30000, // 超时时长，默认30000
+          pre_init: ispre, // 是否初始化时获取运营商参数，默认为true。 建议开启避免影响认证的响应时间
+        })
+      }
+    })()
+  </script>
+  <link
+    href="https://s0.lgstatic.com/kw-web-fed/common.b2c4d615.css"
+    rel="stylesheet"
+  /><link
+    href="https://s0.lgstatic.com/kw-web-fed/course/main.5f96f8ce.css"
+    rel="stylesheet"
+  />
+
+  <div id="app" class="">
+    <div data-v-daa3f53a="" data-v-6cc00bca="" class="pc-detail-wrap">
+      <div data-v-5d185b94="" data-v-daa3f53a="" class="wrap pc-header">
+        <div data-v-5d185b94="" class="wrap-content">
+          <div data-v-5d185b94="" class="wrap-left">
+            <a data-v-5d185b94="" href="https://edu.lagou.com"
+              ><img
+                data-v-5d185b94=""
+                src="https://s21.lgstatic.com/growth/activity/20210729/1627528017710.png?x-oss-process=style/80"
+                alt=""
+                class="logo"
+            /></a>
+            <h1 data-v-5d185b94="" class="title">拉勾教育</h1>
+            <h1 data-v-5d185b94="" class="desc">互联网职业教育平台</h1>
+          </div>
+          <div data-v-5d185b94="" class="wrap-right">
+            <div data-v-5d185b94="" class="tab-list">
+              <h2 data-v-5d185b94="" class="tab-item">选课</h2>
+              <h2 data-v-5d185b94="" class="tab-item">学习</h2>
+              <h2 data-v-5d185b94="" class="tab-item">企业培训</h2>
+            </div>
+            <div data-v-5d185b94="" class="login-wrap">
+              <div data-v-5d185b94="" class="wrap-login">
+                <span data-v-5d185b94="" class="username triangle">
+                  张熙远
+                  <div data-v-5d185b94="" class="tool-tip tool-tip-user">
+                    <a
+                      data-v-5d185b94=""
+                      href="https://tb.53kf.com/code/client/90d3e270b5d355aa44bafe74fd7fe8a11/3"
+                      target="_blank"
+                      class="tool-tip-item"
+                    >
+                      帮助与反馈 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/certificate/index"
+                      target="_certificate"
+                      class="tool-tip-item"
+                    >
+                      学业证书 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/setting"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      账号设置 </a
+                    ><a
+                      data-v-5d185b94=""
+                      href="https://kaiwu.lagou.com/frontLogout.do"
+                      target="_self"
+                      class="tool-tip-item"
+                    >
+                      退出登录
+                    </a>
+                  </div></span
+                >
+                <img
+                  data-v-5d185b94=""
+                  src="https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png"
+                  alt=""
+                  class="avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---->
+      </div>
+      <div data-v-daa3f53a="" class="container">
+        <div data-v-130a0286="" data-v-daa3f53a="" class="pub-header">
+          <div data-v-130a0286="" class="pub-header-container-wrap">
+            <div data-v-130a0286="" class="item-wrap inline-block catalog">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                收起目录
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block pre">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                上一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block next">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                下一讲
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block detail">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                课程详情
+              </div>
+            </div>
+            <div data-v-130a0286="" class="splice-line inline-block"></div>
+            <div data-v-130a0286="" class="item-wrap inline-block all">
+              <div data-v-130a0286="" class="img-wrap inline-block"></div>
+              <div data-v-130a0286="" class="text-wrap inline-block">
+                全部课程
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-v-daa3f53a="" class="content-wrap">
+          <div data-v-daa3f53a="" class="left-content-wrap">
+            <div
+              data-v-5f686215=""
+              data-v-daa3f53a=""
+              class="menu-top-tips inline-block"
+            >
+              <img
+                data-v-5f686215=""
+                src="https://s0.lgstatic.com/i/image6/M00/0E/89/Cgp9HWA8lV6AQ8pPAABK41jNMSg476.png"
+                class="image-wrap"
+              />
+              <div data-v-5f686215="" class="menu-top-tips-wrap inline-block">
+                <div data-v-5f686215="" class="title">Node.js 应用开发实战</div>
+                <div data-v-5f686215="" class="name">
+                  清弦
+                  <div data-v-5f686215="" class="incise inline-block"></div>
+                  高级前端开发工程师，跨端平台研发团队负责人
+                </div>
+                <!---->
+                <div data-v-5f686215="" class="button btn btn-pc-css">
+                  专属班主任
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="menu-content calc">
+              <div
+                data-v-68b0779c=""
+                data-v-daa3f53a=""
+                class="class-menu-contaniner more-sections more-sections-detail"
+              >
+                <!---->
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 267px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    开篇词
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          开篇词 | Node.js 从工程化工具到后端服务应用的转变
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          课前导读 | Node.js 在前端工程化和后端服务应用的区别
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 841px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块一：核心知识点篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          01 | 事件循环：高性能到底是如何做到的？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          02 | 应用场景：Node.js 作为后台可以提供哪些服务？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          03 | 如何构建一个简单的 RESTful 服务？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          04 | 3 大主流系统框架：由浅入深分析 Express、Koa 和
+                          Egg.js
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          05 | 多进程解决方案：cluster 模式以及 PM2
+                          工具的原理介绍
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          06 | 哪些因素会影响 Node.js 性能？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          07 | CPU 过载保护设计：如何在服务层面确保系统稳定？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          08 | 优化设计：在 I/O 方面应该注意哪些要点？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          09 | 缓存与应用：多级缓存策略介绍与应用要点
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块二：技术应用分析篇
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          10 | 系统稳定：如何监控和保护进程安全？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          11 | 内存检查：多种类型的内存泄漏分析方案
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        isclick
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          12 | 性能分析：性能影响的关键路径以及优化策略
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          13 | 网络安全：常见网络攻击以及防护策略
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          14 | 工具应用：使用 clinicjs 工具实现通用性安全检查
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 513px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    模块三：系统服务研发实战
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          15 | 理论先行：高并发设计必须学的知识点有哪些？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          16 | RESTful 应用实践：构建一个介于前后台之间的服务
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          17 | 系统的实践设计（上）：完成一个通用抢票系统
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          18 | 系统的实践设计（下）：完成一个通用投票系统
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          19 | Serverless 的实践：进一步提升系统的稳定性
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  data-v-68b0779c=""
+                  class="class-menu-box"
+                  style="max-height: 185px"
+                >
+                  <div
+                    data-v-68b0779c=""
+                    class="kw-icon-arrow show show-detail show-active"
+                  ></div>
+                  <div
+                    data-v-68b0779c=""
+                    class="section-name single-line section-name-detail"
+                  >
+                    结束语
+                  </div>
+                  <div data-v-68b0779c="" class="class-menu-block">
+                    <div
+                      data-v-68b0779c=""
+                      class="
+                        class-level-one
+                        over-ellipsis
+                        class-level-one-detail
+                      "
+                    >
+                      <div data-v-68b0779c="" class="text-wrap">
+                        <div data-v-68b0779c="" class="content">
+                          结束语 | 如何规划自己的 Node.js 学习之路？
+                        </div>
+                        <div data-v-68b0779c="" class="item-status-wrap">
+                          <!---->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-v-daa3f53a=""
+            class="right-content-wrap"
+            style="height: 140px"
+          >
+            <div data-v-1605a430="" data-v-daa3f53a="" class="main-wrap">
+              <div data-v-1605a430="">
+                <h1 data-v-1605a430="" class="main-title">
+                  12 | 性能分析：性能影响的关键路径以及优化策略
+                </h1>
+                <div data-v-1605a430="" class="main-tips">
+                  2021/04/12
+                  <span data-v-1605a430="" class="auth">清弦</span>
+                </div>
+                <div data-v-1605a430="" class="media-player-wrap">
+                  <div data-v-6ecd2302="" data-v-1605a430="">
+                    <div data-v-6ecd2302="" class="media-container">
+                      <div data-v-6ecd2302="" class="button-wrap inline-block">
+                        <div
+                          data-v-6ecd2302=""
+                          class="button-icon inline-block"
+                        ></div>
+                      </div>
+                      <div data-v-6ecd2302="" class="data-wrap inline-block">
+                        <div data-v-6ecd2302="" class="progress-bar">
+                          <div
+                            class="vue-slider vue-slider-ltr"
+                            style="padding: 7px 0px; width: auto; height: 4px"
+                          >
+                            <div
+                              class="vue-slider-rail"
+                              style="
+                                height: 2px;
+                                background: rgb(213, 218, 223);
+                                border-radius: 1.5px;
+                              "
+                            >
+                              <div
+                                class="vue-slider-process"
+                                style="
+                                  height: 100%;
+                                  top: 0px;
+                                  left: 0%;
+                                  width: 0%;
+                                  transition-property: width, left;
+                                  transition-duration: 0.5s;
+                                  background: rgb(252, 215, 102);
+                                "
+                              ></div>
+                              <div
+                                aria-valuetext="00:00/12:44"
+                                class="vue-slider-dot vue-slider-dot-hover"
+                                role="slider"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="764"
+                                aria-orientation="horizontal"
+                                tabindex="0"
+                                style="
+                                  width: 14px;
+                                  height: 14px;
+                                  transform: translate(-50%, -50%);
+                                  top: 50%;
+                                  left: 0%;
+                                  transition: left 0.5s ease 0s;
+                                "
+                              >
+                                <div
+                                  class="vue-slider-dot-handle"
+                                  style="
+                                    width: 16px;
+                                    height: 16px;
+                                    background: rgb(252, 215, 102);
+                                    box-shadow: none;
+                                    margin-top: -1px;
+                                    z-index: 1;
+                                  "
+                                ></div>
+                                <div
+                                  class="
+                                    vue-slider-dot-tooltip
+                                    vue-slider-dot-tooltip-top
+                                  "
+                                >
+                                  <div
+                                    class="
+                                      vue-slider-dot-tooltip-inner
+                                      vue-slider-dot-tooltip-inner-top
+                                    "
+                                    style="
+                                      padding: 2px 12px;
+                                      border-radius: 14px;
+                                      font-size: 14px;
+                                      color: rgb(0, 0, 0);
+                                      background: rgb(252, 215, 102);
+                                      min-width: 20px;
+                                      border-color: rgb(252, 215, 102);
+                                    "
+                                  >
+                                    <span class="vue-slider-dot-tooltip-text"
+                                      >00:00/12:44</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div data-v-6ecd2302="" class="detail-wrap">
+                          <div data-v-6ecd2302="" class="detail-one">
+                            33.21M
+                          </div>
+                          <div data-v-6ecd2302="" class="detail-two">
+                            00:00/12:44
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        data-v-6ecd2302=""
+                        class="division-line inline-block"
+                      ></div>
+                      <div data-v-6ecd2302="" class="viedo-wrap inline-block">
+                        <div data-v-6ecd2302="" class="viedo-icon"></div>
+                        <div data-v-6ecd2302="" class="text">看视频</div>
+                      </div>
+                    </div>
+                    <!---->
+                  </div>
+                </div>
+                <div data-v-1605a430="" class="main-container">
+                  <div data-v-1605a430="" class="rich-text-wrap">
+                    <p data-nodeid="191125">
+                      模块一的<a
+                        href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=694#/detail/pc?id=6788&amp;fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="191666"
+                        >《06 | 哪些因素会影响 Node.js 性能？》</a
+                      >，我们详细讲解了影响到 Node.js
+                      性能的一些因素，但是在实际开发过程中，我们应该如何去定位影响性能的关键因素呢？定位到性能问题后，又该如何去优化这部分功能呢？以上就是本讲要介绍的核心知识点。
+                    </p>
+                    <h3 data-nodeid="191126">工具介绍</h3>
+                    <p data-nodeid="191127">
+                      在讲解性能分析实践之前，我们先来看看性能分析所应用的两个比较关键的工具：
+                    </p>
+                    <ul data-nodeid="191128">
+                      <li data-nodeid="191129">
+                        <p data-nodeid="191130">
+                          压测所使用到的 WRK（Windows Research Kernel）；
+                        </p>
+                      </li>
+                      <li data-nodeid="191131">
+                        <p data-nodeid="191132">
+                          性能分析所使用到的 Chrome 分析工具 JavaScript
+                          Profile。
+                        </p>
+                      </li>
+                    </ul>
+                    <h4 data-nodeid="191133">WRK 的安装及参数</h4>
+                    <p data-nodeid="191134">
+                      在压测工具上可选择的比较多，比如 Apache-ab 压测工具、Siege
+                      及本讲所应用的 WRK。<strong data-nodeid="191678"
+                        >为了能够更好地利用多核的多线程并发测试，这里我们选择使用
+                        WRK 来作为压测工具</strong
+                      >。我们看下该工具的安装以及一些常用参数。
+                    </p>
+                    <ul data-nodeid="191135">
+                      <li data-nodeid="191136">
+                        <p data-nodeid="191137">
+                          在<strong data-nodeid="191684">Mac</strong
+                          >上使用软件包管理工具 Homebrew
+                          来安装，使用如下命令即可：
+                        </p>
+                      </li>
+                    </ul>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="powershell"><ol><li><div class="code-word">brew install wrk
+</div></li></ol></code></pre>
+                    </div>
+                    <ul data-nodeid="191139">
+                      <li data-nodeid="191140">
+                        <p data-nodeid="191141">
+                          在<strong data-nodeid="191690">Linux</strong
+                          >上依次执行……的命令安装就可以（如果 Linux 上没有安装
+                          GCC、Make 或者 Git，就需要先安装这几个工具）。
+                        </p>
+                      </li>
+                    </ul>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="powershell"><ol><li><div class="code-word"><span class="hljs-comment">#下载命令</span>
+</div></li><li><div class="code-word">git clone https://github.com/wg/wrk.git 
+</div></li><li><div class="code-word"><span class="hljs-comment">#切换路径到wrk目录下</span>
+</div></li><li><div class="code-word"><span class="hljs-built_in">cd</span> wrk  
+</div></li><li><div class="code-word"><span class="hljs-comment">#使用make命令编译环境</span>
+</div></li><li><div class="code-word"> 
+</div></li><li><div class="code-word">make 
+</div></li></ol></code></pre>
+                    </div>
+                    <ul data-nodeid="191143">
+                      <li data-nodeid="191144">
+                        <p data-nodeid="191145">
+                          在<strong data-nodeid="191696">Windows</strong
+                          >上就非常遗憾了，因为这个工具不支持
+                          Windows。但如果你是 Windows 10，可以切换到 Ubuntu
+                          子系统的方式来安装，或者在 Windows 上安装 Linux
+                          虚拟机也是可以的。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191146">
+                      成功安装后，你可以在命令行使用……命令查看具体的参数说明和介绍：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="powershell"><ol><li><div class="code-word">wrk
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191148">
+                      这一讲因为需要进行并发请求的验证，所以我们会使用下面的压测命令：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="powershell"><ol><li><div class="code-word">wrk <span class="hljs-literal">-t4</span> <span class="hljs-literal">-c300</span> <span class="hljs-literal">-d20s</span> https://www.baidu.com/
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191150">其参数说明如下：</p>
+                    <ul data-nodeid="191151">
+                      <li data-nodeid="191152">
+                        <p data-nodeid="191153">-t 代表的是启动 4 个线程；</p>
+                      </li>
+                      <li data-nodeid="191154">
+                        <p data-nodeid="191155">
+                          -c 代表的是并发数，300 个并发请求；
+                        </p>
+                      </li>
+                      <li data-nodeid="191156">
+                        <p data-nodeid="191157">
+                          -d 代表的是持续时长，20s 就是 20 秒。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191158">
+                      我们运行上面的命令后，会有相应的压测结果，如下所示：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="powershell"><ol><li><div class="code-word">Running <span class="hljs-number">20</span>s test <span class="hljs-selector-tag">@</span> https://www.baidu.com/
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-number">10</span> threads and <span class="hljs-number">300</span> connections
+</div></li><li><div class="code-word">&nbsp; Thread Stats &nbsp; Avg&nbsp; &nbsp; &nbsp; Stdev &nbsp; &nbsp; Max &nbsp; +/- Stdev
+</div></li><li><div class="code-word">&nbsp; &nbsp; Latency &nbsp; <span class="hljs-number">789.93</span>ms&nbsp; <span class="hljs-number">393.84</span>ms &nbsp; <span class="hljs-number">2.00</span>s&nbsp; &nbsp; <span class="hljs-number">76.57</span>%
+</div></li><li><div class="code-word">&nbsp; &nbsp; Req/Sec&nbsp; &nbsp; <span class="hljs-number">14.33</span> &nbsp; &nbsp; <span class="hljs-number">10.17</span>&nbsp; &nbsp; <span class="hljs-number">59.00</span> &nbsp; &nbsp; <span class="hljs-number">72.31</span>%
+</div></li><li><div class="code-word">&nbsp; <span class="hljs-number">2252</span> requests <span class="hljs-keyword">in</span> <span class="hljs-number">20.10</span>s, <span class="hljs-number">34.49</span>MB read
+</div></li><li><div class="code-word">&nbsp; Socket errors: connect <span class="hljs-number">60</span>, read <span class="hljs-number">0</span>, <span class="hljs-built_in">write</span> <span class="hljs-number">0</span>, timeout <span class="hljs-number">481</span>
+</div></li><li><div class="code-word">Requests/sec:&nbsp; &nbsp; <span class="hljs-number">112.05</span>
+</div></li><li><div class="code-word">Transfer/sec:&nbsp; &nbsp; &nbsp; <span class="hljs-number">1.72</span>MB
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191160">
+                      上面的结果，我们核心应该关注的是 Requests/sec 为
+                      QPS，其次也需要了解平均耗时的情况，也就是上面的 Avg
+                      789.93ms，以及失败超时的情况，即上面 socket errors 的
+                      timeout 481。
+                    </p>
+                    <h4 data-nodeid="191161">
+                      Chrome 分析工具 JavaScript Profiler
+                    </h4>
+                    <p data-nodeid="191162">
+                      在压测下，如果发现请求 QPS
+                      非常低、平均耗时非常长，或者失败率非常高的话，这时就需要将
+                      CPU 信息进行保存，然后用 Chrome 的 JavaScript Profiler
+                      工具来进行分析。
+                    </p>
+                    <p data-nodeid="191163">
+                      方法也很简单，用 Chrome 的开发者工具 More-tools →
+                      JavaScript Profiler → Load，读取 CPU
+                      Profile，查看火焰图（如图 1 所示）。
+                    </p>
+                    <p data-nodeid="199540" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD02Ab_ffAAK5Evk7rNM190.png"
+                        alt="Drawing 0.png"
+                        data-nodeid="199544"
+                      />
+                    </p>
+                    <div data-nodeid="199541">
+                      <p style="text-align: center">
+                        图 1 Chrome 打开 JavaScript Profiler 指引图
+                      </p>
+                    </div>
+
+                    <p data-nodeid="191166">
+                      要使用这个功能，需要在 Node.js 中对 CPU
+                      进行采集，采集的方式需要使用 v8-profiler 这个库（如果你的
+                      Node.js 版本大于 10，则需要使用 v8-profiler-next
+                      这个库），在上一讲中已经应用过该工具分析过内存泄漏问题。
+                    </p>
+                    <h4 data-nodeid="191167">简单 Demo 演示</h4>
+                    <p data-nodeid="191168">
+                      为了演示这个分析方式，我们写一个最简单的测试代码，如下所示：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 引入 v8-profiler 库，可以作为一个中间件来实现</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> v8Profiler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./lib/v8_profiler'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 创建 http 服务，简单返回
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    res.write(<span class="hljs-string">'hello world'</span>);
+</div></li><li><div class="code-word">    res.end();
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 启动服务，并开始执行 v8 profiler 的采集工作
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word">server.listen(<span class="hljs-number">3000</span>, () =&gt; {
+</div></li><li><div class="code-word">    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'server start http://127.0.0.1:3000'</span>);
+</div></li><li><div class="code-word">    v8Profiler.start();
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191170">
+                      在上面代码中的第二行，我们引入了一个自身写的 v8-profiler
+                      库，接下来看看这个库的逻辑。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-meta">'use strict'</span>;
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> v8Profiler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'v8-profiler-next'</span>);
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 设置采集数据保存的文件名</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> title = <span class="hljs-string">'example'</span>;
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = {
+</div></li><li><div class="code-word">    <span class="hljs-string">'start'</span> : <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+</div></li><li><div class="code-word">        <span class="hljs-comment">// 启动采集，如果需要定时采集，可以将 title 设置为一个动态的根据时间变化的值</span>
+</div></li><li><div class="code-word">        v8Profiler.startProfiling(title, <span class="hljs-literal">true</span>);
+</div></li><li><div class="code-word">        setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-comment">// 30 秒后采集并导出</span>
+</div></li><li><div class="code-word">          <span class="hljs-keyword">const</span> profile = v8Profiler.stopProfiling(title);
+</div></li><li><div class="code-word">          profile.export(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, result</span>) </span>{ <span class="hljs-comment">// 将内容写入指定文件</span>
+</div></li><li><div class="code-word">            fs.writeFileSync(<span class="hljs-string">`./cpu_profiler/<span class="hljs-subst">${title}</span>.cpuprofile`</span>, result);
+</div></li><li><div class="code-word">            profile.delete();
+</div></li><li><div class="code-word">          });
+</div></li><li><div class="code-word">        }, <span class="hljs-number">30</span> * <span class="hljs-number">1000</span>);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">};
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191172">
+                      <strong data-nodeid="191720"
+                        >上面代码中的 start 方法，就是核心的采集代码</strong
+                      >。v8-Profiler 开始采集，使用 title 作为唯一标示，在 30
+                      秒后，停止这个 title 的采集，并获取数据保存在文件中。
+                    </p>
+                    <p data-nodeid="191173">
+                      为了验证效果，你可以根据我们下面的步骤来进行分析（代码源码保存在<a
+                        href="https://github.com/love-flutter/nodejs-column?fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="191724"
+                        >GitHub</a
+                      >中，自行下载后，可按照下面步骤执行）。
+                    </p>
+                    <p data-nodeid="191174">
+                      （1）打开项目，进入项目根目录，执行命令启动服务。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">npm run test
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191176">
+                      （2）打开另外一个命令窗口，开始执行压测程序。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">wrk -t2 -c300 -d20s http:<span class="hljs-comment">//127.0.0.1:3000/</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191178">
+                      （3）大概 30 秒后，项目目录下的 cpu_profiler
+                      文件夹下会生成 example.cpuprofile 文件。
+                    </p>
+                    <p data-nodeid="191179">
+                      （4）打开 Chrome 工具中的 JavaScript Profiler，然后 load
+                      刚才项目目录下的 cpu_profiler/example.cpuprofile
+                      文件，就可以看到如图 2 所示的结果。
+                    </p>
+                    <p data-nodeid="204356" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/33/FF/Cgp9HWBwD1yAaayGAAO16nRrzQQ497.png"
+                        alt="Drawing 1.png"
+                        data-nodeid="204360"
+                      />
+                    </p>
+                    <div data-nodeid="204357">
+                      <p style="text-align: center">图 2 cpuprofile 演示结果</p>
+                    </div>
+
+                    <p data-nodeid="191182">
+                      从上面的结果可以看到相应的单个执行时间和总的耗时。如果性能较慢，你可以参照标准的结果来进行分析，或者对比一个性能较好、一个性能较差的执行结果。为了让你更清晰地了解这些，下面我将从实践来进行分析。
+                    </p>
+                    <h3 data-nodeid="191183">实践分析</h3>
+                    <p data-nodeid="191184">
+                      在分析任何数据之前，首先必须有一个标准的数据进行比较，如果你用的是
+                      Express、Eggjs
+                      等框架，需要做一个完全空转的数据作为标准分析数据。在本讲，由于我们没有用任何框架，所以需要设计一个完全空转的
+                      HTTP 服务来作为标准的分析数据。
+                    </p>
+                    <h4 data-nodeid="191185">标准数据</h4>
+                    <p data-nodeid="191186">
+                      这里我们还是用上面“简单 Demo 演示”中的代码，然后通过 WRK
+                      下面的压测命令来压测，看下具体的数据情况。
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">wrk -t2 -c300 -d20s http:<span class="hljs-comment">//127.0.0.1:3000/</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191188">压测得到的结果如表 1 所示。</p>
+                    <p data-nodeid="209047">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD2aAAtjKAABBXwAaJE8675.png"
+                        alt="Drawing 2.png"
+                        data-nodeid="209050"
+                      />
+                    </p>
+
+                    <p data-nodeid="191219">
+                      有了这份数据后，我们再来逐个分析以下问题。
+                    </p>
+                    <h4 data-nodeid="191220">CPU 计算耗时</h4>
+                    <p data-nodeid="191221">
+                      为了验证效果，这里我们写一个 CPU
+                      计算耗时的逻辑，然后继续压测。这点在模块一的<a
+                        href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=694#/detail/pc?id=6788&amp;fileGuid=xxQTRXtVcqtHK6j8"
+                        data-nodeid="191788"
+                        >《06 | 哪些因素会影响 Node.js 性能？》</a
+                      >已经有一些例子，我们拿一个出来尝试一下，比如 MD5
+                      计算的逻辑，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">'crypto'</span>);
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">content</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> crypto.createHash(<span class="hljs-string">'md5'</span>).update(content).digest(<span class="hljs-string">"hex"</span>)
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191223">
+                      核心逻辑就是应用 crypto 来生成 MD5
+                      加密数据，为了效果更好，我们在入口文件 index.js
+                      中多调用几次，这里只修改 server 中的代码逻辑，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 设置返回的字符串</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">let</span> ret;
+</div></li><li><div class="code-word">    <span class="hljs-comment">// 加密一组数据</span>
+</div></li><li><div class="code-word">    <span class="hljs-keyword">const</span> md5List = [<span class="hljs-string">'hello'</span>, <span class="hljs-string">'Node.js'</span>, <span class="hljs-string">'lagou'</span>, <span class="hljs-string">'is'</span>, <span class="hljs-string">'great'</span>];
+</div></li><li><div class="code-word">    md5List.forEach( <span class="hljs-function">(<span class="hljs-params">str</span>)=&gt;</span> {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span>(ret){
+</div></li><li><div class="code-word">            ret = <span class="hljs-string">`<span class="hljs-subst">${ret}</span> <span class="hljs-subst">${getMd5(str)}</span>`</span>;
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            ret = getMd5(str)
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">    res.write(ret);
+</div></li><li><div class="code-word">    res.end();
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191225">
+                      修改完成后，我们再按照简单 Demo 中的四个步骤压测数据即可：
+                    </p>
+                    <ul data-nodeid="191226">
+                      <li data-nodeid="191227">
+                        <p data-nodeid="191228">启动服务</p>
+                      </li>
+                      <li data-nodeid="191229">
+                        <p data-nodeid="191230">开始压测</p>
+                      </li>
+                      <li data-nodeid="191231">
+                        <p data-nodeid="191232">等待 CPU 采集</p>
+                      </li>
+                      <li data-nodeid="191233">
+                        <p data-nodeid="191234">分析压测数据</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191235">
+                      接下来我们看下压测后的数据，如表 2 所示。
+                    </p>
+                    <p data-nodeid="211325" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD3SAIEtvAABS4dW-YPo314.png"
+                        alt="Drawing 3.png"
+                        data-nodeid="211328"
+                      />
+                    </p>
+
+                    <p data-nodeid="191274">
+                      这一对比可以非常清晰地看到，相对于标准服务，CPU
+                      耗时服务在各方面（平均耗时、最低耗时、最大耗时以及失败率）都差很多，在性能上两者是有比较大的落差的，如果我们不知道是因为
+                      MD5 影响到 CPU 计算导致的，那么就需要分析 CPU
+                      耗时的情况了。
+                    </p>
+                    <p data-nodeid="191275">
+                      接下来我们打开 Chrome JavaScript Profiler
+                      工具，可以看到如图 3 所示的结果。
+                    </p>
+                    <p data-nodeid="215563">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD3uADtMhAAMNNH1bIOY973.png"
+                        alt="Drawing 4.png"
+                        data-nodeid="215567"
+                      />
+                    </p>
+                    <div data-nodeid="215564" class="">
+                      <p style="text-align: center">
+                        图 3 CPU 压测 CPU 耗时分析
+                      </p>
+                    </div>
+
+                    <p data-nodeid="191278">
+                      几个耗时较长的函数，例如 digest、Hash 以及 update
+                      等，都是在 MD5 计算中的逻辑，因此可以非常清晰地了解到，在
+                      MD5 计算方面会对 Node.js
+                      的服务有一个比较大的性能影响，因此在开发时尽量减少或者避免这种类似的计算服务。
+                    </p>
+                    <h4 data-nodeid="191279">网络 I/O</h4>
+                    <p data-nodeid="191280">
+                      为了演示效果，我们<strong data-nodeid="191858"
+                        >先创建一个新的服务</strong
+                      >，这个服务在原来的“简单 Demo
+                      演示”基础上增加了一个延迟返回的效果，具体代码在 api_server
+                      文件项目中，核心代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 创建 http 服务，简单返回
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-comment">// 延迟 1 秒返回</span>
+</div></li><li><div class="code-word">        res.write(<span class="hljs-string">'this is api result'</span>);
+</div></li><li><div class="code-word">        res.end();
+</div></li><li><div class="code-word">    }, <span class="hljs-number">1</span> * <span class="hljs-number">1000</span>);
+</div></li><li><div class="code-word">});
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 启动服务，并开始执行 v8 profiler 的采集工作
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word">server.listen(<span class="hljs-number">4000</span>, () =&gt; {
+</div></li><li><div class="code-word">    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'server start http://127.0.0.1:4000'</span>);
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191282">
+                      核心代码是在 setTimeout
+                      延迟返回，其次修改了以下监听端口，从 3000 修改为 4000。
+                    </p>
+                    <p data-nodeid="191283">
+                      <strong data-nodeid="191868"
+                        >接下来我们创建一个 network_io</strong
+                      >，实现调用 http://127.0.0.1:4000 这个服务，从而实现网络
+                      I/O 操作。首先还是实现一个 call_api 的服务，该服务会应用到
+                      request 这个 npm
+                      库（后续这个库不会维护了，暂时还没有替代方案，除非自己手动实现），代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// 引入 request 库，需要在 package.json 中申明，并且 npm install</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> request = <span class="hljs-built_in">require</span>(<span class="hljs-string">'request'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * request 调用外部 api
+</div></li><li><div class="code-word"> * @param {*} apiLink string
+</div></li><li><div class="code-word"> * @param {*} callback funtion
+</div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">apiLink, callback</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    request(apiLink, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, response, body</span>) </span>{
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span>(error) {
+</div></li><li><div class="code-word">            callback(<span class="hljs-literal">false</span>);
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            callback(body);
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191285">
+                      这部分代码主要是应用 request 模块调用 apiLink
+                      服务，并获取执行结果。通过回调的方式返回具体的数据，也就是上面的参数
+                      callback。
+                    </p>
+                    <p data-nodeid="191286">
+                      最后我们再来看下 index.js 中的核心部分 server
+                      的修改，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 创建 http 服务，简单返回
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    callApi(<span class="hljs-string">'http://127.0.0.1:4000'</span>, (ret) =&gt; { <span class="hljs-comment">// 调用 4000 服务，并显示返回结果</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span>(ret) {
+</div></li><li><div class="code-word">            res.write(ret);
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            res.write(<span class="hljs-string">'call api server error'</span>);
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">        res.end();
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191288">
+                      接下来就启动两个服务，分别打开地址：
+                    </p>
+                    <ul data-nodeid="191289">
+                      <li data-nodeid="191290">
+                        <p data-nodeid="191291">
+                          <a
+                            href="http://127.0.0.1:4000?fileGuid=xxQTRXtVcqtHK6j8"
+                            data-nodeid="191874"
+                            >http://127.0.0.1:4000</a
+                          >
+                        </p>
+                      </li>
+                      <li data-nodeid="191292">
+                        <p data-nodeid="191293">
+                          <a
+                            href="http://127.0.0.1:3000?fileGuid=xxQTRXtVcqtHK6j8"
+                            data-nodeid="191877"
+                            >http://127.0.0.1:3000</a
+                          >
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191294">
+                      看下是否正常响应，正常返回数据后，我们再启动对 3000
+                      服务的压测，运行如下命令：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">wrk -t2 -c300 -d20s http:<span class="hljs-comment">//127.0.0.1:3000/</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191296">
+                      接下来我们看下压测后的数据，如表 3 所示：
+                    </p>
+                    <p data-nodeid="217680" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/00/Cgp9HWBwD4-AFJLoAABlk46DdAs957.png"
+                        alt="Drawing 5.png"
+                        data-nodeid="217683"
+                      />
+                    </p>
+
+                    <p data-nodeid="191343">
+                      拿到压测数据后，同样按照 CPU 分析方法，可以看到如图 4
+                      所示的性能分析结果。
+                    </p>
+                    <p data-nodeid="221527" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/34/00/Cgp9HWBwD5mAFR0WAAHjSmqkmd0847.png"
+                        alt="Drawing 6.png"
+                        data-nodeid="221531"
+                      />
+                    </p>
+                    <div data-nodeid="221528">
+                      <p style="text-align: center">
+                        图 4 网络 I/O 性能分析数据
+                      </p>
+                    </div>
+
+                    <p data-nodeid="191346">
+                      其中有一个 connect，该模块在 net.js
+                      中，这里就可以得到是网络 I/O 引起的问题。
+                    </p>
+                    <p data-nodeid="191347">
+                      最后我们再来看下 磁盘 I/O 的问题。
+                    </p>
+                    <h4 data-nodeid="191348">磁盘 I/O</h4>
+                    <p data-nodeid="191349">
+                      这里主要使用 Node.js 的 fs
+                      模块来读取本地的文件，并显示返回文件的内容，核心代码是
+                      server 回调部分，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">let</span> ret = fs.readFileSync(<span class="hljs-string">'./test_file.conf'</span>);
+</div></li><li><div class="code-word">    res.write(ret);
+</div></li><li><div class="code-word">    res.end();
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191351">
+                      接下来，我们同样用如下命令来启动压测服务：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="java"><ol><li><div class="code-word">wrk -t2 -c300 -d20s http:<span class="hljs-comment">//127.0.0.1:3000/</span>
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191353">
+                      压测后将得到如表格 4 所示的结果。
+                    </p>
+                    <p data-nodeid="223452" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD6SAOvwRAAB4GHKuanE270.png"
+                        alt="Drawing 7.png"
+                        data-nodeid="223455"
+                      />
+                    </p>
+
+                    <p data-nodeid="191408">
+                      从结果看也是存在一定损耗的，具体在哪方面影响到性能，同样用
+                      Chrome 工具载入该服务采集的 CPU 信息，如图 5 所示。
+                    </p>
+                    <p data-nodeid="226862">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/00/Cgp9HWBwD6yATYtxAAHRgb9iz4o952.png"
+                        alt="Drawing 8.png"
+                        data-nodeid="226866"
+                      />
+                    </p>
+                    <div data-nodeid="226863" class="">
+                      <p style="text-align: center">
+                        图 5 磁盘 I/O CPU 采集信息
+                      </p>
+                    </div>
+
+                    <p data-nodeid="191411">
+                      从图 5
+                      中可以非常清晰地看到前面几个耗时较长的都是关于文件读写相关的模块，如上面红色圈里面的信息。
+                    </p>
+                    <h3 data-nodeid="191412">优化以及效果</h3>
+                    <p data-nodeid="191413">
+                      上面已经介绍到了那么多性能影响的部分，那么接下来看看如何进行一些优化，来提升性能。
+                    </p>
+                    <h4 data-nodeid="191414">CPU 计算耗时</h4>
+                    <p data-nodeid="191415">
+                      这部分只能说减少操作，或者减少运算。像我们上面的例子，如果都是一样的
+                      MD5
+                      计算，那么增加一个短时间的缓存就可以了。当然这里我们可以直接用内存来缓存（实际开发过程中，不能使用内存的方式，因为会造成内存使用越来越大，一般使用共享内存，并短时间保存即可），代码如下（代码保存在
+                      cpu_opt 中）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word">crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">'crypto'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 保存缓存信息</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> md5Cache = {};
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">content</span>) =&gt;</span> { 
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span>(md5Cache[content]) { <span class="hljs-comment">// 判断是否存在缓存信息，存在则直接返回</span>
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> md5Cache[content]
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    <span class="hljs-comment">/** 不存在则计算并返回 */</span>
+</div></li><li><div class="code-word">    md5Cache[content] = crypto.createHash(<span class="hljs-string">'md5'</span>).update(content).digest(<span class="hljs-string">"hex"</span>);
+</div></li><li><div class="code-word">    <span class="hljs-keyword">return</span> md5Cache[content];
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191417">
+                      <strong data-nodeid="192020"
+                        >核心就是在原来的基础上，增加计算的缓存，避免多次相同的计算</strong
+                      >，接下来我们压测后看看实际的效果数据，并与之前的进行对比，得到的结果如表
+                      5 所示。
+                    </p>
+                    <p data-nodeid="228565" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M01/34/00/Cgp9HWBwD7aAKWHYAABelIOMBeE096.png"
+                        alt="Drawing 9.png"
+                        data-nodeid="228568"
+                      />
+                    </p>
+
+                    <p data-nodeid="191464">
+                      对比数据后，可以看到已经非常好了，已经和标准数据相差无几，QPS
+                      和
+                      标准服务也基本一致（这里比标准服务高，是因为本机测试，会有一定的起伏，是正常情况）。也就代表本次优化是达到了效果的。
+                    </p>
+                    <h4 data-nodeid="191465">网络 I/O</h4>
+                    <p data-nodeid="191466">
+                      网络 I/O
+                      同样的办法也是增加缓存，避免重复的请求导致的问题。这里我们同样<strong
+                        data-nodeid="192085"
+                        >用缓存的方式来保存请求结果</strong
+                      >，优化的代码如下（代码保存在 network_io_opt 中）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// 引入 request 库，需要在 package.json 中申明，并且 npm install</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> request = <span class="hljs-built_in">require</span>(<span class="hljs-string">'request'</span>);
+</div></li><li><div class="code-word"><span class="hljs-comment">// 缓存 api 请求结果数据</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> apiCacheData = {};
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * request 调用外部 api
+</div></li><li><div class="code-word"> * @param {*} apiLink string
+</div></li><li><div class="code-word"> * @param {*} callback funtion
+</div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">apiLink, callback</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span>(apiCacheData[apiLink]) {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> callback(apiCacheData[apiLink]);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    request(apiLink, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, response, body</span>) </span>{
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span>(error) {
+</div></li><li><div class="code-word">            callback(<span class="hljs-literal">false</span>);
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            apiCacheData[apiLink] = body;
+</div></li><li><div class="code-word">            callback(body);
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191468">
+                      <strong data-nodeid="192090"
+                        >其次为了服务性能考虑，我们可以考虑放弃部分超时请求，从而提升服务性能</strong
+                      >。避免因为部分请求返回慢，导致整体服务被 block 住，修改
+                      request 部分增加超时处理，代码如下：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">apiLink, callback</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span>(apiCacheData[apiLink]) {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span> callback(apiCacheData[apiLink]);
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    request(apiLink, {<span class="hljs-attr">timeout</span>: <span class="hljs-number">3000</span>}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, response, body</span>) </span>{
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span>(error) {
+</div></li><li><div class="code-word">            callback(<span class="hljs-literal">false</span>);
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            apiCacheData[apiLink] = body;
+</div></li><li><div class="code-word">            callback(body);
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">}
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191470">
+                      实际情况需要根据具体的接口性能来设置这个超时时间，避免超时时间过度影响服务，也避免时间过长无法达到效果。
+                    </p>
+                    <p data-nodeid="191471">
+                      优化完成后，同样我们再跑一遍测试数据：
+                    </p>
+                    <ul data-nodeid="191472">
+                      <li data-nodeid="191473">
+                        <p data-nodeid="191474">
+                          首先还是先去 api_server 中启动 api 服务；
+                        </p>
+                      </li>
+                      <li data-nodeid="191475">
+                        <p data-nodeid="191476">
+                          接下来再启动本文件夹 network_io_opt 的服务；
+                        </p>
+                      </li>
+                      <li data-nodeid="191477">
+                        <p data-nodeid="191478">启动完成后，再进行压测。</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191479" class="">
+                      可以得到表 6 的压测对比数据。
+                    </p>
+                    <p data-nodeid="230077" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/00/Cgp9HWBwD8GACAFLAABqJCdynds886.png"
+                        alt="Drawing 10.png"
+                        data-nodeid="230080"
+                      />
+                    </p>
+
+                    <p data-nodeid="191526">
+                      从结果中可以看出优化效果非常明显，一个简单的优化就可以将原来
+                      272.96 的 QPS 提升到 31503.58。
+                    </p>
+                    <p data-nodeid="191527">
+                      最后我们再来看看磁盘 I/O 的优化。
+                    </p>
+                    <h4 data-nodeid="191528">磁盘 I/O</h4>
+                    <p data-nodeid="191529">
+                      <strong data-nodeid="192163"
+                        >磁盘 I/O 的优化分为读优化和写优化</strong
+                      >，优化的策略有：
+                    </p>
+                    <ul data-nodeid="191530">
+                      <li data-nodeid="191531">
+                        <p data-nodeid="191532">
+                          为了提升性能需要将同步修改异步，避免影响主线程的性能；
+                        </p>
+                      </li>
+                      <li data-nodeid="191533">
+                        <p data-nodeid="191534">
+                          读优化，必须增加必要的缓存，减少相同文件的重复读取；
+                        </p>
+                      </li>
+                      <li data-nodeid="191535">
+                        <p data-nodeid="191536">
+                          写优化，可以使用异步写文件的方式，先将写内容缓存到队列（如我们第一部分的第
+                          08 讲的方案）；
+                        </p>
+                      </li>
+                      <li data-nodeid="191537">
+                        <p data-nodeid="191538">
+                          合并多次写操作，避免频繁打开文件，读写文件内容。
+                        </p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191539">
+                      当然对于本讲，我们着重优化 2 点：
+                    </p>
+                    <ul data-nodeid="191540">
+                      <li data-nodeid="191541">
+                        <p data-nodeid="191542">修改为异步</p>
+                      </li>
+                      <li data-nodeid="191543">
+                        <p data-nodeid="191544">增加缓存</p>
+                      </li>
+                    </ul>
+                    <p data-nodeid="191545">
+                      优化代码如下（代码在 disk_io_opt 中）：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    fs.readFile(<span class="hljs-string">'./test_file.conf'</span>, (err, data) =&gt; {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (err) {
+</div></li><li><div class="code-word">            res.write(<span class="hljs-string">'error read file'</span>);
+</div></li><li><div class="code-word">            res.end();
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            res.write(data);
+</div></li><li><div class="code-word">            res.end();
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191547">
+                      接下来继续压测看下效果，如表 7 所示：
+                    </p>
+                    <p data-nodeid="231399" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/00/Cgp9HWBwD8qATRwGAABrIJLpIKs046.png"
+                        alt="Drawing 11.png"
+                        data-nodeid="231402"
+                      />
+                    </p>
+
+                    <p data-nodeid="191594">
+                      从上面看得出异步 I/O
+                      对服务性能提升还是比较突出，也是比较关键的。如果文件大会更突出，因此在平时代码中要非常注重这点，减少同步读写的操作。
+                    </p>
+                    <p data-nodeid="191595">
+                      那么如果我们继续优化，增加缓存呢？我们来看下效果，修改下面代码：
+                    </p>
+                    <div class="course-code-area">
+                      <div class="copy-btn">
+                        <div class="copy-icon"></div>
+                        复制代码
+                      </div>
+                      <pre><code data-language="javascript"><ol><li><div class="code-word"><span class="hljs-comment">// 文件缓存</span>
+</div></li><li><div class="code-word"><span class="hljs-keyword">let</span> fileCache;
+</div></li><li><div class="code-word"><span class="hljs-comment">/**
+</span></div></li><li><div class="code-word"> * 
+</div></li><li><div class="code-word"> * 创建 http 服务，简单返回
+</div></li><li><div class="code-word"> */
+</div></li><li><div class="code-word"><span class="hljs-keyword">const</span> server = http.createServer(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+</div></li><li><div class="code-word">    <span class="hljs-keyword">if</span>(fileCache) {
+</div></li><li><div class="code-word">        res.write(fileCache);
+</div></li><li><div class="code-word">        res.end();
+</div></li><li><div class="code-word">        <span class="hljs-keyword">return</span>;
+</div></li><li><div class="code-word">    }
+</div></li><li><div class="code-word">    fs.readFile(<span class="hljs-string">'./test_file.conf'</span>, (err, data) =&gt; {
+</div></li><li><div class="code-word">        <span class="hljs-keyword">if</span> (err) {
+</div></li><li><div class="code-word">            res.write(<span class="hljs-string">'error read file'</span>);
+</div></li><li><div class="code-word">            res.end();
+</div></li><li><div class="code-word">        } <span class="hljs-keyword">else</span> {
+</div></li><li><div class="code-word">            fileCache = data;
+</div></li><li><div class="code-word">            res.write(data);
+</div></li><li><div class="code-word">            res.end();
+</div></li><li><div class="code-word">        }
+</div></li><li><div class="code-word">    });
+</div></li><li><div class="code-word">});
+</div></li></ol></code></pre>
+                    </div>
+                    <p data-nodeid="191597">
+                      并且重新压测看下数据，如表格 8 所示。
+                    </p>
+                    <p data-nodeid="232531" class="">
+                      <img
+                        src="https://s0.lgstatic.com/i/image6/M00/34/08/CioPOWBwD9KAICB5AAB9TVaRLF4498.png"
+                        alt="Drawing 12.png"
+                        data-nodeid="232534"
+                      />
+                    </p>
+
+                    <p data-nodeid="191652">
+                      从结果看已经和标准的数据非常接近，因此<strong
+                        data-nodeid="192298"
+                        >在 Node.js
+                        开发过程中，要特别注意文件读取，避免相同文件的重复读取</strong
+                      >。从表格 8
+                      中的异步和缓存数据对比来看，通过缓存的处理优化，就可以在
+                      QPS 上从 18353.39 提升至 35058.79，有 91% 以上的性能提升。
+                    </p>
+                    <h3 data-nodeid="191653">总结</h3>
+                    <p data-nodeid="191654">
+                      学完本讲，你应该要掌握两个工具的应用，对于服务端研发来说这些工具是非常重要的，我希望你能深入去实践应用这两个工具。其次了解
+                      3
+                      种影响性能因素的优化策略，同时在日常开发中，应尽量避免影响性能的代码逻辑。
+                    </p>
+                    <p data-nodeid="191655">
+                      那你在实际的工作中，是如何提升性能的呢，欢迎在评论区分享你的经验。
+                    </p>
+                    <p data-nodeid="233443">
+                      这一讲就讲完了，下一讲将讲解“常见网络攻击以及防护策略”，到时见~
+                    </p>
+
+                    <hr data-nodeid="191661" />
+
+                    <p data-nodeid="191033">
+                      <a
+                        href="https://shenceyun.lagou.com/t/mka"
+                        data-nodeid="191040"
+                        ><img
+                          src="https://s0.lgstatic.com/i/image6/M00/12/FA/CioPOWBBrAKAAod-AASyC72ZqWw233.png"
+                          alt="Drawing 2.png"
+                          data-nodeid="191039"
+                      /></a>
+                    </p>
+                    <p data-nodeid="191034">
+                      <strong data-nodeid="191044">《大前端高薪训练营》</strong>
+                    </p>
+                    <p data-nodeid="191035" class="">
+                      对标阿里 P7 技术需求 + 每月大厂内推，6
+                      个月助你斩获名企高薪 Offer。<a
+                        href="https://shenceyun.lagou.com/t/mka"
+                        data-nodeid="191048"
+                        >点击链接</a
+                      >，快来领取！
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-v-1605a430=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center show-img-wrap"
+                  style="margin-top: 15vh; width: 60%"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+            <div data-v-daa3f53a="" class="fix-box-wrap">
+              <div data-v-daa3f53a="" class="mini-player-wrap">
+                <div
+                  data-v-2ee8fa4a=""
+                  data-v-daa3f53a=""
+                  class="player-container-wrap"
+                >
+                  <div data-v-2ee8fa4a="" class="player">
+                    <div data-v-2ee8fa4a="" class="close-btn"></div>
+                    <div data-v-2ee8fa4a="" class="content">
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="theme single-line narrow-theme"
+                      ></div>
+                      <div data-v-2ee8fa4a="" class="time-course">
+                        <div data-v-2ee8fa4a="" class="time">
+                          00:00<span data-v-2ee8fa4a="" class="line"></span>
+                        </div>
+                        <span data-v-2ee8fa4a="" class="course-name single-line"
+                          >Node.js 应用开发实战</span
+                        >
+                      </div>
+                    </div>
+                    <div data-v-2ee8fa4a="" class="player-container">
+                      <div data-v-2ee8fa4a="" class="play-btn">
+                        <div
+                          data-v-2ee8fa4a=""
+                          class="play-status playing"
+                        ></div>
+                      </div>
+                      <div
+                        data-v-2ee8fa4a=""
+                        class="play-next next-unable"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---->
+            </div>
+            <div data-v-daa3f53a="" class="right-content-space"></div>
+            <div data-v-daa3f53a="" class="right-content-message">
+              <div
+                data-v-4bc80e00=""
+                data-v-daa3f53a=""
+                class="message pc-message"
+              >
+                <div data-v-4bc80e00="" class="message-topic">
+                  <div data-v-4bc80e00="" class="message-topic-title">
+                    精选留言
+                  </div>
+                  <div
+                    data-v-4bc80e00=""
+                    class="message-topic-write pointer btn-pc-css"
+                  >
+                    <img
+                      data-v-4bc80e00=""
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAABDlBMVEUAAAAAAAArKyscHBwrKyswMDAtLS0xMTEuLi4rKyszMzMzMzMyMjIvLy8zMzMxMTEvLy8tLS0zMzMyMjIxMTEwMDAyMjIwMDAzMzMxMTEwMDAxMTEyMjIzMzMyMjIzMzMxMTEyMjIyMjIyMjIyMjIyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIzMzMyMjIyMjIzMzMyMjIyMjIzMzMyMjIyMjIyMjIzMzMyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIzMzMzMzMyMjIzMzMzMzMzMzMzMzMyMjIzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMzMzMyMjIzMzMzMzMyMjIzMzMMFbxYAAAAWXRSTlMAAwYJDBARFRYYHiMkJigqKy0tMzk7PUBBQ0VJTFBSVVlbXGFla3B0dXh/hYeKjY+QkZSVlpiao6ausbK3u73DxcfIys3O0NPY3N3g4uXm6Ovu8fX3+Pr7/Z2GrlIAAAEvSURBVCjPdZJrT8JAEEVvC4ggqAiKiq0vlLa8tIoWBQFBRK0yIrTM//8jfighLWzPh8nNnsnMZrPAAlkxe+Q41DMVGUGiOrHbbzYazb7LpEf9TiVuKzEvx5Q2k7pUUo0HOX9vbsA1aZFNvl9ZI9+x6SWdq1ijyjoApGcWBFizNIAWxUUyTi0gwyUIKXEGZTchlgm3jG4HAAq2XQhWoNMF1QHAZraDFagTHCNMGg4mlbCxlT+MLIRgjWB9hTjp28IZ74vlIV8gQk9i2fqNABqfiJzKVwDk4Xhr3e3QmwQAKfrcXnUp+yfppSzRadCdT2hv2TfkS5/Kv3Av6fsWjgHk1d3NZFa9HfFYk/xzpkb0gT3mr9eR4JLp88f85qCoacXj2NrNp2wfhb0x3h83BKf/ogM3zcQrR7gAAAAASUVORK5CYII="
+                      class="message-topic-write-icon"
+                    />
+                    写留言
+                  </div>
+                </div>
+                <!---->
+                <!---->
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        *毅
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      >
+                        1
+                      </div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div
+                      data-v-4bc80e00=""
+                      class="message-list-content ellipsis"
+                    >
+                      (egg.js)一个接口请求处理上百万的网络iO(下载网络文件buffer挂载到jszip（npm包）实例上）打包成一个zip。出现过两种情况1.在jszip实例归档过程中会导致node堆溢出。2.接口并发请求时，有时子进程会无响应无法与主进程进行通信.不确定的地方：1.node文档介绍buffer是堆外内存，jszip实例里挂载的文件buffer是不是也不会被V8管理，但是jszip实例又属于复杂对象，它应该被V8管理。这点儿感觉有点冲突。上述堆内存溢出的根本原因是因为jszip实例太大吗？2.子进程有时无响应是因为网络io影响到了服务器本身的通信结合上面几节课，不知道这样的理解有没有问题。针对上述问题，请问老师有什么解决方案推荐吗？😂
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-expand">
+                      全部
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-replay">
+                    <div data-v-4bc80e00="" class="borleft"></div>
+                    <span data-v-4bc80e00="" class="message-list-replay-name"
+                      >讲师回复：</span
+                    >
+                    首先上百万的网络 I/O
+                    肯定是会影响服务器的本身的，你理解是没错的。 jszip
+                    处理的数据肯定还是在 V8
+                    的内存中，不管怎么样都是会占用内存，上百万的，其次加上多个请求同时并发来的话，是有可能超出
+                    1.4 G的。 我的建议： 1.
+                    接口做异步的，用户请求打包，会立即返回给用户正在处理中，并增加数据库状态，然后异步去执行，当处理完成后，再通知用户，或者更新数据库状态已经完成；
+                    2.
+                    异步打包时，做本地文件缓存处理，减少不必要的网络请求，可以使用
+                    head
+                    方法，只请求header信息，判断文件缓存是否可用（需要本地有足够的存储空间，其次需要定时删除本地文件）；
+                    3.
+                    异步分批次，将上百万的网络I/O分批次进行，对于没有缓存的文件，则发起文件下载请求，比如将1百万数据，分成
+                    1000 批次进行，每次处理 1000
+                    个，处理完成后再执行下一批，比如下面的伪代码。 const
+                    errorArr = []; for(let i=0; i&lt;1000; i++){ const execArr =
+                    []; for(let j=0; j&lt;1000; j++){
+                    execArr.push(downloadPromise()); // downloadPromise
+                    就是jszip去下载并打包的过程。 } const results = await
+                    execArr; // 判断失败的情况，将失败的放入
+                    errorArr.push(downloadPromise()); //
+                    将对应的失败的promise放入错误队列，最后再重试错误队列，可以重试2次，2次失败后，需要告警返回报错信息给到用户。
+                    }
+                    虽然时间上是没有变化，可能还变长了，但是用户无感知，对于用户来说他的请求已经被处理了，其次缓解服务器的
+                    I/O 压力，使用分批次进行，减少上百万同时并发压力。
+                  </div>
+                  <!---->
+                  <!---->
+                </div>
+                <div data-v-4bc80e00="" class="message-list">
+                  <div data-v-4bc80e00="" class="message-list-title">
+                    <div data-v-4bc80e00="" class="message-list-title-left">
+                      <!---->
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-left-name"
+                      >
+                        **同
+                      </div>
+                    </div>
+                    <div data-v-4bc80e00="" class="message-list-title-right">
+                      <!---->
+                      <img
+                        data-v-4bc80e00=""
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4BAMAAABaqCYtAAAAKlBMVEVHcExnZ2dzc3NmZmZqampmZmZmZmZnZ2dnZ2dnZ2dmZmZoaGhmZmZmZmZl+8SAAAAADXRSTlMA/AbsFtilbj5YwSqJPyESoQAAAZxJREFUOMt1lTtLA1EQha8xRhPTBEmhuKCCoNgoIlYLMcRKBG0sxIUgCDaBSDohEO0FEbQyIBZaBazERvAPWCwxPnP+i3tnrlGTmVPswn73NXNm7hrzq9m9kZ2ckTUUABifkOEBrK7liR7BMRFOA/uFc+BUgnV8mFisEW5IsIFi9FzBuwR91KJnAm8S9EIbxSBeBRZHk86MrBQJWjymJUC3nlugSyk+SQyhANfxos+s4krfM0DZvmbw2cuSCHNGi3PAfUygXYiU79ryyw1ibf0xZ9intBsz6SBadx24iiZXz8kPxCiTtYdLPzKTVFkkLQAZO/VikwYW/x/wHohcT/MiPQE8W9frxJrlbpiw4xvA0vbNmWyhj2Nrhmy+B7nEyTsN0rIaJAc0SDWqwX7rhAYfMa/Dui0bDZbwZAwUGNjWUWActnUUyN2hwDTaOkxRaSiwj6pRhjHKgTazSkWlwBK1jgIpBwrkHCgwyZ0oQ86BAjkHCjziG0KE8YBvCA/5KacOm6sgrHFAotouT6J23bkkLbsNDjM9yt7yP+IbQYga5De+eBMAAAAASUVORK5CYII="
+                        alt="right-icon"
+                        class="message-list-title-right-icon"
+                      />
+                      <div
+                        data-v-4bc80e00=""
+                        class="message-list-title-right-praise"
+                      ></div>
+                    </div>
+                  </div>
+                  <div data-v-4bc80e00="" class="message-list-container">
+                    <div data-v-4bc80e00="" class="message-list-content">
+                      增加缓存在文章给出的cpu密集型和网络IO
+                      case中，有些放大效应，只能说在input限定在某个范围内效果能这么突出。一般真实业务比如md5面对的input都是复杂未知的，缓存能命中的概率有限，同时会带来不可控的内存或者是共享内存空间消耗，并不是一个万能方法。
+                    </div>
+                    <!---->
+                  </div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+                <!---->
+              </div>
+              <div
+                data-v-7580e7ec=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 25vh; width: 400px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><button
+                      type="button"
+                      aria-label="Close"
+                      class="el-dialog__headerbtn"
+                    >
+                      <i class="el-dialog__close el-icon el-icon-close"></i>
+                    </button>
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+              <div
+                data-v-e31d0af2=""
+                data-v-daa3f53a=""
+                class="el-dialog__wrapper"
+                style="display: none"
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="dialog"
+                  class="el-dialog el-dialog--center"
+                  style="margin-top: 10vh; width: 500px"
+                >
+                  <div class="el-dialog__header">
+                    <span class="el-dialog__title"></span
+                    ><!---->
+                  </div>
+                  <!----><!---->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <video
+      data-v-537ed502=""
+      id="video"
+      controls="controls"
+      x-webkit-airplay="true"
+      x5-video-player-fullscreen="true"
+      preload="auto"
+      playsinline="true"
+      webkit-playsinline=""
+      x5-video-player-type="h5"
+      class="video vjs-default-skin"
+    >
+      <source data-v-537ed502="" type="application/x-mpegURL" src="" />
+    </video>
+    <!---->
+    <div>
+      <!---->
+      <!---->
+      <!---->
+      <div
+        data-v-51f7ab0d=""
+        class="vux-alert purchase-alert-container"
+        current-environment="PC"
+      >
+        <div class="vux-x-dialog">
+          <div class="weui-mask" style="display: none"></div>
+          <div class="weui-dialog" style="display: none">
+            <div class="weui-dialog__hd">
+              <strong class="weui-dialog__title">购买成功</strong>
+            </div>
+            <div class="weui-dialog__bd">
+              <div data-v-51f7ab0d="" class="purchase-alert-content">
+                <img
+                  data-v-51f7ab0d=""
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABpCAYAAAA5gg06AAAAAXNSR0IArs4c6QAADpNJREFUeAHtXQmQFNUZ/nt2F1h2OeQSBEG5VhBUFJVTAySiskBIggseGDUVKzGmirCIoIWJsYDIEqosSMWkClIrgXAUBHdRCLB4cEjkMKAIiBSi3LfLLsfuTuf/Xm/v9Ox2z/T09DWz81dNdU+/N+/97//mf/2/9/73fokShTYtbERlZ7uSJOeQHMhRrtSR2W8iPrKcrdxLjYnkcr4vJUm6LK7ino6SLB0gKXhAXLNaHaIhz1zldN+T5FsON81tTuWVD1KQhpLEH1nuybwGbOQ3yCDuI5lKuNQSapz+IQ2ZeNHG8m0ryl8gFc/tTFLlUwxILgvvbptBiSY0Bo12MXDFJKe/Q7kTD0f7gVvp3oMEjSmreoyBeYq7qUFuNTx6PdJmBuwdykpb5rWGeQcStIYqX2ZhTWCAGkYXmkc5JOka11xIlD7LK+1yH6TiuT0YnGncnY1nzUnzSPQWqpWquDtcQgFpJj2av89CAZZ/4h5I6+bcTBXBAuZ0LGuOe/VaFo3BDyVJ5pTllBHIp+GTvjXIZetj54W14+0MOnFpIvfv0xmcLFu597IwSSrj9rxO7ZrNpb7PVzjJirMgFc3+AXcR87kxMJ+TkxQz/gUaOfkDpxroDEjQnpOXZvJ7Z5JTjPuuXInmUNtmU53QKvtBWlPQiTVnKX/u950gnWZIkrZzt55HI/K/sbMqO0fwRGtmjyY5uLteAgRU8MdE+yEHG8k+kNbMnszd2yr+3GAjf4lXFNoPOUAeNlH83R3M6eICNq3l39nEUxIVI/2ZcvPzuQuE2W6Z4gNJGAjfL2A1f9IyB8n+Q0laRG2bPhuPQWEdJGX8s5JlnJvscrahfcU8nvqJVaCsvZPQxZ1kDUoBZBa/XCEvizMt1ubO+mbP4XfQ82Y5TOUTEriDDm5rQkvW/ydWecSuSUVvvpQyEmIVs5qfjSshP/W7uWts7yTY/0H53+aKTuXSlQAsPYnG0IjJq3XTdR6aB0nMJGCgWs/HQTpCjPmRRBdICvQxOzNhrruDJSemelIAxQyI3g/EgJenziBXE2QOJDFZWg/n4kwI0HIWTCFBriYoeneH5QaSN5koK5XFkgSkIdGWOSJrEtQR60Epck4CkG+Ubi8ySFhRTeYFO+dEb75kyBdyjkDG3Z3ik/Alg5Q8S94RBOFpEpbiMwI9jHwmjDUJTiMpgNzBDnJWnHR069PXpPcKevKg9XMGST9dt6jUw7gkgEFuQOql5y6mr0lBeWoKoLhEHvuPoRCQuw7VBQmepcJxUSd36lGYBPLa5dDqvmMoQ6orxrCMZr9A7sKzN/wHOqXD9TeRPEvDG+TGt5ysG6ikXx79655RNKptV3qlWz+bqoXchet1WHnh7xzhPF95krs6//pmh7Hv7pc0HjTmd7mXft99IDVKS6+pvCJYRfdtXkSffX+65pnlG/ieZ6W31W4SCNWEUpXdDSmAdCTcpXFzKrzrURrQon2d1OsM0o0Nee+aHQQFAQ5Ef1OLq9XdyRPUhNQ1JIEn2vegzx54WhegY1dKafDWJbTuzJHQD+K9E9uAQoWEujthMFR8HUpK3WUG0mlerx/Ssx176wpj58WTNOrTlXT8WpluelwPpYwu6labkCZhh12KaiRwS2ZT2jLwcUOA1p4+TA+wBjkCELjQ4BECSaaRNRzW85thLTvSzsETqE+zG3UlUXTqEI3+dBWVByt10215qMFD6e5g1V2uOMeFh0CzpabEK+RXne6it24fRukBfVGsPHGQxu0qogo56HTjgpSd0RJWnsIJdnnXc4AgiLduH0p/6f0jQ4CWHt9PebvedQMg/AECYvd9DTDYhl+PqVEgjVbcM5pevPUeQym8d+owPbm7mCrluDyGDcvXTajGRRkniXMSdLMl/cMWGY3o3XvH0MAWHQzb+smF4zR252p3AQI3wEVccNLI5TOwIZWuD0/rCbVrmEXr+z1GtzdpZdjiL0vP0aCti+l8hSeHp/B7qXVWujgKph4CBBN7AwPUhefhjAgD1eHbl3sFENgKAJ/06jN6jPhMyueYIN3AE6QdMpsYtu9KVQX9eMcq+vZqqWEeVxL4LKV0cZgSH+BTX6g7A7Sp/zhq1yg7YpOf+99a2nHpVMQ8riTyYVcBoUmu1OZ9Jd2ympsCaOZXn9ASNrd9QaxJAV7g6+gLZhxmoivPYm/qN45uiqJBa059Ta8e+NhhbmIonvGBRWfcMcdQlp+zdmBgNvbPo/YR3kHg//jVy/Tzz973W+ffJOlBapWRKczsjmzNRaIgD1IxWD1bcSVSNi/SkhukJmkZ9P79P6PbsltGFe6sQ9tp0zlXjgqKykutDAySnJzdXQN2Dll9L29Tbd62VpvrfsWMwmsHN9dN8MMTxgfdXabbvNzEI30MJp2kBXc+QkNaRbeJLlVco/E8q+3qnFxsDc9kkMShsrH9LI7cbRmgEh6nYL3mkda3xlGS8U//mDOInuhg7syp5/esoyNXvjcuzPMUuZzHSeLEX1dYubFBYx6n5FFOdgtq0SCT1tz3U/a8GWDrpOFzN/emV7v1N9WeBUf30tITB0zl9TBTKbo7V+Y92jBAJQyQ9iUuSRK9xu5RAKslz0bHS0N5RfWvvR8yVczBy+fpt19sNJXX00ysRK6A1Jq1ZiNPZvY0mG1+uE1n0f31NViuNiOkzo2b0TJ2VjRaUdWWIbO5/Ys9a9lzytGzBLVVxnPvvCZhnLKRJzN7NW0dkdFOLOTNAx6nX3a8I2I+vcRsNrXh7tuS/wxm6O9H99DH54+ZyeqHPAySxCfPO0TowrAc0DsKQGr1Ddkr9O07htM/2DKDO5UZgpMGnBaj/QnUsk7yrMKULz9Uv/r/yvjwOIlDAzhAWPEEQHc2axNz6U/f3Iu2DXyC4DUajaZ3G0Bj2nWPlq0m/UV+D12svFbz3fc3jA9rEsducIDQBWXyxyoB3B2Dn6KRbboYFvFQq1toOluHZgmuWCvY2yehiPFxTJOO8mLZwC3/pO08mrdKzVkbV7P/wYycwQRneS2150nTRX1G8L6r8OfaPNr70srr9Ou967WPEuNeaBKin5AzE7/n2C9g6LalBE8bqwQzfSpvLVnXbyzBSgSl87Nld4+i1jE4yb+y/2P6jt9HCUZBYnwCIjwNjk12iODlOXrHSlr47d64ahjWqhPtGvw09Wvejmbd9qCu87xRBdDm+Ud2GSX79zlw4fBBigmF8DREvZziFvNiz/Jy9ImrZTQtjg1X8En4aMB43qjNe61MEpYgXvh8gzNdhUkeLGdTcKmekUH8IBfoFV7xfBECY8FZpVgAQh3Q4J1+8FWw0uBqXDDjQCLAk0Pvpdq8zTuyW7jqXqty0Nm9ulLMcE/jd1GCUrAal2pNQgQuSdrtVmNgBj/83xUEITpJrx/cSqevlztZhXNlI+BWdWQ0RZNQlURFztVYt+QPeBVU7O9xyOL6uuwCzUtEY0EVFSKiVVMIJIRIc5n2lJ6hATyWOsAz0nbTy/s/ouvOb0+xm+1QeRo8QiCJGHYcIs1l+oYX3DDoxRK2XbSVJ08TbmYhrPGMgyamYAgkZEIMOw8Ig95hPOiFz5sd9FIiTaDqNbgWDuEgIcigEsNO76eOPsOgF77X8Q56MT+35ULCLEPUlak4x4Fx0FA4SIo1UahJd/VWHfTOYDdfK4TxF6Z/EpwKVatObUc4SOIpR4EkDjLoIWHQ+5u9sQ96Fx/bR3tLz3rIebxVQ+6QfzjVBQkvLESB9JjmfxPboLeKLbk/8LgooQly1xgMalvqgoQUhOmMM5yMWkE8V1ho2MRlZtBb+N0XdKjcl1GxzYlAOe9O93RjfZCUOKrLzZXubK4Pz38XddBbGQzSG19tc5YR50tfrncgIarVBwkpiKOKs0F9QOqgd/9lHDVRlxYd+4IOl1+qm5AoT5QzWPON2DUGCYFuEUfVJ4RB76Ati+sMemHRzThkzRr0SdPYiZjlHCGwsDFIaAEC3Tq4IBirkNRBb7Fm0LucPVC/Kkvod9E+IecIwogMEiIR85qZH4wItQ0Y9I7hQS9chEF/4i0rCUswFiDfKBGfzXlxFL/Jx0/7L7DvY3wG6jL/+3Ib/4cQQDj3JcN3kfrDyJqk5kIkYiLfdfwJDRDkqchVlbLh1RxIUMdAYBwPci8YlpRKMC8ByBHyjNLNqQWaAwm5ESpakp7x0/tJbURCXfEeghxjCL1tHiQBFIc4k2hKQgnFb8xCfjGEigP75gyH2g0tmj2HjftUhObacon6nSM4j5w8KWq2WhmsgYQj+9cUFPIg7Mla5aW+GkkAkZtH5E+w8rqIrbtTGUC/ilDRRDXOEmpS6qorgWIhL8jNAlkDCRXBMkGoaPxDUmQsAcgnjpDaKNhad6dlCV1fcUFB6h2lFYp6z++g3HxMVFvSILUU65qklgAGlJfhlHiZUYtM+KsCyhQhlzgBgizi1yStRBHRWZYX8hSS8XGM2vzJeC8C/WIcZD4iczQx2AsSahORnTnQLeKo1jeSpO3cm+TFMlA1IyL7QUKtCMkpAgj7b1LWjFAs5cFkKebiTE71xFKHMyCpHCCQMOKoJnMYVKy3Yblh5OQP1GbbfXUWJHALrUIcVUmazmAlTzhULHljRRULow5ojxZo50FSa1Pi1rKpTmO5ce7Vq9Zv11Wx1pYLH5AIS952VYdy3BdW8dweHLduGncR43lslWZnY5wtix0X4RcHdzfFm8rZ6jSluw+SWrmIAimCDE5gzfJviDrFN75QeJbqOC6qzXHy6h1IaqtEsEfEsONQdbI8UH3s+VWStnBHU0jYxFC9484rnrwHSdtyaBcicCHAkyz34aT4Z0S05Ue+D7Jxs5u7tCLCBi6PtEaPRX+BpOUQGoa4TghPI6LSyDgK0k7QAArM5xIutURsIvZYY7TN1977FyQtl7hHdBoOrqHE1gjkVMfYwCGrONdc+SiH/uLYlCsMbClfQx+cRobDrnCWEq44CYYPsuA8vqf/AzeOq1TDOdDkAAAAAElFTkSuQmCC"
+                  alt="购买成功"
+                  class="purchase-success-img"
+                />
+              </div>
+            </div>
+            <div class="weui-dialog__ft">
+              <a
+                href="javascript:;"
+                class="weui-dialog__btn weui-dialog__btn_primary"
+                >我知道了</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <!---->
+      <!---->
+      <!---->
+      <div data-v-0b91fc6d="" class="pc-all-dirlog-wrap">
+        <div
+          data-v-467635e0=""
+          data-v-0b91fc6d=""
+          class="el-dialog__wrapper sale-pc-all-dirlog"
+          style="display: none"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="dialog"
+            class="el-dialog el-dialog--center"
+            style="margin-top: 25vh; width: 500px"
+          >
+            <div class="el-dialog__header">
+              <span class="el-dialog__title"></span
+              ><button
+                type="button"
+                aria-label="Close"
+                class="el-dialog__headerbtn"
+              >
+                <i class="el-dialog__close el-icon el-icon-close"></i>
+              </button>
+            </div>
+            <!----><!---->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 如需在IE8、9浏览器中初始化播放器，浏览器需支持Flash并在页面中引入 -->
+  <!--[if lt IE 9]>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/ie8/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <script
+    id="_lgpassport_"
+    data-css-site="0"
+    data-css-popup="0"
+    type="text/javascript"
+    src="https://passport.lagou.com/static/js/passport.js"
+  ></script>
+
+  <script type="text/javascript">
+    //后端变量赋值
+    window.courseInfo = {
+      id: 694,
+      courseCId: "",
+      courseName: "Node.js 应用开发实战",
+      teachers: [
+        {
+          id: 636,
+          teacherName: "清弦",
+          position: "高级前端开发工程师，跨端平台研发团队负责人",
+          teacherHeadPicUrl:
+            "https://s0.lgstatic.com/i/image6/M00/0E/8A/CioPOWA8mK-AaNBDAAAH6FexGy4833.png",
+          description: "<p>1</p>",
+        },
+      ],
+      totalCourseTime: 19,
+      totalDuration: 285,
+      sales: 13579,
+      price: "98",
+      priceTag: "立即购买",
+      discounts: "98",
+      discountsTag: "立即购买",
+      courseImgUrl:
+        "https://s0.lgstatic.com/i/image6/M01/15/C3/CioPOWBFsH2ASMa5AAAOvFvQwys696.png",
+      sellGoodsId: 771,
+      sellGoodsPriceId: 37358,
+      lgCoinPrice: 98,
+      isBuy: false,
+      isFavorite: false,
+      isNewDes: "",
+      seoDescription:
+        "Node.js 是目前非常火热的技术，现已广泛应用于 Web 服务、工作流、客户端应用等诸多领域。淘宝、天猫、京东等很多大公司都在用 Node.js，并且招聘也明确提出了要掌握Node.js，所以掌握 Node.js 是前端开发者想要进入大厂、获得高薪，绕不过去的坎。",
+      seoKeywords:
+        "JavaScript,Node.js,脚本语言,前端开发,前端面试,性能优化,性能指标,首屏时间,白屏,卡顿,性能平台搭建,性能监控,预警,诊断,Hybrid,加载,骨架屏,SSR 优化,WebView层,预渲染,预加载,RN,Flutter,小程序,Enhance Hybrid,Vue,源码分析,架构师,JavaScript,Composition API,Java, Vue.js,React , MVVM 框架,JavaScript, cube-ui 开发,uni-app,Mpx,chameleon,WePY,组件渲染,DOM diff, 组件渲染,vnode ,侦听器,共享数据,AST,Props,Virtual DOM,Snabbdon,patch,Diff 算法,Dep,底层原理,VueapI,Vue-cli,原生内置功能,Tree-shaking,代码逻辑,模板无关性,前端工程化,性能优化,React",
+      seoTitle: "Node.js 应用开发实战",
+      shareTitle: "吃透  Node.js ，推荐你看这篇",
+      shareDescription: "前端开发高薪之路绕不过去的坎！",
+      brief: "玩转 Node.js，进阶高级工程师",
+      courseListImg:
+        "https://s0.lgstatic.com/i/image6/M00/0E/89/Cgp9HWA8lV6AQ8pPAABK41jNMSg476.png",
+      courseType: 1,
+      previewFirstField: "共19讲",
+      previewSecondField: "已更新至第2讲",
+      joinMember: false,
+      freeForVip: true,
+      decorateId: 657,
+      showCatalog: true,
+      showEvaluation: false,
+      courseTags: ["1.36W人已购", "共19节", "周一、三更新"],
+      hasFreeListen: true,
+      moduleId: 830,
+      successShowType: "COURSE_COMMUNITY",
+      appDecorateId: 0,
+      recruitAppDecorateId: 0,
+      joinSeckill: false,
+      seckillRemainSeconds: "0",
+      hasActivityTask: false,
+      enterpriseDecorateId: 657,
+      hasCoupon: false,
+      hasActivityGroup: false,
+      synEnterprise: true,
+      classCourseType: 0,
+    }
+    window.isLogin = true
+    window.sellGoodsPriceId = -1
+    window.orderToken = "2776a7e6f4f84ed0981777a53c573b45"
+    window.userInfo = {
+      id: 20015885,
+      nickName: "张熙远",
+      isActive: 0,
+      portrait:
+        "https://s0.lgstatic.com/common/image/pc/default_boy_headpic1.png",
+    }
+    window.enterNewPage = true
+    window.activityButtonInfo = null
+  </script>
+  <script
+    type="text/javascript"
+    src="https://s21.lgstatic.com/growth/activity/20201206/1607238135888.js"
+    crossorigin=""
+  ></script>
+
+  <!-- <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+
+  <!---->
+  <!---->
+
+  <script
+    type="text/javascript"
+    src="https://s2.lgstatic.com/kw-web-fed/js/dll/vendor.424fdf064e46228ef60d.dll.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/runtime~course/main.572dd74.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/common.9edd253.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/vendors~404/main~500/main~activity-collage/main~activity/main~activity818/main~algorithm-shock/main~~a72ef340.fd94bec.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://s0.lgstatic.com/kw-web-fed/js/lazy-load/course/main.26d18ee.js"
+    crossorigin="anonymous"
+  ></script>
+  <div class="lg-pay lg-recharge-pay-container">
+    <div class="lg-pay-container recharge-pay-container">
+      <div class="lg-pay-close"></div>
+      <div class="modal-payment-title">
+        <i class="icon-hd"></i>
+        <span class="title-text">已开启安全支付</span>
+      </div>
+      <div class="amount-coupon"></div>
+      <div class="recharge-pay-title">请选择支付方式</div>
+      <div class="pay-methods">
+        <div class="pay-method-list">
+          <div
+            class="
+              lg-pay-select lg-pay-select-ali
+              pay-method-item pay-ali
+              active
+            "
+          >
+            <i class="pay-icon-ali"></i>
+            <span class="pay-method-name">支付宝支付</span>
+          </div>
+          <div class="lg-pay-select lg-pay-select-wx pay-method-item pay-wx">
+            <i class="pay-icon-wx"></i>
+            <span class="pay-method-name">微信支付</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-wx">
+        <canvas id="wxQrcode"></canvas>
+      </div>
+      <div class="lg-pay-qrcode lg-pay-qrcode-ali" style="display: block">
+        <canvas id="aliQrcode"></canvas>
+      </div>
+
+      <div class="pay-qrcode-status">
+        <span>
+          <span class="left-text">未支付成功，请重新扫码支付</span>
+          <div class="pay-tips">
+            <span>使用支付宝扫码支付</span>
+            <a class="link"> 我已支付 </a>
+          </div>
+        </span>
+      </div>
+      <div class="pay-notes">
+        <span
+          >付费即表示同意<a
+            href="https://activity.lagou.com/app/business/service-agreement.html"
+            }=""
+            target="_blank"
+            >《拉勾网在线增值服务协议》</a
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <div class="lg-pay-recharge" style="display: none">
+    <div class="lg-pay-container lg-pay-recharge-confirm">
+      <div class="lg-pay-close"></div>
+      <div class="recharge-title">勾豆充值</div>
+      <div>
+        <div class="recharge-label">填写充值勾豆数量</div>
+        <div class="recharge-amount">
+          <input
+            type="text"
+            class="amount input"
+            min="0"
+            max="9999"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="recharge-tips">
+        需支付：<span class="count-show">100元</span
+        ><span class="recharge-description">（1元=1勾豆）</span>
+      </div>
+      <div class="recharge-btn">立即充值</div>
+    </div>
+  </div>
+  <script
+    type="text/javascript"
+    crossorigin="anonymous"
+    src="https://kaiwu.lagou.com/upload/oss.js?v=1010"
+  ></script>
+
+  <script></script>
+  <div id="cboxOverlay" style="display: none"></div>
+  <div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none">
+    <div id="cboxWrapper">
+      <div>
+        <div id="cboxTopLeft" style="float: left"></div>
+        <div id="cboxTopCenter" style="float: left"></div>
+        <div id="cboxTopRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxMiddleLeft" style="float: left"></div>
+        <div id="cboxContent" style="float: left">
+          <div id="cboxTitle" style="float: left"></div>
+          <div id="cboxCurrent" style="float: left"></div>
+          <button type="button" id="cboxPrevious"></button
+          ><button type="button" id="cboxNext"></button
+          ><button id="cboxSlideshow"></button>
+          <div id="cboxLoadingOverlay" style="float: left"></div>
+          <div id="cboxLoadingGraphic" style="float: left"></div>
+        </div>
+        <div id="cboxMiddleRight" style="float: left"></div>
+      </div>
+      <div style="clear: left">
+        <div id="cboxBottomLeft" style="float: left"></div>
+        <div id="cboxBottomCenter" style="float: left"></div>
+        <div id="cboxBottomRight" style="float: left"></div>
+      </div>
+    </div>
+    <div
+      style="
+        position: absolute;
+        width: 9999px;
+        visibility: hidden;
+        display: none;
+      "
+    ></div>
+  </div>
+  <div
+    class="xl-chrome-ext-bar"
+    id="xl_chrome_ext_{4DB361DE-01F7-4376-B494-639E489D19ED}"
+    style="display: none"
+  >
+    <div class="xl-chrome-ext-bar__logo"></div>
+
+    <a
+      id="xl_chrome_ext_download"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__option"
+      >下载视频</a
+    >
+    <a
+      id="xl_chrome_ext_close"
+      href="javascript:;"
+      class="xl-chrome-ext-bar__close"
+    ></a>
+  </div>
+</body>
